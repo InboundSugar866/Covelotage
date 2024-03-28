@@ -1,0 +1,174 @@
+/* Base styles for the entire chat container */
+.chat-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Styles for the "Contacts" section */
+.contacts-section {
+    background: #FFFFFF;
+    width: 33.33%;
+}
+
+.contacts-inside {
+    display: flex;
+    flex-direction: grow;
+}
+
+.test-1 {
+    padding: 0.5rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.test-2 {
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+    color: #4B5563;
+    display: flex;
+    align-items: center;
+}
+  
+.test-3 {
+    width: 1rem;
+    height: 1rem;
+}
+
+.logout-button {
+    font-size: 0.875rem;
+    background-color: #CCE0FE;
+    padding: 0.25rem 0.5rem;
+    color: #6B7280;
+    border: 1px solid;
+    border-radius: 0.25rem;
+}
+  
+
+
+
+
+
+
+/* Styles for the main chat area */
+.chat-section {
+    display: flex;
+    flex-direction: column;
+    background: #ebf0ff;
+    width: 66.67%;
+    padding: 10px;
+}
+
+/* Styles for the "Messages with selected person" section */
+.messages-section {
+    flex-grow: 1;
+}
+
+.test-4 {
+    display: flex;
+    height: 100%;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.test-5 {
+    color: #D1D5DB;
+}
+
+.test-6 {
+    position: relative;
+    height: 100%;
+}
+
+.test-7 {
+    overflow-y: scroll;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0.5rem;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.test-8 {
+    text-align: left;
+    display: inline-block;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.test-9 {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.test-10 {
+    background-color: white; /* This corresponds to Tailwind's bg-white */
+    color: #6b7280; /* This is a close approximation of Tailwind's text-gray-500 */
+}
+
+.test-11 {
+    display: flex; /* This corresponds to Tailwind's flex */
+    align-items: center; /* This corresponds to Tailwind's items-center */
+    gap: 0.25rem; /* This is a close approximation of Tailwind's gap-1 */
+    border-bottom: 1px solid; /* This corresponds to Tailwind's border-b */
+}
+  
+  
+
+/* Styles for the input and send button */
+.input-container {
+    display: flex;
+    gap: 10px;
+}
+
+/* Input field styles */
+.input-field {
+    width: 50%;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E0;
+    padding: 0.5rem;
+    border-radius: 15px;
+}
+
+/* Send button styles */
+.send-button {
+    background: #1E40AF;
+    color: #FFFFFF;
+    border-radius: 15px;
+}
+
+.send-file {
+    background-color: #cfe8fc;
+    padding: 0.5rem;
+    color: #718096;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    border-width: 1px;
+    border-color: #cfe8fc;
+}
+
+.send-size {
+    width: 1rem;
+    height: 1rem;
+}
