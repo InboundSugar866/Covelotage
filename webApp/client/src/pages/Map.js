@@ -20,15 +20,18 @@ import marker_2 from '../assets/map-marker-icon-2.png';
 import marker_dynamic from '../assets/map-marker-icon-dynamic.png';
 import marker_dynamic_2 from '../assets/map-marker-icon-dynamic-2.png';
 
+import { OpenStreetMapProvider } from 'leaflet-geosearch';
+import _ from 'lodash';
+
 import { Toast } from 'bootstrap';
 
 /**
  * ------------------- TODO -------------------
  * - Localisation auto
- * - Entrer une adresse pour placer un point
- * - Changer la couleur des points déplacés
+ * - Entrer une adresse pour placer un point /// FAIT ///
+ * - Changer la couleur des points déplacés - reset ?
  * - Changer la couleur de la partie commune entre deux chemins
- * - Permettre de d'approprier le chemin d'un autre utilisateur
+ * - Permettre de s'approprier le chemin d'un autre utilisateur
  */
 
 
@@ -323,6 +326,87 @@ export default function Map() {
     }).catch((error) => {"fail to get matching routes"});
   };
 
+  // for the adress search
+  const [startAddress, setStartAddress] = useState('');
+  const [endAddress, setEndAddress] = useState('');
+  const [startAddressSuggestions, setStartAddressSuggestions] = useState([]);
+  const [endAddressSuggestions, setEndAddressSuggestions] = useState([]);
+  //const provider = new OpenStreetMapProvider();
+  const provider = new OpenStreetMapProvider({
+    params: {
+      'accept-language': 'fr', // render results in Dutch
+      countrycodes: 'fr', // limit search results to the Netherlands
+      addressdetails: 1, // include additional address detail parts
+      limit: 10, // limit the number of results
+    },
+  });
+
+  // Cache for search results
+  const searchCache = {};
+
+  // Function to place a marker based on address
+  const handleSearch = _.debounce(async (address, isStartPoint) => {
+    // Check cache first
+    if (searchCache[address]) {
+      if (isStartPoint) {
+        setStartAddressSuggestions(searchCache[address]);
+      } else {
+        setEndAddressSuggestions(searchCache[address]);
+      }
+    } else {
+      try {
+        const results = await provider.search({ query: address });
+        if (results.length > 0) {
+          // Store results in cache
+          searchCache[address] = results;
+          if (isStartPoint) {
+            setStartAddressSuggestions(results);
+          } else {
+            setEndAddressSuggestions(results);
+          }
+        }
+      } catch (error) {
+        if (error.message === 'Failed to fetch') {
+          toast.error('Network error: Failed to fetch');
+        }
+        else {
+          toast.error(`Unexpected error: ${error.message}`);
+        }
+      }
+    }
+  }, 500); // Debounce time (ms)
+  
+  const handleSuggestionClick = (suggestion, isStartPoint) => {
+    try {
+      const { x: lng, y: lat } = suggestion;
+      if (isStartPoint) {
+        setStartPoint({ lat, lng });
+        setStartAddress(suggestion.label);
+        // Update the start point in the receivedPoints array
+        setReceivedPoints(prevPoints => {
+          const newPoints = [...prevPoints];
+          newPoints[0] = { lat, lng };
+          return newPoints;
+        });
+      } else {
+        setEndPoint({ lat, lng });
+        setEndAddress(suggestion.label);
+        // Update the end point in the receivedPoints array
+        setReceivedPoints(prevPoints => {
+          const newPoints = [...prevPoints];
+          newPoints[newPoints.length - 1] = { lat, lng };
+          return newPoints;
+        });
+        handlePathSubmit();
+      }
+    }
+    catch (error) {
+      toast.error("error");
+    }
+  };
+
+
+
   return (
     <div>
         
@@ -368,6 +452,47 @@ export default function Map() {
         </label>
       </div>
 
+      {/** start point adress */}
+      <div>
+        Adresse de départ
+        <label>
+          <input 
+            type="search"
+            name="startPointSearch"
+            value={startAddress}
+            onChange={(e) => {
+              setStartAddress(e.target.value);
+              handleSearch(e.target.value, true);
+            }}
+          />
+          {startAddressSuggestions.map((suggestion, index) => (
+            <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
+              {suggestion.label}
+            </div>
+          ))}
+        </label>
+      </div>
+
+      {/** end point adress */}
+      <div>
+        Adresse d'arrivée
+        <label>
+          <input 
+            type="search"
+            name="endPointSearch"
+            value={endAddress}
+            onChange={(e) => {
+              setEndAddress(e.target.value);
+              handleSearch(e.target.value, false);
+            }}
+          />
+          {endAddressSuggestions.map((suggestion, index) => (
+            <div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
+              {suggestion.label}
+            </div>
+          ))}
+        </label>
+      </div>
 
       <MapContainer
         center={[48.65, 6.15]}
@@ -389,6 +514,7 @@ export default function Map() {
           startPoint && (
             <Marker
               position={[startPoint.lat, startPoint.lng]}
+              //altitude={[startPoint.altitude, startPoint.altitude]}
               icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
               draggable={true}
               eventHandlers={{
@@ -431,11 +557,6 @@ export default function Map() {
          matchingRoutes.length > 0 && (
           <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
         )}
-
-        
-  
-        
-        
 
          {/** Path */
          receivedPoints && (
@@ -488,13 +609,9 @@ export default function Map() {
               }
             }}
           >
-
             { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
           </Marker>
         ))}
-
-                
-
         <MapClickHandler />
       </MapContainer>
 
