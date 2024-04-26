@@ -12,6 +12,7 @@
     "formik": "^2.4.5",
     "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
+    "leaflet-geosearch": "^3.11.1",
     "rc-time-picker": "^3.7.3",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
