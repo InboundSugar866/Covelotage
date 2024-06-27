@@ -4,6 +4,11 @@ import { useAuthStore } from '../store/store'
 import { generateOTP, verifyOTP } from '../helper/userHelper';
 import { useNavigate } from 'react-router-dom'
 
+import backgroundImage from '../assets/Fond_urbain1.jpg';
+import Footer from '../components/Footer';
+
+import '../styles/Login.css';
+
 export default function Recovery() {
 
   const { username } = useAuthStore(state => state.auth);
@@ -53,15 +58,22 @@ export default function Recovery() {
 
   return (
 
+    <div>
+          <Toaster position="top-center" reverseOrder={false}></Toaster>
     <div
-    className="container-fluid d-flex align-items-center justify-content-center vh-100 position-relative"
+    className="container-fluid d-flex align-items-center justify-content-center position-relative"
     style={{
-      backgroundImage: `url(/Background.jpg)`, // Update the path to your image in the public folder
+      backgroundImage: `url(${backgroundImage})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
+      color: 'black',
+      position: 'relative',
+      backgroundRepeat: 'no-repeat',
+      flex: 1,
+      minHeight: '75vh',
     }}
   >
-    <Toaster position="top-center" reverseOrder={false}></Toaster>
+
 
     <div
       className="position-absolute top-0 end-0 bottom-0 start-0"
@@ -82,13 +94,12 @@ export default function Recovery() {
       }}
     >
       <div className="text-center">
-        <h4 className="mb-0">Recovery</h4>
-        <span>Enter OTP to recover password.</span>
+        <h4 className="mb-0">Récupération</h4>
       </div>
 
       <form onSubmit={onSubmit} className="mt-4">
         <div className="mb-3">
-          <span>Enter 6 digits OTP sent to your email address.</span>
+          <span>Entrez le code envoyé par mail :</span>
           <input
             onChange={(e) => setOTP(e.target.value)}
             type="password"
@@ -98,18 +109,19 @@ export default function Recovery() {
         </div>
 
         <button type="submit" className="btn btn-primary w-100">
-          Recover
+          Réinitialiser
         </button>
       </form>
 
       <div className="text-center mt-3">
         <span>
-          Can't get OTP? <button onClick={resendOTP} className="btn btn-link">Resend</button>
+          Vous n'avez rien reçu ? <button onClick={resendOTP} className="btn btn-link">Renvoyer</button>
         </span>
       </div>
     </div>
   </div>
-         
+  <Footer/>
+  </div> 
 
   )
 }

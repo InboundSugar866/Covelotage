@@ -1,0 +1,12 @@
+.logo {
+    color: #3182ce; /* Equivalent of text-blue-600 */
+    font-weight: 700; /* Equivalent of font-bold */
+    display: flex;
+    gap: 0.5rem; /* Equivalent of gap-2 */
+    padding: 1rem; /* Equivalent of p-4 */
+}
+
+.logo svg {
+    width: 1.5rem; /* Equivalent of w-6 */
+    height: 1.5rem; /* Equivalent of h-6 */
+}

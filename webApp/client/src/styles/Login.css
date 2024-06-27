@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Basic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bayon&display=swap');
+
+  :root {
+    --bs-body-font-family: 'bayon', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6, span, div {
+  color: 'black';
+}
+
+form {
+  width: 100% !important;
+}

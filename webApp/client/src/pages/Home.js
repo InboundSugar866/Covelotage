@@ -1,66 +1,59 @@
 import React from 'react';
 import { Link } from 'react-router-dom'
+import backgroundImage from '../assets/Fond_urbain1.jpg';
 
-/** logout button component */
+import { ReactComponent as TrouverCoveloteur } from '../assets/TrouverCoveloteur.svg';
+import { ReactComponent as Profil } from '../assets/Profil.svg';
+
+import '../styles/Home.css';
+
+/** Components */
+import Footer from '../components/Footer';
+
+
 export default function Home() {
-
   return (
+    <div className='general'>
+      <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
+          {/* Navigation Bar */}
+          <nav className="navbar">
+            <Link className="profile" to="/login">
+              <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
+            </Link>
+          </nav>
 
-    <div>
-    {/* Navigation Bar */}
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
-        <Link className="navbar-brand" to="/">Covélotage</Link>
-        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ml-auto">
-            <li className="nav-item active">
-              <a className="nav-link" href="#">Accueil</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">Parcours</a>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">Communauté</Link>
-            </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/Profile">Profil</Link>
-            </li>
-          </ul>
+          <div className="main">
+            <div className="text">
+              <h2 className="text1">Covelotage</h2>
+              <p className="text11">Votre Communaute Cycliste</p>
+              <p className="text2">Le covelotage est une initiative visant à rendre l’utilisation du vélo plus accessible au quotidien, en encourageant les cyclistes grâce à la mise en relation avec d’autres utilisateurs partageant des itinéraires similaires.</p>
+              
+              <Link to="/login">
+                <TrouverCoveloteur style={{ width: '700px', height: '100px', margin: '30px' }} alt='commencer'/>
+              </Link>
+
+              {/* Features Section */}
+              <div className="text3">
+                <div className="text31">
+                  <div className="text31blocks">
+                    <h2>TROUVEZ un coveloteur</h2>
+                    <p>Entrez les itinéraires que vous emprûntés quotidiennement sur le secteur du Grand Nancy, et contactez d’autres cyclistes avec un trajet similaire au votre.</p>
+                  </div>
+                  <div className="text31blocks">
+                    <h2>DECOUVRIR DES PARCOURS</h2>
+                    <p>Explorez des itinéraires de vélo sûrs et populaires dans le Grand Nancy. Obtenez des informations sur des lieux de stationnement, les points d’eau, et plus encore.</p>
+                  </div>
+                  <div className="text31blocks">
+                    <h2>TROUVEZ VOTRE COMPAGNON</h2>
+                    <p>Rejoignez une communauté cycliste et dynamique. Interragissez avec d’autres utilisateurs, partagez des expériences et contribuez à un environnement urbain plus sûr.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
-      </div>
-    </nav>
-
-    {/* Hero Section */}
-    <div className="jumbotron jumbotron-fluid">
-      <div className="container">
-        <h1 className="display-4">Covélotage : Votre Communauté Cycliste</h1>
-        <p className="lead">Connectez-vous avec des cyclistes expérimentés, trouvez des itinéraires sûrs et profitez d'une expérience de vélo confiante dans la métropole du Grand Nancy.</p>
-        
-        <Link to="/login"><button className="btn btn-primary btn-lg" role="button">Commencer</button></Link>
-      </div>
+      <Footer/>
     </div>
-
-    {/* Features Section */}
-    <div className="container mt-5">
-    <div className="row">
-        <div className="col-md-4">
-          <h2>Trouver un Compagnon</h2>
-          <p>Connectez-vous avec des cyclistes expérimentés partageant des itinéraires similaires. Améliorez la sécurité et renforcez la confiance en tant que cycliste novice.</p>
-        </div>
-        <div className="col-md-4">
-          <h2>Découvrir des Parcours</h2>
-          <p>Explorez des itinéraires de vélo sûrs et populaires dans le Grand Nancy. Obtenez des informations sur les lieux de stationnement, les points d'eau et plus encore.</p>
-        </div>
-        <div className="col-md-4">
-          <h2>Soutien de la Communauté</h2>
-          <p>Rejoignez une communauté cycliste dynamique. Interagissez avec d'autres utilisateurs, partagez des expériences et contribuez à un environnement de vélo urbain plus sûr.</p>
-        </div>
-      </div>
-    </div>
-    </div>
-
   );
 };

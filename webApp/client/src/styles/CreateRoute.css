@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Basic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bayon&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+form{
+    position: relative !important;
+    
+    
+}
+
+form div {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+}
+
+form h2{
+    text-align: left !important;
+    color: #4F772D;
+}
+
+label {
+    width: 100% !important;
+    margin-left: 30px !important;
+    font-family: bayon !important;
+    font-size: 1.5rem !important;
+    align-self: flex-start !important;
+}
+
+input {
+    width: 400px;
+    margin-top: 5px !important;
+    padding-right: 40px !important;
+    border: 2px solid #414833;
+    background-color: #D9D9D9;
+    height: 40px; 
+}
+
+.rc-time-picker-input {
+    width: 400px !important;
+    margin-left: 50px !important;
+    margin-top: 5px !important;
+    border: 2px solid #414833 !important;
+    background-color: #D9D9D9 !important;
+    height: 40px !important; 
+}
+
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+    padding: 0px
+}

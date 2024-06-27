@@ -20,7 +20,7 @@ export async function addRoute(req, res) {
         // Get the username from the token
         const username = req.user.username;
         // Get the route details from the request body
-        const {name, route, planning } = req.body;
+        const {name, route, planning, startAdress, endAdress } = req.body;
         // verify if the route don't exist
         const exitingRoute = await RouteModel.findOne({ username, name });
         if (exitingRoute) {
@@ -30,6 +30,8 @@ export async function addRoute(req, res) {
         const newRoute = new RouteModel({
             username,
             name,
+            startAdress,
+            endAdress,
             route,
             planning,
         });

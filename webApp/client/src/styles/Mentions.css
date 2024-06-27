@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Basic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bayon&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-weight: bold !important;
+    overflow-x: hidden !important;
+}
+  
+.backgroundImage {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    overflow-x: hidden !important;
+    height: 100% !important;
+}
+
+.container {
+    /* Bootstrap's jumbotron and jumbotron-fluid classes */
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    border-radius: .3rem;
+
+}
+
+.h1{
+    font-family: bayon !important;
+    font-size: 5rem !important;
+    font-weight: bold !important;
+}
+
+.h2{
+    font-family: bayon !important;
+    font-size: 2.5rem !important;
+}
+
+.h3{
+    font-family: bayon !important;
+    padding-top: 50px !important;
+    font-weight: bold !important;
+}
+
+.h2:first-of-type {
+    transform: translateY(-30px) !important;
+    font-weight: bold !important;
+  }
+
+.text {
+    font-family: basic !important;
+}
+
+.intro{
+    margin-bottom: 100px !important;
+}
+
+.intro .text2{
+    transform: translateY(-20px) !important;
+    font-weight: bold !important;
+}
+
+.mentions{
+    transform: translateY(-50px) !important;
+    padding-left: 5% !important;
+    width: 60vw !important;
+    text-align: justify !important;
+}
+
+.mentions .text{
+    display: block !important;
+    font-size: 1.2rem !important;
+    padding-left: 50px !important;
+}

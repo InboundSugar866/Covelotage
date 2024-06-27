@@ -1,0 +1,30 @@
+.contact {
+    border-bottom: 1px solid #F5F5F5; /* border-gray-100 */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* gap-2 */
+    cursor: pointer;
+  }
+  
+  .selected {
+    background-color: #E3F2FD; /* bg-blue-50 */
+  }
+  
+  .indicator {
+    width: 0.25rem; /* w-1 */
+    background-color: #4299E1; /* bg-blue-500 */
+    height: 3rem; /* h-12 */
+    border-radius: 0 0.5rem 0.5rem 0; /* rounded-r-md */
+  }
+  
+  .content {
+    display: flex;
+    gap: 0.5rem; /* gap-2 */
+    padding: 0.5rem 0 0.5rem 1rem; /* py-2 pl-4 */
+    align-items: center;
+  }
+  
+  .username {
+    color: #2D3748; /* text-gray-800 */
+  }
+  

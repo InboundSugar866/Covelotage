@@ -1,0 +1,76 @@
+.avatar {
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .username {
+    text-align: center;
+    width: 100%;
+    opacity: 0.7;
+  }
+  
+  .status {
+    position: absolute;
+    width: 0.75rem;
+    height: 0.75rem;
+    bottom: 0;
+    right: 0;
+    border-radius: 50%;
+    border: 1px solid white;
+  }
+  
+  .online {
+    background-color: #48bb78;
+  }
+  
+  .offline {
+    background-color: #cbd5e0;
+  }
+  
+  /* Define your colors */
+  .teal {
+    background-color: #80CBC4;
+  }
+
+  .red {
+    background-color: #FED7D7;
+  }
+
+  .green {
+    background-color: #C6F6D5;
+  }
+
+  .purple {
+    background-color: #CE93D8;
+  }
+
+  .blue {
+    background-color: #90CAF9;
+  }
+
+  .yellow {
+    background-color: #FFF59D;
+  }
+
+  .orange {
+    background-color: #FEBD69;
+  }
+
+  .pink {
+    background-color: #F48FB1;
+  }
+
+  .fuchsia {
+    background-color: #D9027D;
+  }
+
+  .rose {
+    background-color: #FECDD3;
+  }
+  
+  /* Add other colors similarly */
+  

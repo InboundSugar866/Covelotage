@@ -5,5 +5,6 @@ export default {
     EMAIL : "arvel3@ethereal.email",
     PASSWORD : "MgmznbsstaWSsZFgAr",
     MONGODB_URI : "mongodb://localhost:27017/covelotage",
-    MAP_API_URI : "https://api.openrouteservice.org"
+    MAP_API_URI : "https://api.openrouteservice.org",
+    CLIENT_URL: ["http://localhost:3000", "http://localhost:3001"]
 }

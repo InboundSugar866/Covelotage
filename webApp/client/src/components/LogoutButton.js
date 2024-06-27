@@ -7,15 +7,19 @@ export const LogoutButton = () => {
 
   const userLogout = () => {
     localStorage.removeItem('token');
+
+    // Remove a cookie
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
     navigate('/');
   };
 
   return (
     <div className="text-center">
       <span>
-        Come back later?{' '}
+        Revenir plus tard,{''}
         <button onClick={userLogout} className="btn btn-link">
-          Logout
+          Se déconnecter
         </button>
       </span>
     </div>

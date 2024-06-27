@@ -5,6 +5,11 @@ import {useFormik} from 'formik'
 import { usernameValidate } from '../helper/validate'
 import { useAuthStore } from '../store/store'
 
+import backgroundImage from '../assets/Fond_urbain1.jpg';
+import Footer from '../components/Footer';
+
+import '../styles/Login.css';
+
 export default function Username() { 
 
   const navigate = useNavigate();
@@ -23,30 +28,45 @@ export default function Username() {
     }
   });
 
+
+
   return (
+    <div>
+    <Toaster position="bottom-center" reverseOrder={false}></Toaster>
 
     <div
-    className="container-fluid d-flex align-items-center justify-content-center vh-100"
+    className="container-fluid d-flex align-items-center justify-content-center"
     style={{
-      backgroundImage: `url(${process.env.PUBLIC_URL}/Background.jpg)`,
+      backgroundImage: `url(${backgroundImage})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       color: 'white',
       position: 'relative',
+      backgroundRepeat: 'no-repeat',
+      flex: 1,
+      minHeight: '75vh'
     }}
   >
-    <Toaster position="bottom-center" reverseOrder={false}></Toaster>
+
+    {/* The following div creates the blurred overlay */}
+    <div
+      className="position-absolute top-0 end-0 bottom-0 start-0"
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(5px)',
+      }}
+    ></div>
+
 
     <div
       className="card p-4"
       style={{
         position: 'relative',
-        zIndex: '1', 
+        zIndex: '1',
       }}
     >
       <div className="text-center mb-4">
-        <h4 className="mb-0">Hello Again!</h4>
-        <span>Explore More by connecting with us.</span>
+        <h4 className="mb-0">Heureux de vous revoir !</h4>
       </div>
 
       <form onSubmit={formik.handleSubmit}>
@@ -61,27 +81,20 @@ export default function Username() {
 
         <div className="mb-3">
           <button type="submit" className="btn btn-primary w-100">
-            Let's Go
+            Se connecter
           </button>
         </div>
 
         <div className="text-center">
           <span>
-            Not a Member? <Link to="/register">Register Now</Link>
+            Pas encore membre ? <Link to="/register">S'enregistrer</Link>
           </span>
         </div>
       </form>
     </div>
 
-    {/* The following div creates the blurred overlay */}
-    <div
-      className="position-absolute top-0 end-0 bottom-0 start-0"
-      style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        backdropFilter: 'blur(5px)',
-      }}
-    ></div>
   </div>
-
+  <Footer/>
+  </div>
   )
 }

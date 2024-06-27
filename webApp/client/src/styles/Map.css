@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Basic&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bayon&display=swap');
+
+body, html {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+  
+.backgroundImage {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex: 1;
+}
+
+.navbar {
+    display: flex !important;
+    justify-content: right !important;
+}
+
+.navutil {
+    border: 2px solid black !important;
+    border-radius: 10px !important;
+    transition: border-color 0.3s ease !important;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 10px;
+}
+
+.navutil.active {
+    border-color: green !important;
+}
+
+.container-carte {
+    justify-self: center;
+    background-color: #D9D9D9;
+    border-radius: 10px;
+    padding: 20px;
+    width: 50vw;
+    margin-left: 100px;
+    transform: translateY(-100px);
+    margin-bottom: -50px;
+    margin-top: -50px;
+}
+
+.cov {
+    margin: 50px !important;
+    transform: translateY(-100px) !important;
+}
+
+.cov .text11{
+    transform: translateY(-20px) !important;
+    font-weight: bold !important;
+}
+

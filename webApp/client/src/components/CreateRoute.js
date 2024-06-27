@@ -5,11 +5,18 @@ import TimePicker from 'rc-time-picker';
 import 'rc-time-picker/assets/index.css';
 import toast from 'react-hot-toast';
 
+import { Link } from 'react-router-dom'
+import '../styles/CreateRoute.css';
+
+import { ReactComponent as CreerTrajet } from '../assets/CreerTrajer.svg';
+
 
 import { getDayOfWeek } from '../helper/routeHelper';
 
 
-export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updateRoute, handleFindMatches}) => {
+export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updateRoute, handleFindMatches, 
+                              startAddress, setStartAddress, endAddress, setEndAddress, 
+                              startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick}) => {
   const [routeName, setRouteName] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -19,6 +26,9 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
   const [selectedTime, setSelectedTime] = useState(null);
   
   const periodicDateRef = new Date(1970, 0, 1);
+
+  // for the adress search
+
 
   // Check if the hour is valid
   const isValidHour = (date) => {
@@ -87,7 +97,9 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
       "planning": { 
         "dates": selectedDates, 
         "periodic": selectedPeriodicTimes 
-      }
+      },
+      "startAdress": startAddress,
+      "endAdress": endAddress
     }
     console.log('routeInfos', routeInfos);
     return routeInfos;
@@ -140,6 +152,7 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     return formattedDate;
   };
 
+
   // update the form when a route is selected
   useEffect(() => {
     // if no route is selected, return
@@ -156,15 +169,66 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     <div>
 
       <form onSubmit={handleCreateRoute}>
-        <h2>Trajet courant</h2>
+        <h2>Entrer un nouveau trajet</h2>
   
         <div>
-          <label>Nom du chemin : </label>
-          <input required={true} type="text" value={routeName} onChange={(e) => setRouteName(e.target.value)} />
+          <label>Nom du trajet :</label>
+            <div>
+            <input required={true} type="text" value={routeName} onChange={(e) => setRouteName(e.target.value)} />
+            </div>
+          
         </div>
   
+
+
+        {/** start point adress */}
         <div>
-          <label>Dates de départ : </label>
+          
+          <label>Adresse de depart :</label>
+            <div>
+            <input 
+              type="search"
+              name="startPointSearch"
+              value={startAddress}
+              onChange={(e) => {
+                setStartAddress(e.target.value);
+                handleSearch(e.target.value, true);
+              }}
+            />
+            </div>
+            {startAddressSuggestions.map((suggestion, index) => (
+              <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
+                {suggestion.label}
+              </div>
+            ))}
+          
+        </div>
+
+        {/** end point adress */}
+        <div>
+          
+          <label>Adresse d'arrivee :</label>
+            <div>
+            <input 
+              type="search"
+              name="endPointSearch"
+              value={endAddress}
+              onChange={(e) => {
+                setEndAddress(e.target.value);
+                handleSearch(e.target.value, false);
+              }}
+            />
+            </div>
+            {endAddressSuggestions.map((suggestion, index) => (
+              <div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
+                {suggestion.label}
+              </div>
+            ))}
+          
+        </div>
+
+        <div>
+          <label>Date et heure de depart :</label>
           <DatePicker
             selected={selectedDate}
             onChange={(value) => setSelectedDate(value)}
@@ -175,10 +239,13 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
             dateFormat="dd/MM/yyyy HH:mm"
             isClearable
             placeholderText="Sélectionnez une date"
+            popperPlacement="bottom-start"
+            portalId="root-portal"
           />
           <button type="button" onClick={handleAddDate}>
             +
           </button>
+          
         </div>
   
         <div>
@@ -195,7 +262,9 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
         </div>
   
         <div>
-          <label>Horaires périodiques : </label>
+          <h2>Ajouter une periodicite : </h2>
+          </div>
+
           <div>
             <label>Jour de la semaine : </label>
             <select
@@ -240,16 +309,24 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
               </li>
             ))}
           </ul>
+
+          <div>
+          <h2>Carte </h2>
+          </div>
   
-        </div>
+        
   
-        <button type="submit">Créer trajet</button>
+        <button type="submit">
+          <CreerTrajet/>
+        </button>
+
+
 
       </form>
-     
-      <button onClick={handleFindMatchesBtn}>
+     {/*       <button onClick={handleFindMatchesBtn}>
         Trouver les correspondances
-      </button>
+      </button> */}
+
 
       {/* Bouton pour mettre à jour le trajet */}
       {selectedRoute && (

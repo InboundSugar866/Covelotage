@@ -11,6 +11,16 @@ export const RouteSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // Start adress
+    startAdress: {
+        type: String,
+        required: true
+    },
+    // End adress
+    endAdress: {
+        type: String,
+        required: true
+    },
     // Array of points representing the route
     route: {
         type: [

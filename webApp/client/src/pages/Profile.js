@@ -9,6 +9,13 @@ import useFetch from '../hooks/fetch.hook'
 import { updateUser } from '../helper/userHelper';
 import { LogoutButton } from '../components/LogoutButton'
 
+import backgroundImage from '../assets/Fond_urbain1.jpg';
+import Footer from '../components/Footer';
+import { ReactComponent as Profil } from '../assets/Profil.svg';
+import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
+import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
+import { NavLink } from 'react-router-dom';
+
 export default function Profile() {
 
   const navigate = useNavigate();
@@ -58,19 +65,23 @@ export default function Profile() {
   }
 
   return (
-
-    <div
-      className="container-fluid d-flex align-items-center justify-content-center vh-100"
-      style={{
-        backgroundImage: `url('Background.jpg')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        position: 'relative',
-      }}
-    >
-      <Toaster position="top-center" reverseOrder={false}></Toaster>
-
+    <div>
+      <Toaster position="bottom-center" reverseOrder={false}></Toaster>
       <div
+        className="container-fluid d-flex align-items-center justify-content-center"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          color: 'white',
+          position: 'relative',
+          backgroundRepeat: 'no-repeat',
+          flex: 1,
+          minHeight: '75vh'
+        }}
+      >
+
+<div
         className="rounded p-4"
         style={{
           width: '40%',
@@ -80,13 +91,28 @@ export default function Profile() {
           zIndex: '1',
         }}
       >
+      
+
+        {/* Navigation Bar */}
+        <nav className="navbar">
+          <NavLink className="navutil" activeClassName="active" to="/map">
+              <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
+          </NavLink>
+          <NavLink className="navutil" activeClassName="active" to="/chat">
+              <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
+          </NavLink>
+          <NavLink className="navutil" activeClassName="active" to="/profile">
+              <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
+          </NavLink>
+        </nav>
+
+{/*
         <div className="text-center mb-4">
-        <span> Return to the  <Link to="/map"><button>map</button></Link> </span>
 
           <h4 className="mb-0">Profile</h4>
           <span>You can update the details.</span>
         </div>
-
+*/}
         <form onSubmit={formik.handleSubmit}>
           <div className="mb-3 text-center">
             <label htmlFor="profile">
@@ -97,24 +123,24 @@ export default function Profile() {
           </div>
 
           <div className="mb-3">
-            <input {...formik.getFieldProps('firstName')} className="form-control" type="text" placeholder="First Name" />
+            <input {...formik.getFieldProps('firstName')} className="form-control" type="text" placeholder="Prénom" />
           </div>
           <div className="mb-3">
-            <input {...formik.getFieldProps('lastName')} className="form-control" type="text" placeholder="Last Name" />
+            <input {...formik.getFieldProps('lastName')} className="form-control" type="text" placeholder="Nom" />
           </div>
           <div className="mb-3">
-            <input {...formik.getFieldProps('mobile')} className="form-control" type="text" placeholder="Mobile No." />
+            <input {...formik.getFieldProps('mobile')} className="form-control" type="text" placeholder="Numéro de téléphone" />
           </div>
           <div className="mb-3">
             <input {...formik.getFieldProps('email')} className="form-control" type="text" placeholder="Email" />
           </div>
           <div className="mb-3">
-            <input {...formik.getFieldProps('address')} className="form-control" type="text" placeholder="Address" />
+            <input {...formik.getFieldProps('address')} className="form-control" type="text" placeholder="Addresse" />
           </div>
 
           <div className="mb-3 text-center">
             <button className="btn btn-primary w-100" type="submit">
-              Update
+              Mettre à jour
             </button>
           </div>
 
@@ -135,7 +161,8 @@ export default function Profile() {
 
 
     </div>
-  
+    <Footer/>
+    </div>
 
           
   )

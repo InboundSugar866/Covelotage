@@ -7,6 +7,11 @@ import { registerValidate } from '../helper/validate';
 import convertToBase64 from '../helper/convert';
 import { registerUser } from '../helper/userHelper';
 
+import backgroundImage from '../assets/Fond_urbain1.jpg';
+import Footer from '../components/Footer';
+
+import '../styles/Login.css';
+
 export default function Register() {
 
   const navigate = useNavigate();
@@ -59,23 +64,27 @@ export default function Register() {
       <Toaster position="top-center" reverseOrder={false}></Toaster>
 
       <div
-        className="container-fluid d-flex align-items-center justify-content-center vh-100"
+        className="container-fluid d-flex align-items-center justify-content-center"
         style={{
-          backgroundImage: `url(${process.env.PUBLIC_URL}/Background.jpg)`,
+          backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           color: 'white',
           position: 'relative',
+          backgroundRepeat: 'no-repeat',
+          flex: 1,
+          minHeight: '75vh',
         }}
       >
 
-        <div className="position-absolute top-0 end-0 bottom-0 start-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(8px)' }}></div>
+        <div className="position-absolute top-0 end-0 bottom-0 start-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(8px)' }}>
+        </div>
 
 
         <div className="card p-4" style={{ width: '45%', borderRadius: '15px' }}>
           <div className="text-center mb-4">
-            <h4 className="mb-0">Register</h4>
-            <span>Happy to join you!</span>
+            <h4 className="mb-0">Bienvenue</h4>
+            <span>Nous sommes heureux de vous recevoir parmis nous !</span>
           </div>
 
           <form className="row g-3" onSubmit={formik.handleSubmit}>
@@ -91,20 +100,21 @@ export default function Register() {
               <input {...formik.getFieldProps('username')} type="text" className="form-control" placeholder="Username*" />
               <input {...formik.getFieldProps('password')} type="password" className="form-control" placeholder="Password*" />
               <button type="submit" className="btn btn-primary w-100">
-                Register
+                S'enregister
               </button>
             </div>
 
             <div className="col-12">
               <span>
-                Already registered? <Link className="text-decoration-none" to="/">
-                  Login now
+                Vous possédez déjà un compte ? <Link className="text-decoration-none" to="/login">
+                  Se connecter
                 </Link>
               </span>
             </div>
           </form>
         </div>
       </div>
+      <Footer/>
     </div>
          
 

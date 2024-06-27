@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect} from 'react';
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik';
 import toast, { Toaster } from 'react-hot-toast';
-import { getShortestPath, updateIndex, findMatches } from '../helper/mapHelper'
+import { getShortestPath, updateIndex, findMatches } from '../helper/mapHelper';
 import { addRouteToServer, updateRoute, deleteRoute } from '../helper/routeHelper';
 
 /** Components */
-import { LogoutButton } from '../components/LogoutButton'
+import { LogoutButton } from '../components/LogoutButton';
 import { CreateRoute } from '../components/CreateRoute';
 import ListRoute from '../components/ListRoute';
 import { MatchList } from '../components/MatchList';
@@ -24,6 +24,15 @@ import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import _ from 'lodash';
 
 import { Toast } from 'bootstrap';
+
+
+import backgroundImage from '../assets/Fond_urbain1.jpg';
+import Footer from '../components/Footer';
+import { ReactComponent as Profil } from '../assets/Profil.svg';
+import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
+import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
+import '../styles/Map.css';
+import { NavLink } from 'react-router-dom';
 
 /**
  * ------------------- TODO -------------------
@@ -411,224 +420,216 @@ export default function Map() {
     <div>
         
     <Toaster position='top-center' reverseOrder={false}></Toaster>
+      <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
+        {/* Navigation Bar */}
+        <nav className="navbar">
+            <NavLink className="navutil" activeClassName="active" to="/map">
+                <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
+            </NavLink>
+            <NavLink className="navutil" activeClassName="active" to="/chat">
+                <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
+            </NavLink>
+            <NavLink className="navutil" activeClassName="active" to="/profile">
+                <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
+            </NavLink>
+        </nav>
 
-      {/** Display the form above the map */}
-      <div style={{ position: 'relative', zIndex : 1001 }}>
-        {/* Formulaire pour le nom du chemin et la planification */}
-        <CreateRoute 
-          createRoute={handleCreateRoute} 
-          selectedRoute={selectedRoute} 
-          selectionUpdate={selectionUpdate}
-          updateRoute={handleUpdateRoute}
-          handleFindMatches={handleFindMatches}
-        />
-      </div>
+        <div className="cov">
+              <h2 className="text1">Covelotage</h2>
+              <p className="text11">Votre Communaute Cycliste</p>
+        </div>
 
-      {/** start point selection button */}
-      <div>
+        <div className='container-carte' >
+
+        {/** Display the form above the map */}
+        <div style={{ position: 'relative', zIndex : 1001 }}>
+          {/* Formulaire pour le nom du chemin et la planification */}
+          <CreateRoute 
+            createRoute={handleCreateRoute} 
+            selectedRoute={selectedRoute} 
+            selectionUpdate={selectionUpdate}
+            updateRoute={handleUpdateRoute}
+            handleFindMatches={handleFindMatches}
+
+            startAddress={startAddress}
+            setStartAddress={setStartAddress}
+            endAddress={endAddress}
+            setEndAddress={setEndAddress}
+            startAddressSuggestions={startAddressSuggestions}
+            endAddressSuggestions={endAddressSuggestions}
+            handleSearch={handleSearch}
+            handleSuggestionClick={handleSuggestionClick}
+          />
+        </div>
+
+        {// start point selection button
+        /*
+        <div>
+            <label>
+                <input
+                    type="checkbox"
+                    name="startingPointCheckbox"
+                    checked={isStartPointSelected}
+                    onChange={() => {
+                      setIsStartPointSelected(!isStartPointSelected)}
+                    }
+                />
+                Point de départ
+            </label>
+        </div>
+        
+        // arrival point selection button 
+        <div>
           <label>
-              <input
-                  type="checkbox"
-                  name="startingPointCheckbox"
-                  checked={isStartPointSelected}
-                  onChange={() => {
-                    setIsStartPointSelected(!isStartPointSelected)}
-                  }
-              />
-              Point de départ
+            <input
+                type="checkbox"
+                name="arrivalPointCheckbox"
+                checked={!isStartPointSelected}
+                onChange={() => setIsStartPointSelected(!isStartPointSelected)}
+            />
+            Point d'arrivée
           </label>
-      </div>
-      
-      {/** arrival point selection button */}
-      <div>
-        <label>
-          <input
-              type="checkbox"
-              name="arrivalPointCheckbox"
-              checked={!isStartPointSelected}
-              onChange={() => setIsStartPointSelected(!isStartPointSelected)}
+        </div>*/}
+
+        <MapContainer
+          center={[48.65, 6.15]}
+          zoom={17}
+          style={{
+            border: '1px solid #ccc',
+            height: '700px',
+            width: '700px',
+            margin: '10px',
+            position: 'relative',
+          }}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          Point d'arrivée
-        </label>
-      </div>
 
-      {/** start point adress */}
-      <div>
-        Adresse de départ
-        <label>
-          <input 
-            type="search"
-            name="startPointSearch"
-            value={startAddress}
-            onChange={(e) => {
-              setStartAddress(e.target.value);
-              handleSearch(e.target.value, true);
-            }}
-          />
-          {startAddressSuggestions.map((suggestion, index) => (
-            <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
-              {suggestion.label}
-            </div>
-          ))}
-        </label>
-      </div>
+          { /** Starting point */
+            startPoint && (
+              <Marker
+                position={[startPoint.lat, startPoint.lng]}
+                //altitude={[startPoint.altitude, startPoint.altitude]}
+                icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
+                draggable={true}
+                eventHandlers={{
+                  dragend: (event) => { handleDragEnd(event, true) }
+                }}
+              >          
+              </Marker>
+          )}
 
-      {/** end point adress */}
-      <div>
-        Adresse d'arrivée
-        <label>
-          <input 
-            type="search"
-            name="endPointSearch"
-            value={endAddress}
-            onChange={(e) => {
-              setEndAddress(e.target.value);
-              handleSearch(e.target.value, false);
-            }}
-          />
-          {endAddressSuggestions.map((suggestion, index) => (
-            <div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
-              {suggestion.label}
-            </div>
-          ))}
-        </label>
-      </div>
+          { /** End point */
+            endPoint && (
+              <Marker
+                position={[endPoint.lat, endPoint.lng]}
+                icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
+                draggable={true}
+                eventHandlers={{
+                  dragend: (event) => { handleDragEnd(event, false) }
+                }}
+              >
+              </Marker>
+          )}
 
-      <MapContainer
-        center={[48.65, 6.15]}
-        zoom={17}
-        style={{
-          border: '1px solid #ccc',
-          height: '700px',
-          width: '700px',
-          margin: '10px',
-          position: 'relative',
-        }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
 
-        { /** Starting point */
-          startPoint && (
-            <Marker
-              position={[startPoint.lat, startPoint.lng]}
-              //altitude={[startPoint.altitude, startPoint.altitude]}
-              icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
-              draggable={true}
+          {/** Matching routes */
+          matchingRoutes.length > 0 &&
+            matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
+                (<Marker 
+                  key={index}
+                  position={point}
+                  icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
+                >
+                </Marker>)
+                
+
+          
+              ))       
+          }
+
+          {/** Path */
+          matchingRoutes.length > 0 && (
+            <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
+          )}
+
+          {/** Path */
+          receivedPoints && (
+            <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
+          )}
+          
+          {/** Dynamics points */
+            receivedPoints.map((point, index) => (
+            <Marker 
+              key={index}
+              position={point}
+              icon={L.icon({ iconUrl: marker_dynamic, iconSize: [10, 10] })}
+              // draggable only if not start or end point
+              draggable={(index !== 0) && (index !== receivedPoints.length - 1)}
+              
               eventHandlers={{
-                dragend: (event) => { handleDragEnd(event, true) }
-              }}
-            >          
-            </Marker>
-        )}
+                dragend: (event) => {
+                  // set the drag end event flag
+                  setIsDragEndEvent(true);
 
-        { /** End point */
-          endPoint && (
-            <Marker
-              position={[endPoint.lat, endPoint.lng]}
-              icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
-              draggable={true}
-              eventHandlers={{
-                dragend: (event) => { handleDragEnd(event, false) }
+                  // reformat the event
+                  const modifiedPoint = {
+                    latlng: event.target._latlng,
+                    index: index,
+                  };
+
+                  // retrieve the list of points previously moved manually
+                  const points = [...intermediatePoints];
+                                
+                  // Check if the index already exists.
+                  const existingIndex = points.findIndex(
+                    (point) => point.index === index
+                  );
+
+                  // update the temporary list
+                  if (existingIndex !== -1) {
+                    // update the existing point
+                    points[existingIndex] = modifiedPoint;
+                  } else {
+                    // add the new point
+                    points.push(modifiedPoint);
+                    // sort the list of points
+                    points.sort((a, b) => a.index - b.index);
+                  }
+
+                  // update the list of intermediate points
+                  setIntermediatePoints(points);
+                  // enable the update of the path
+                  setShouldUpdatePath(true);                
+                }
               }}
             >
+              { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
             </Marker>
-        )}
+          ))}
+          <MapClickHandler />
+        </MapContainer>
+
+{/*
+        // Intégrez le composant ListRouteForm 
+        <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute}/>
+
+          // Intégrez le composant MatchList 
+          { true && (
+            <MatchList routes={matchingRoutes} handleFindMatches={handleFindMatches} onSelectMatchingRoute={handleSelecMatchingRoute}/>
+          )}
+
+*/}
+        <Link to="/NvxTrajet" style={{color:'#414833'}}>Revenir à la page trajet</Link>
 
 
-        {/** Matching routes */
-        matchingRoutes.length > 0 &&
-          matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
-              (<Marker 
-                key={index}
-                position={point}
-                icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
-              >
-              </Marker>)
-              
 
-        
-            ))       
-        }
-
-        {/** Path */
-         matchingRoutes.length > 0 && (
-          <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
-        )}
-
-         {/** Path */
-         receivedPoints && (
-           <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
-         )}
-        
-        {/** Dynamics points */
-          receivedPoints.map((point, index) => (
-          <Marker 
-            key={index}
-            position={point}
-            icon={L.icon({ iconUrl: marker_dynamic, iconSize: [10, 10] })}
-            // draggable only if not start or end point
-            draggable={(index !== 0) && (index !== receivedPoints.length - 1)}
-            
-            eventHandlers={{
-              dragend: (event) => {
-                // set the drag end event flag
-                setIsDragEndEvent(true);
-
-                // reformat the event
-                const modifiedPoint = {
-                  latlng: event.target._latlng,
-                  index: index,
-                };
-
-                // retrieve the list of points previously moved manually
-                const points = [...intermediatePoints];
-                               
-                // Check if the index already exists.
-                const existingIndex = points.findIndex(
-                  (point) => point.index === index
-                );
-
-                // update the temporary list
-                if (existingIndex !== -1) {
-                  // update the existing point
-                  points[existingIndex] = modifiedPoint;
-                } else {
-                  // add the new point
-                  points.push(modifiedPoint);
-                  // sort the list of points
-                  points.sort((a, b) => a.index - b.index);
-                }
-
-                // update the list of intermediate points
-                setIntermediatePoints(points);
-                // enable the update of the path
-                setShouldUpdatePath(true);                
-              }
-            }}
-          >
-            { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
-          </Marker>
-        ))}
-        <MapClickHandler />
-      </MapContainer>
-
-
-       {/* Intégrez le composant ListRouteForm */}
-       <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute}/>
-
-        {/* Intégrez le composant MatchList */}
-        { true && (
-          <MatchList routes={matchingRoutes} handleFindMatches={handleFindMatches} onSelectMatchingRoute={handleSelecMatchingRoute}/>
-        )}
-
-       
-
-      <LogoutButton />
-      <Link to="/profile"><button>Profile</button></Link>
-      
+        <LogoutButton />
+        </div>
+        </div>
+      <Footer/>
     </div>
   );
 };
