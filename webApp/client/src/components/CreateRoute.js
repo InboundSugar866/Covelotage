@@ -18,6 +18,7 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
                               startAddress, setStartAddress, endAddress, setEndAddress, 
                               startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick}) => {
   const [routeName, setRouteName] = useState('');
+  const [comment, setComment] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -99,7 +100,8 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
         "periodic": selectedPeriodicTimes 
       },
       "startAdress": startAddress,
-      "endAdress": endAddress
+      "endAdress": endAddress,
+      "comment": comment
     }
     console.log('routeInfos', routeInfos);
     return routeInfos;
@@ -159,6 +161,8 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     if (!selectedRoute) return;
     // update the name of the route
     setRouteName(selectedRoute.name);
+    // update the comment
+    setComment(selectedRoute.comment);
     // update the selected dates
     setSelectedDates(selectedRoute.planning.dates);
     // update the selected periodic times
@@ -259,6 +263,14 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
               </li>
             ))}
           </ul>
+        </div>
+
+        <div>
+          <label>Ajouter un commentaire :</label>
+            <div>
+            <input required={false} type="text" value={comment} onChange={(e) => setComment(e.target.value)} />
+            </div>
+          
         </div>
   
         <div>

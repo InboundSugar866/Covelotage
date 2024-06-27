@@ -11,10 +11,39 @@ body, html {
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    flex: 1;
+    overflow-y: hidden !important;
 }
 
 .navbar {
-    display: flex;
-    justify-content: right;
+    display: flex !important;
+    justify-content: right !important;
   }
+
+.container-carte-trajet {
+  justify-self: center;
+  background-color: #D9D9D9;
+  border-radius: 10px;
+  padding: 20px;
+
+  margin-left: 100px;
+  margin-right: 100px;
+
+  margin-bottom: 50px;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  grid-template-rows: repeat(2, 1fr); /* 2 rows */
+}
+
+.container-carte-trajet>* {
+  padding: 10px;
+}
+
+.container-carte-trajet>*:first-child {
+  grid-column: 1;
+}
+
+.container-carte-trajet>*:last-child {
+  align-self: flex-end;
+  grid-column: 1 / 4;
+}

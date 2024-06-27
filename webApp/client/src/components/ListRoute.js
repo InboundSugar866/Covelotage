@@ -3,6 +3,10 @@ import { getAllRoutes, getDayOfWeek } from '../helper/routeHelper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'rc-time-picker/assets/index.css';
 
+import { ReactComponent as Emplacement} from '../assets/emplacement.svg';
+import { ReactComponent as Horloge} from '../assets/horloge.svg';
+import { ReactComponent as Calendrier} from '../assets/calendrier.svg';
+
 const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
 
   // state to store the list of routes
@@ -50,18 +54,43 @@ const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
   return (
     <div>
       <h2>Mes Trajets</h2>
-      <div style={{ height: '300px', overflowY: 'auto', border: '1px solid #ccc' }}>
+      <div style={{ height: '90%', overflowY: 'auto', border: '1px solid #ccc' }}>
+
+
         <ul>
           {routes.map((route, index) => (
-            <li key={route.name} onClick={() => handleRouteClick(route)} style={{ cursor: 'pointer', border: selectedRoute === route ? '2px solid blue' : 'none' }}>
+            <li key={route.name} onClick={() => handleRouteClick(route)} style={{ cursor: 'pointer', border: selectedRoute === route ? '2px solid #414833' : 'none' }}>
               <p>{route.name}</p>
-              <ul> Dates :
+
+              <ul>
+                <Emplacement style={{ width: '20px', height: '20px' }}/> 
+                <p>{route.startAdress}</p>
+                <p>{route.endAdress}</p>
+              </ul>
+
+              <ul>
                 {route.planning.dates.map((date, index) => {
                     // create a new date object from the date string
                     const d = new Date(date);
                     // formated the date
-                    const formattedDate = `${d.toLocaleDateString('fr-FR')} ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-                    return <li key={index}>{formattedDate}</li>
+                    const formattedDate = `${d.toLocaleDateString('fr-FR')}`;
+                    return (<li key={index}>
+                      <Calendrier style={{ width: '20px', height: '20px' }}/>
+                      {formattedDate}
+                    </li>);
+                })}
+              </ul>
+
+              <ul>
+                {route.planning.dates.map((date, index) => {
+                    // create a new date object from the date string
+                    const d = new Date(date);
+                    // formated the date
+                    const formattedTime = `${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                    return <li key={index}>
+                      <Horloge style={{ width: '20px', height: '20px' }}/> 
+                      {formattedTime}
+                    </li>
                 })}
               </ul>
 
@@ -84,6 +113,7 @@ const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
             </li>
           ))}
         </ul>
+
       </div>
     </div>
   );
