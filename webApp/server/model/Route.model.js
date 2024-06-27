@@ -21,6 +21,11 @@ export const RouteSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // Comment
+    comment: {
+        type: String,
+        required: false
+    },
     // Array of points representing the route
     route: {
         type: [

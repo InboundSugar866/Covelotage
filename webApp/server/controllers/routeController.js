@@ -20,7 +20,7 @@ export async function addRoute(req, res) {
         // Get the username from the token
         const username = req.user.username;
         // Get the route details from the request body
-        const {name, route, planning, startAdress, endAdress } = req.body;
+        const {name, route, planning, startAdress, endAdress, comment } = req.body;
         // verify if the route don't exist
         const exitingRoute = await RouteModel.findOne({ username, name });
         if (exitingRoute) {
@@ -34,6 +34,7 @@ export async function addRoute(req, res) {
             endAdress,
             route,
             planning,
+            comment
         });
         // Save the new route to the database
         newRoute.save()
