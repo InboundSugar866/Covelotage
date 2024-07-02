@@ -82,12 +82,12 @@ export default function Password() {
             <img src={apiData?.profile || avatar} className="img-fluid rounded-circle" alt="avatar" />
           </div>
 
-          <div className="col-md-6">
+          <divcon className="col-md-6">
             <input {...formik.getFieldProps('password')} type="password" className="form-control" placeholder="Password" />
             <button type="submit" className="btn btn-primary w-100">
               Se connecter
             </button>
-          </div>
+          </divcon>
 
           <div className="col-12">
             <span>

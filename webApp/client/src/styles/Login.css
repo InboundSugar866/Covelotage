@@ -12,3 +12,8 @@
 form {
   width: 100% !important;
 }
+
+form div {
+  display: grid !important;
+  width: 100%
+}

@@ -81,28 +81,28 @@ export default function Register() {
         </div>
 
 
-        <div className="card p-4" style={{ width: '45%', borderRadius: '15px' }}>
+        <divgen className="card p-4" style={{ width: '45%', borderRadius: '15px' }}>
           <div className="text-center mb-4">
             <h4 className="mb-0">Bienvenue</h4>
             <span>Nous sommes heureux de vous recevoir parmis nous !</span>
           </div>
 
           <form className="row g-3" onSubmit={formik.handleSubmit}>
-            <div className="col-md-6">
+            <divphoto>
               <label htmlFor="profile" className="form-label">
-                <img src={file || avatar} className="img-fluid rounded-circle" alt="avatar" />
+                <img src={file || avatar} className="img-fluid rounded-circle" alt="avatar" style={{width:'200px'}} />
               </label>
               <input onChange={onUpload} type="file" id="profile" name="profile" className="form-control" />
-            </div>
+            </divphoto>
 
-            <div className="col-md-6">
+            <divtext>
               <input {...formik.getFieldProps('email')} type="text" className="form-control" placeholder="Email*" />
               <input {...formik.getFieldProps('username')} type="text" className="form-control" placeholder="Username*" />
               <input {...formik.getFieldProps('password')} type="password" className="form-control" placeholder="Password*" />
               <button type="submit" className="btn btn-primary w-100">
                 S'enregister
               </button>
-            </div>
+            </divtext>
 
             <div className="col-12">
               <span>
@@ -112,7 +112,7 @@ export default function Register() {
               </span>
             </div>
           </form>
-        </div>
+        </divgen>
       </div>
       <Footer/>
     </div>
