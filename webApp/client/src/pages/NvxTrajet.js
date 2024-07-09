@@ -32,150 +32,111 @@ import { CreateRoute } from '../components/CreateRoute';
 
 export default function NvxTrajet() {
 
-    // ergonomics variable for the first selection
-    const firstSelection = useRef(true);
-    
-    // starting point and arrival point
-    const [startPoint, setStartPoint] = useState(null);
-    const [endPoint, setEndPoint] = useState(null);
-
-    // received points from the server
-    const [receivedPoints, setReceivedPoints] = useState([]);
-
-    // is a route is selected in the list of my routes
-    const isRouteSelected = useRef(false);
-    // route selected in the list of my routes
-    const [selectedRoute, setSelectedRoute] = useState(null);
-    // enables updating the displayed information when the same route is re-selected.
-    const [selectionUpdate, setSelectionUpdate] = useState(false);
-    // refresh the list of routes
-    const [refresh, setRefresh] = useState(false);
-    
-    //  id of the selected matching route
-    const [macthingRouteSelectedId, setMacthingRouteSelectedId] = useState(0);
-    // matching routes 
-    const [matchingRoutes, setMatchingRoutes] = useState([]);
-
+  // ergonomics variable for the first selection
+  const firstSelection = useRef(true);
   // Manage the behavior of the starting and arrival points
   const [isStartPointSelected, setIsStartPointSelected] = useState(true);
   // allow to avoid multiple calls of the function handlePathSubmit
   const [shouldUpdatePath, setShouldUpdatePath] = useState(false);
   // prevent the mutilple calls of the function handleMapClick
   const [isDragEndEvent, setIsDragEndEvent] = useState(false);
+  
+  // starting point and arrival point
+  const [startPoint, setStartPoint] = useState(null);
+  const [endPoint, setEndPoint] = useState(null);
+  // points manually modified by the user
+  const [intermediatePoints, setIntermediatePoints] = useState([]);
 
-    // points manually modified by the user
-    const [intermediatePoints, setIntermediatePoints] = useState([]);
+  // received points from the server
+  const [receivedPoints, setReceivedPoints] = useState([]);
 
-    // Path color
-    const blueOptions = { fillColor: 'blue' }
+  // is a route is selected in the list of my routes
+  const isRouteSelected = useRef(false);
+  // route selected in the list of my routes
+  const [selectedRoute, setSelectedRoute] = useState(null);
+  // enables updating the displayed information when the same route is re-selected.
+  const [selectionUpdate, setSelectionUpdate] = useState(false);
+  // refresh the list of routes
+  const [refresh, setRefresh] = useState(false);
+  
+  //  id of the selected matching route
+  const [macthingRouteSelectedId, setMacthingRouteSelectedId] = useState(0);
+  // matching routes 
+  const [matchingRoutes, setMatchingRoutes] = useState([]);
 
-    // Update innfomations displayed when a route is selected
-    const handleSelectMyRoute = (route) => {
-        // disable the first selection flag
-        firstSelection.current = false;
-        // set the flag to true
-        isRouteSelected.current = true;
-        // transform the points to a list of points [lat, lng]
-        const transformedPoints = route.route.map(point => {
-        const [lng, lat] = JSON.parse(point);
-        return [lat, lng];
-        });
-        // update the path
-        setReceivedPoints(transformedPoints);
-        // get the starting point and the arrival point
-        const startPoint = transformedPoints[0];
-        const endPoint = transformedPoints[transformedPoints.length - 1];
-        // transform the points to a JSON format
-        const formatedStartPoint = { "lat": startPoint[0], "lng": startPoint[1]};
-        const formatedEndPoint = {"lat": endPoint[0], "lng": endPoint[1]};
-        // update the starting point and the arrival point
-        setStartPoint(formatedStartPoint);
-        setEndPoint(formatedEndPoint);
-        // update the selected route
-        setSelectedRoute(route);
-        isRouteSelected.current = false;
-        setSelectionUpdate(!selectionUpdate);
-    };
+  // Path color
+  const blueOptions = { fillColor: 'blue' }
 
-    // Handle the deletion of a route
-    const handleDeleteRoute = (routeName) => {
-        // delete the route from the server
-        const deleteRoutePromise = deleteRoute(routeName);
+  
+  /** Updates the path */
+  const handlePathSubmit = async (values) => {
 
-        toast.promise(deleteRoutePromise, {
-        loading: 'Deleting route...',
-        success: <b>Route deleted</b>,
-        error: <b>Fail to delete the route</b>,
-        });
+    // verify that the starting point and the arrival point are defined
+    if (!startPoint || !endPoint) return;
 
-        deleteRoutePromise.then(() => {
-        // update the list of routes
-        setRefresh(!refresh);
-        }).catch((error) => {"fail to update the list of routes"});
-    }
+    // formate the points
+    const formatedPoints = [startPoint, ...intermediatePoints.map(point => point.latlng) ,endPoint];
+    // Handle form submission, e.g., call getShortestPath
+    const getPathPromise = getShortestPath(formatedPoints);
 
-    // Format the route for the server
-    function formatRoute(formData, points) {
-        // verify the existence of the route
-        if (!points || points.length === 0) {
-        toast.error('Veuillez créer un chemin');
-        return null;
+    toast.promise(getPathPromise, {
+        loading: 'Calculating path...',
+        success: <b>Path calculated</b>,
+        error: <b>Path calculation failed</b>,
+    });
+
+    getPathPromise.then((points) => {
+      // update the path
+      setReceivedPoints(points);
+      // if there are intermediate points
+      if (intermediatePoints.length > 0) {
+        // update the list of intermediate points 
+        const updatedIntermediatePoints = updateIndex(points, [...intermediatePoints]);
+        updatedIntermediatePoints.then((res) => {  
+          setIntermediatePoints(res);
+        }).catch((error) => {"fail to update the index of the intermediate points"});
+      }
+    }).catch((error) => {"fail to get the path from the server"});
+  }
+
+   /** Updates the path when modifying points of the path */
+  useEffect(() => {
+    // not calculate the path if a route is selected
+    if (isRouteSelected.current === true) return;
+    // allow to avoid the first call of the function
+    if (firstSelection.current) return;
+    // if the update of the path is not allowed, return
+    if (!shouldUpdatePath) return;
+
+    // updtae the path
+    handlePathSubmit();
+    // disable the update of the path
+    setShouldUpdatePath(false);
+  },
+  // call the function when a point is modified
+  [startPoint, endPoint, intermediatePoints]);
+
+  /** Use the useMapEvents function to handle map events */
+  function MapClickHandler() {
+    useMapEvents({
+      click: (event) => {
+        // avoid multiple calls of the function handleMapClick when dragend event is triggered
+        if (isDragEndEvent) {
+          // reset the drag end event flag
+          setIsDragEndEvent(false);
+          return;
         }
-        // transform the points to a JSON format
-        const transformedPoints = points.map(point => {
-        const [lng, lat] = point;
-        return JSON.stringify([lat, lng]);
-        });
-        // Add the path to the form data
-        formData.route = transformedPoints;
-        return formData;
-    };
+        // reset the list of intermediate points
+        setIntermediatePoints([]);
+        // handle the click
+        handleMapClick(event, isStartPointSelected);
+      },
+    });
+    // No element to render here
+    return null;
+  }
 
-    // Handle the update of a route
-    const handleFindMatches = (formData) => {
-        console.log('ok');
-        
-        // format the data for the server
-        const data = formatRoute(formData, receivedPoints);
-        console.log('formData : ', formData);
-
-        if (!data) return;
-        // add the route to the server
-        const findMatchesPromise = findMatches(data);
-
-        toast.promise(findMatchesPromise, {
-        loading: 'Findings routes...',
-        success: <b>Trajets récupérés</b>,
-        error: (err) => <b>{err.response.data.error}</b>,
-        });
-
-        findMatchesPromise.then((formData) => {
-
-        // transform the points to a list of points [lat, lng]
-        const formatedData = formData.map((route, id) => {
-            let points = route.route;
-            const transformedPoints = points.map(point => {
-            const [lng, lat] = JSON.parse(point);
-            return [lat, lng];
-            });
-            let formattedRoute = route;
-            formattedRoute.route = transformedPoints;
-            return formattedRoute;
-        });
-
-
-        setMatchingRoutes(formatedData);
-        // update the list of routes
-        // setRefresh(!refresh);
-        }).catch((error) => {"fail to get matching routes"});
-    };
-
-    // Update innfomations displayed when a route is selected
-    const handleSelecMatchingRoute = (id) => {
-        setMacthingRouteSelectedId(id);
-    };
-
-      /** Handle map click (set startPoint and EndPoint) */
+  /** Handle map click (set startPoint and EndPoint) */
   const handleMapClick = (event, isStart) => {
 
     // ergonomics operations for the first selection
@@ -199,34 +160,246 @@ export default function NvxTrajet() {
     setShouldUpdatePath(true);
   };
 
-    function handleDragEnd(event, isStart) {
-        // set the drag end event flag
-        setIsDragEndEvent(true);
-        // reformat the event
-        const e = { latlng: event.target._latlng };
-        // change the arrival point 
-        handleMapClick(e, isStart);
-      }
+  function handleDragEnd(event, isStart) {
+    // set the drag end event flag
+    setIsDragEndEvent(true);
+    // reformat the event
+    const e = { latlng: event.target._latlng };
+    // change the arrival point 
+    handleMapClick(e, isStart);
+  }
 
-      /** Use the useMapEvents function to handle map events */
-    function MapClickHandler() {
-        useMapEvents({
-        click: (event) => {
-            // avoid multiple calls of the function handleMapClick when dragend event is triggered
-            if (isDragEndEvent) {
-            // reset the drag end event flag
-            setIsDragEndEvent(false);
-            return;
-            }
-            // reset the list of intermediate points
-            setIntermediatePoints([]);
-            // handle the click
-            handleMapClick(event, isStartPointSelected);
-        },
-        });
-        // No element to render here
-        return null;
+  // -------------- CreateRoute.js && ListRoute.js --------------
+
+  // Format the route for the server
+  function formatRoute(formData, points) {
+    // verify the existence of the route
+    if (!points || points.length === 0) {
+      toast.error('Veuillez créer un chemin');
+      return null;
     }
+    // transform the points to a JSON format
+    const transformedPoints = points.map(point => {
+      const [lng, lat] = point;
+      return JSON.stringify([lat, lng]);
+    });
+    // Add the path to the form data
+    formData.route = transformedPoints;
+    return formData;
+  };
+
+  // Handle the deletion of a route
+  const handleDeleteRoute = (routeName) => {
+    // delete the route from the server
+    const deleteRoutePromise = deleteRoute(routeName);
+
+    toast.promise(deleteRoutePromise, {
+      loading: 'Deleting route...',
+      success: <b>Route deleted</b>,
+      error: <b>Fail to delete the route</b>,
+    });
+
+    deleteRoutePromise.then(() => {
+      // update the list of routes
+      setRefresh(!refresh);
+    }).catch((error) => {"fail to update the list of routes"});
+  }
+
+  // Handle the creation of a route
+  const handleCreateRoute = (formData) => {
+
+    // format the data for the server
+    const data = formatRoute(formData, receivedPoints);
+    if (!data) return;
+    // add the route to the server
+    const addRoutePromise = addRouteToServer(data);
+
+    toast.promise(addRoutePromise, {
+      loading: 'Adding route...',
+      success: <b>Route added</b>,
+      error: (err) => <b>{err.response.data.error}</b>,
+    });
+
+    addRoutePromise.then(() => {
+      // update the list of routes
+      setRefresh(!refresh);
+    }).catch((error) => {"fail to update the list of routes"});
+  };
+
+  // Handle the update of a route
+  const handleUpdateRoute = (formData) => {
+
+    // format the data for the server
+    const data = formatRoute(formData, receivedPoints);
+    // add the route to the server
+    const updateRoutePromise = updateRoute(data);
+
+    toast.promise(updateRoutePromise, {
+      loading: 'Updating route...',
+      success: <b>Route Mmise à jour</b>,
+      error: (err) => <b>{err.response.data.error}</b>,
+    });
+
+    updateRoutePromise.then(() => {
+      // update the list of routes
+      setRefresh(!refresh);
+    }).catch((error) => {"fail to update the list of routes"});
+  };
+
+  // Update innfomations displayed when a route is selected
+  const handleSelectMyRoute = (route) => {
+    // disable the first selection flag
+    firstSelection.current = false;
+    // set the flag to true
+    isRouteSelected.current = true;
+    // transform the points to a list of points [lat, lng]
+    const transformedPoints = route.route.map(point => {
+      const [lng, lat] = JSON.parse(point);
+      return [lat, lng];
+    });
+    // update the path
+    setReceivedPoints(transformedPoints);
+    // get the starting point and the arrival point
+    const startPoint = transformedPoints[0];
+    const endPoint = transformedPoints[transformedPoints.length - 1];
+    // transform the points to a JSON format
+    const formatedStartPoint = { "lat": startPoint[0], "lng": startPoint[1]};
+    const formatedEndPoint = {"lat": endPoint[0], "lng": endPoint[1]};
+    // update the starting point and the arrival point
+    setStartPoint(formatedStartPoint);
+    setEndPoint(formatedEndPoint);
+    // update the selected route
+    setSelectedRoute(route);
+    isRouteSelected.current = false;
+    setSelectionUpdate(!selectionUpdate);
+  };
+
+
+   // Update innfomations displayed when a route is selected
+   const handleSelecMatchingRoute = (id) => {
+    setMacthingRouteSelectedId(id);
+  };
+
+
+  // ----------------------- MatchList.js -----------------------
+
+  // Handle the update of a route
+  const handleFindMatches = (formData) => {
+    
+    // format the data for the server
+    const data = formatRoute(formData, receivedPoints);
+    console.log('formData : ', formData);
+
+    if (!data) return;
+    // add the route to the server
+    const findMatchesPromise = findMatches(data);
+
+    toast.promise(findMatchesPromise, {
+      loading: 'Findings routes...',
+      success: <b>Trajets récupérés</b>,
+      error: (err) => <b>{err.response.data.error}</b>,
+    });
+
+    findMatchesPromise.then((formData) => {
+
+      // transform the points to a list of points [lat, lng]
+      const formatedData = formData.map((route, id) => {
+        let points = route.route;
+        const transformedPoints = points.map(point => {
+          const [lng, lat] = JSON.parse(point);
+          return [lat, lng];
+        });
+        let formattedRoute = route;
+        formattedRoute.route = transformedPoints;
+        return formattedRoute;
+      });
+
+
+      setMatchingRoutes(formatedData);
+      // update the list of routes
+      // setRefresh(!refresh);
+    }).catch((error) => {"fail to get matching routes"});
+  };
+/*
+  // for the adress search
+  const [startAddress, setStartAddress] = useState('');
+  const [endAddress, setEndAddress] = useState('');
+  const [startAddressSuggestions, setStartAddressSuggestions] = useState([]);
+  const [endAddressSuggestions, setEndAddressSuggestions] = useState([]);
+  //const provider = new OpenStreetMapProvider();
+  const provider = new OpenStreetMapProvider({
+    params: {
+      'accept-language': 'fr', // render results in Dutch
+      countrycodes: 'fr', // limit search results to the Netherlands
+      addressdetails: 1, // include additional address detail parts
+      limit: 10, // limit the number of results
+    },
+  });
+
+  // Cache for search results
+  const searchCache = {};
+
+  // Function to place a marker based on address
+  const handleSearch = _.debounce(async (address, isStartPoint) => {
+    // Check cache first
+    if (searchCache[address]) {
+      if (isStartPoint) {
+        setStartAddressSuggestions(searchCache[address]);
+      } else {
+        setEndAddressSuggestions(searchCache[address]);
+      }
+    } else {
+      try {
+        const results = await provider.search({ query: address });
+        if (results.length > 0) {
+          // Store results in cache
+          searchCache[address] = results;
+          if (isStartPoint) {
+            setStartAddressSuggestions(results);
+          } else {
+            setEndAddressSuggestions(results);
+          }
+        }
+      } catch (error) {
+        if (error.message === 'Failed to fetch') {
+          toast.error('Network error: Failed to fetch');
+        }
+        else {
+          toast.error(`Unexpected error: ${error.message}`);
+        }
+      }
+    }
+  }, 500); // Debounce time (ms)
+  
+  const handleSuggestionClick = (suggestion, isStartPoint) => {
+    try {
+      const { x: lng, y: lat } = suggestion;
+      if (isStartPoint) {
+        setStartPoint({ lat, lng });
+        setStartAddress(suggestion.label);
+        // Update the start point in the receivedPoints array
+        setReceivedPoints(prevPoints => {
+          const newPoints = [...prevPoints];
+          newPoints[0] = { lat, lng };
+          return newPoints;
+        });
+      } else {
+        setEndPoint({ lat, lng });
+        setEndAddress(suggestion.label);
+        // Update the end point in the receivedPoints array
+        setReceivedPoints(prevPoints => {
+          const newPoints = [...prevPoints];
+          newPoints[newPoints.length - 1] = { lat, lng };
+          return newPoints;
+        });
+        handlePathSubmit();
+      }
+    }
+    catch (error) {
+      toast.error("error");
+    }
+  };*/
+
 
     return (
     <div className='general'>
