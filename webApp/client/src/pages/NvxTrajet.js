@@ -67,6 +67,17 @@ export default function NvxTrajet() {
   // Path color
   const blueOptions = { fillColor: 'blue' }
 
+  const [routeName, setRouteName] = useState('');
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const [selectedPeriodicTimes, setSelectedPeriodicTimes] = useState([]);
+  const [selectedDayOfWeek, setSelectedDayOfWeek] = useState(0);
+  const [selectedTime, setSelectedTime] = useState(null);
+
+  // state to store the list of routes
+  const [routes, setRoutes] = useState([]);
+
   
   /** Updates the path */
   const handlePathSubmit = async (values) => {
@@ -283,6 +294,35 @@ export default function NvxTrajet() {
 
   // ----------------------- MatchList.js -----------------------
 
+  function getValideRouteInfos() {
+    /*
+    routes.map((route, index) => (
+      console.log(route.name);
+    ));
+*/
+
+    // Verify that the name is filled
+    if (!routeName.trim()) {
+      toast.error('Veuillez entrer un nom pour le chemin.');
+      return;
+    }
+    // Verify that at least one date OR one periodic time is selected
+    if (selectedDates.length === 0 && selectedPeriodicTimes.length === 0) {
+      toast.error('Veuillez sélectionner au moins une date ou un horaire périodique.');
+      return;
+    }
+    // structure the route information
+    const routeInfos = { 
+      "name": routeName, 
+      "planning": { 
+        "dates": selectedDates, 
+        "periodic": selectedPeriodicTimes 
+      }
+    }
+    console.log('routeInfos', routeInfos);
+    return routeInfos;
+  }
+
   // Handle the update of a route
   const handleFindMatches = (formData) => {
     
@@ -304,6 +344,7 @@ export default function NvxTrajet() {
 
       // transform the points to a list of points [lat, lng]
       const formatedData = formData.map((route, id) => {
+        console.log(route);
         let points = route.route;
         const transformedPoints = points.map(point => {
           const [lng, lat] = JSON.parse(point);
@@ -320,6 +361,17 @@ export default function NvxTrajet() {
       // setRefresh(!refresh);
     }).catch((error) => {"fail to get matching routes"});
   };
+
+    // find matches for a route button
+    const handleFindMatchesBtn = () => {
+      // Verify that all the required information is filled
+      const routeInfos = getValideRouteInfos();
+      if (routeInfos) {
+        // If the conditions are met, submit the form
+        handleFindMatches(routeInfos);
+      }
+      console.log('handleFindMatchesBtn OK');
+    }
 /*
   // for the adress search
   const [startAddress, setStartAddress] = useState('');
@@ -425,6 +477,10 @@ export default function NvxTrajet() {
 
                 {/* Intégrez le composant ListRouteForm */}
                 <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute}/>
+
+                <button onClick={handleFindMatchesBtn}>
+                  Trouver les correspondances
+                </button>
 
                 {/* Intégrez le composant MatchList */}
                 { true && (

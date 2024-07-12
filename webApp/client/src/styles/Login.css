@@ -17,3 +17,17 @@ form div {
   display: grid !important;
   width: 100%
 }
+
+.form-container {
+  display: flex; /* Use flexbox to arrange blocks */
+  flex-wrap: wrap; /* Allow wrapping to next line if needed */
+}
+
+form divphoto {
+  width: 35%;
+  height: 100%
+}
+
+form divtext {
+  width: 65%;
+}

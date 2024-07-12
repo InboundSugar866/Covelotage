@@ -37,7 +37,7 @@ export default function Home() {
                 <div className="text31">
                   <div className="text31blocks">
                     <h2>TROUVEZ un coveloteur</h2>
-                    <p>Entrez les itinéraires que vous emprûntés quotidiennement sur le secteur du Grand Nancy, et contactez d’autres cyclistes avec un trajet similaire au votre.</p>
+                    <p>Entrez les itinéraires que vous emprûntez quotidiennement sur le secteur du Grand Nancy, et contactez d’autres cyclistes avec un trajet similaire au votre.</p>
                   </div>
                   <div className="text31blocks">
                     <h2>DECOUVRIR DES PARCOURS</h2>
@@ -45,7 +45,7 @@ export default function Home() {
                   </div>
                   <div className="text31blocks">
                     <h2>TROUVEZ VOTRE COMPAGNON</h2>
-                    <p>Rejoignez une communauté cycliste et dynamique. Interragissez avec d’autres utilisateurs, partagez des expériences et contribuez à un environnement urbain plus sûr.</p>
+                    <p>Rejoignez une communauté cycliste dynamique. Interragissez avec d’autres utilisateurs, partagez des expériences et contribuez à un environnement urbain plus sûr.</p>
                   </div>
                 </div>
               </div>
