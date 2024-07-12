@@ -22,7 +22,9 @@ export default function Register() {
     initialValues : {
       email: 'c666@gmail.com',
       username: 'example123',
-      password : 'admin@12'
+      password : 'admin@12',
+      name : 'John',
+      surname : 'Doe'
     },
     validate : registerValidate,
     validateOnBlur : false,
@@ -87,7 +89,7 @@ export default function Register() {
             <span>Nous sommes heureux de vous recevoir parmis nous !</span>
           </div>
 
-          <form className="row g-3" onSubmit={formik.handleSubmit}>
+          <form className="form-container" onSubmit={formik.handleSubmit}>
             <divphoto>
               <label htmlFor="profile" className="form-label">
                 <img src={file || avatar} className="img-fluid rounded-circle" alt="avatar" style={{width:'200px'}} />
@@ -96,9 +98,13 @@ export default function Register() {
             </divphoto>
 
             <divtext>
-              <input {...formik.getFieldProps('email')} type="text" className="form-control" placeholder="Email*" />
-              <input {...formik.getFieldProps('username')} type="text" className="form-control" placeholder="Username*" />
-              <input {...formik.getFieldProps('password')} type="password" className="form-control" placeholder="Password*" />
+              <input {...formik.getFieldProps('name')} type="text" className="form-control" placeholder="Name*" required/>
+              <input {...formik.getFieldProps('surname')} type="text" className="form-control" placeholder="Surname*" required/>
+              <input {...formik.getFieldProps('username')} type="text" className="form-control" placeholder="Username*" required/>
+              <input {...formik.getFieldProps('phone')} type="tel" className="form-control" placeholder="Phone" required/>
+              <input {...formik.getFieldProps('adress')} type="text" className="form-control" placeholder="Adresse" required/>
+              <input {...formik.getFieldProps('email')} type="text" className="form-control" placeholder="Email*" required/>
+              <input {...formik.getFieldProps('password')} type="password" className="form-control" placeholder="Password*" required/>
               <button type="submit" className="btn btn-primary w-100">
                 S'enregister
               </button>
