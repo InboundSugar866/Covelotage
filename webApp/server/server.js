@@ -66,8 +66,10 @@ app.get('/', (req, res) => {
     res.status(201).json("Home GET Request");
 });
 
+/** API routes */
+app.use('/api', router);
 
-
+/*
 const server = app.listen(8080);
 connect().then(() => {
   //const server = app.listen(port);
@@ -84,8 +86,20 @@ connect().then(() => {
 }).catch(error => {
   console.log("Invalid database connection...!")
 });
+*/
 
-
+/** start server only whan we have valid connection*/
+connect().then(() => {
+  try {
+      app.listen(port, () => {
+          console.log(`Server connected tp http://localhost:${port}`);
+      });
+  } catch (error) {
+      console.log('Cannot connect to the server')
+  }
+}).catch(error => {
+  console.log("Invalid database connection...!")
+});
 
 
 
@@ -118,9 +132,9 @@ mongoose.connect(process.env.MONGO_URL, (err) => {
 */
 
 import ENV from './config.js'
-mongoose.connect(ENV.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Database connected!'))
-  .catch(err => console.log(err));
+//mongoose.connect(ENV.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+//  .then(() => console.log('Database connected!'))
+//  .catch(err => console.log(err));
 
 const jwtSecret = ENV.JWT_SECRET;
 const bcryptSalt = bcrypt.genSaltSync(10);
@@ -188,12 +202,13 @@ const wss = new WebSocket.Server({ noServer: true });
 
 //const wss = new ws.Server({ noServer: true });
 
-
+/*
 server.on('upgrade', function upgrade(request, socket, head) {
   wss.handleUpgrade(request, socket, head, function done(ws) {
     wss.emit('connection', ws, request);
   });
 });
+*/
 
 wss.on('connection', (connection, req) => {
 
