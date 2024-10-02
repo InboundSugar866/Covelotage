@@ -66,11 +66,32 @@ app.get('/', (req, res) => {
     res.status(201).json("Home GET Request");
 });
 
+/** API routes */
+app.use('/api', router);
 
 
-const server = app.listen(8080);
+//const server = app.listen(8080);
+
+const server = app.listen(port, () => {
+  console.log(`Server connected to http://localhost:${port}`);
+});
+
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.log(`Port ${port} is already in use.`);
+  } else {
+    console.log('Cannot connect to the server:', error);
+  }
+});
+
 connect().then(() => {
-  //const server = app.listen(port);
+  console.log("Database connected successfully");
+}).catch(error => {
+  console.log("Invalid database connection...!", error);
+});
+/*
+connect().then(() => {
+  const server = app.listen(port);
   server.on('error', (error) => {
       if (error.code === 'EADDRINUSE') {
           console.log(`Port ${port} is already in use.`);
@@ -84,9 +105,22 @@ connect().then(() => {
 }).catch(error => {
   console.log("Invalid database connection...!")
 });
+*/
 
-
-
+/** start server only whan we have valid connection*/
+/*
+connect().then(() => {
+  try {
+      app.listen(port, () => {
+          console.log(`Server connected to http://localhost:${port}`);
+      });
+  } catch (error) {
+      console.log('Cannot connect to the server')
+  }
+}).catch(error => {
+  console.log("Invalid database connection...!")
+});
+*/
 
 
 //const express = require('express');
@@ -111,16 +145,16 @@ import fs from 'fs';
 //const fs = require('fs');
 
 dotenv.config();
-/*
-mongoose.connect(process.env.MONGO_URL, (err) => {
-  if (err) throw err;
-});
-*/
+
+//mongoose.connect(process.env.MONGO_URL, (err) => {
+//  if (err) throw err;
+//});
+
 
 import ENV from './config.js'
-mongoose.connect(ENV.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Database connected!'))
-  .catch(err => console.log(err));
+//mongoose.connect(ENV.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+//  .then(() => console.log('Database connected!'))
+//  .catch(err => console.log(err));
 
 const jwtSecret = ENV.JWT_SECRET;
 const bcryptSalt = bcrypt.genSaltSync(10);
@@ -194,6 +228,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
     wss.emit('connection', ws, request);
   });
 });
+
 
 wss.on('connection', (connection, req) => {
 

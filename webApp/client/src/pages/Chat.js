@@ -5,9 +5,10 @@ import {UserContext} from "./UserContext";
 import {uniqBy} from "lodash";
 import axios from "axios";
 import Contact from "./Contact";
-//import '../styles/Chat.css'
 import { LogoutButton } from '../components/LogoutButton';
-import '../styles/Chat.css';
+//import '../styles/Chat.css';
+
+import { ReactComponent as Search } from '../assets/Search.svg';
 
 export default function Chat() {
   const [ws,setWs] = useState(null);
@@ -127,6 +128,14 @@ export default function Chat() {
       <div className="bg-white w-25 d-flex flex-column">
         <div className="flex-grow-1">
           <Logo />
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-search">
+                <Search style={{ width: '20px', height: '20px' }} alt='commencer'/></i>
+              </span>
+            </div>
+            <input type="text" class="form-control" placeholder="Search..."></input>
+          </div>
           {Object.keys(onlinePeopleExclOurUser).map(userId => (
             <Contact
               key={userId}
@@ -165,30 +174,31 @@ export default function Chat() {
               <div className="text-secondary">&larr; Select a person from the sidebar</div>
             </div>
           )}
-          {!!selectedUserId && (
-            <div className="position-relative vh-5">
-              <div className="overflow-auto position-absolute top-0 left-0 right-0 bottom-2">
-                {messagesWithoutDupes.map(message => (
-                  <div key={message._id} className={(message.sender === id ? 'text-end': 'text-start')}>
-                    <div className={"text-start d-inline-block p-2 my-2 rounded text-sm " +(message.sender === id ? 'bg-primary text-white':'bg-white text-secondary')}>
-                      {message.text}
-                      {message.file && (
-                        <div className="">
-                          <a target="_blank" className="d-flex align-items-center gap-1 border-bottom" href={axios.defaults.baseURL + '/uploads/' + message.file}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{width: '1rem', height: '1rem'}}>
-                              <path fillRule="evenodd" d="M18.97 3.659a2.25 2.25 0 00-3.182 0l-10.94 10.94a3.75 3.75 0 105.304 5.303l7.693-7.693a.75.75 0 011.06 1.06l-7.693 7.693a5.25 5.25 0 11-7.424-7.424l10.939-10.94a3.75 3.75 0 115.303 5.304L9.097 18.835l-.008.008-.007.007-.002.002-.003.002A2.25 2.25 0 015.91 15.66l7.81-7.81a.75.75 0 011.061 1.06l-7.81 7.81a.75.75 0 001.054 1.068L18.97 6.84a2.25 2.25 0 000-3.182z" clipRule="evenodd" />
-                            </svg>
-                            {message.file}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                <div ref={divUnderMessages}></div>
+{!!selectedUserId && (
+  <div className="position-relative h-100">
+    <div className="overflow-auto top-0 left-0 right-0 bottom-2">
+      {messagesWithoutDupes.map(message => (
+        <div key={message._id} className={(message.sender === id ? 'text-end': 'text-start')}>
+          <div className={"text-start d-inline-block p-2 my-2 rounded text-sm " +(message.sender === id ? 'bg-primary text-white':'bg-white text-secondary')}>
+            {message.text}
+            {message.file && (
+              <div className="">
+                <a target="_blank" className="d-flex align-items-center gap-1 border-bottom" href={axios.defaults.baseURL + '/uploads/' + message.file}>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <path fillRule="evenodd" d="M18.97 3.659a2.25 2.25 0 00-3.182 0l-10.94 10.94a3.75 3.75 0 105.304 5.303l7.693-7.693a.75.75 0 011.06 1.06l-7.693 7.693a5.25 5.25 0 11-7.424-7.424l10.939-10.94a3.75 3.75 0 115.303 5.304L9.097 18.835l-.008.008-.007.007-.002.002-.003.002A2.25 2.25 0 015.91 15.66l7.81-7.81a.75.75 0 011.061 1.06l-7.81 7.81a.75.75 0 001.054 1.068L18.97 6.84a2.25 2.25 0 000-3.182z" clipRule="evenodd" />
+                  </svg>
+                  {message.file}
+                </a>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        </div>
+      ))}
+      <div ref={divUnderMessages}></div>
+    </div>
+  </div>
+)}
+
         </div>
         {!!selectedUserId && (
         <form className="d-flex gap-2" onSubmit={sendMessage}>

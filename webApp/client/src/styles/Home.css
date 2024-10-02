@@ -6,17 +6,16 @@ body, html {
     margin: 0;
     padding: 0;
     border: 0;
-  }
+    height: 100%;
+}
 
-.general {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    min-width: 100%;
-    position: relative;
-    position: relative;
-    padding-left: 0px;
-
+.container1 {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.content {
+  flex: 1;
 }
   
 .backgroundImage {
@@ -29,100 +28,25 @@ body, html {
   /* Set the background size to cover */
   background-size: 100% auto;
 
-}
-
-
-/* Home.css */
-.navbar {
-    /* Bootstrap's navbar-light class */
-  }
-
-.profile {
-  /* Styles from Bootstrap's container class */
-  width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  margin-right: auto;
-  margin-left: auto;
-
-  /* Styles from Bootstrap's d-flex class */
-  display: flex;
-
-  /* Styles from Bootstrap's justify-content-end class */
-  justify-content: flex-end;
+  overflow-y: hidden;
 }
   
-  .main {
-    /* Bootstrap's jumbotron and jumbotron-fluid classes */
-    padding: 2rem 1rem !important;
-    margin-bottom: 2rem !important;
-    border-radius: .3rem !important;
-    transform: translateY(-100px) !important;
-  }
-
-
-.text1 {
-    /* Bootstrap's display-4 class */
-    font-size: 4rem !important;
-    font-weight: 800 !important;
-    line-height: 1.2 !important;
-    font-family: 'bayon' !important;
+h1, h2, h3 {
+  font-family: 'bayon';
 }
-  
 
-  .text11 {
-    /* Bootstrap's display-4 class */
-    font-size: 3rem !important;
-    font-weight: 200 !important;
-    line-height: 1.2 !important;
-    font-family: 'bayon' !important;
-    transform: translateY(-20px);
-  }
-  
-  .text2 {
-    /* Bootstrap's lead class */
-    font-size: 1.25rem;
-    font-weight: 300;
-    font-family: 'basic';
-    width: 75%;
-  }
-  
-  .text3 {
-    /* Bootstrap's mt-5 class */
-    margin-top: 3rem !important;
-    font-family: 'basic';
-    transform:translateY(-50px);
-  }
-  
-  .text31 {
-    /* Bootstrap's row class */
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -15px;
-    font-family: 'basic';
-    justify-content: center;
+p {
+  font-family: 'basic';
+}
 
-  }
-  
-  .text31blocks {
-    /* Bootstrap's col-md-4 class */
-    font-size: 1.4rem;
-    position: relative;
-    width: 30%;
-    padding-right: 15px;
-    padding-left: 15px;
-    text-align: justify;
+.text-large {
+  font-size: 4rem;
+}
 
-    background-color: rgba(255, 255, 255, 0.5); /* white background with 50% opacity */
-    border-radius: 10px; /* rounded corners */
-    padding: 10px; /* some padding */
-    margin-right: 20px;
-  }
-  
-  h2 {
-    font-family: 'bayon';
-  }
+.gray-lighter {
+  background-color: #eee;
+}
 
-  p {
-    font-family: 'basic';
-  }
+.bg-white-50 {
+  background-color: rgba(255, 255, 255, 0.5);
+}

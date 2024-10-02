@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect} from 'react';
 import toast, {Toaster} from 'react-hot-toast';
-import { Link } from 'react-router-dom'
+import { Link, Route } from 'react-router-dom'
 
-import backgroundImage from '../assets/Fond_urbain1.jpg';
+import backgroundImage from '../assets/Fond_urbain.jpg';
 import Footer from '../components/Footer';
 import { ReactComponent as Profil } from '../assets/Profil.svg';
 import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
@@ -27,8 +27,6 @@ import marker_dynamic_2 from '../assets/map-marker-icon-dynamic-2.png';
 
 
 import { CreateRoute } from '../components/CreateRoute';
-
-
 
 export default function NvxTrajet() {
 
@@ -77,6 +75,8 @@ export default function NvxTrajet() {
 
   // state to store the list of routes
   const [routes, setRoutes] = useState([]);
+
+  const [routeSelected, setRouteSelected] = useState(false);
 
   
   /** Updates the path */
@@ -259,6 +259,7 @@ export default function NvxTrajet() {
 
   // Update innfomations displayed when a route is selected
   const handleSelectMyRoute = (route) => {
+    setRouteSelected(true);
     // disable the first selection flag
     firstSelection.current = false;
     // set the flag to true
@@ -283,6 +284,8 @@ export default function NvxTrajet() {
     setSelectedRoute(route);
     isRouteSelected.current = false;
     setSelectionUpdate(!selectionUpdate);
+
+    //document.querySelector('.col-md-5').classList.add('route-selected');
   };
 
 
@@ -291,23 +294,30 @@ export default function NvxTrajet() {
     setMacthingRouteSelectedId(id);
   };
 
+  // Get route name
+  const getRouteName = (route) => {
+    const RouteName = route.name;
+    return RouteName;
+  }
+
 
   // ----------------------- MatchList.js -----------------------
 
-  function getValideRouteInfos() {
+  function getValideRouteInfos(route) {
     /*
     routes.map((route, index) => (
       console.log(route.name);
     ));
 */
+    console.log(selectedRoute.planning.dates);
 
     // Verify that the name is filled
-    if (!routeName.trim()) {
+    if (!selectedRoute.name.trim()) {
       toast.error('Veuillez entrer un nom pour le chemin.');
       return;
     }
     // Verify that at least one date OR one periodic time is selected
-    if (selectedDates.length === 0 && selectedPeriodicTimes.length === 0) {
+    if (selectedRoute.planning.dates.length === 0 && selectedRoute.planning.periodic.length === 0) {
       toast.error('Veuillez sélectionner au moins une date ou un horaire périodique.');
       return;
     }
@@ -362,16 +372,18 @@ export default function NvxTrajet() {
     }).catch((error) => {"fail to get matching routes"});
   };
 
-    // find matches for a route button
-    const handleFindMatchesBtn = () => {
-      // Verify that all the required information is filled
-      const routeInfos = getValideRouteInfos();
-      if (routeInfos) {
-        // If the conditions are met, submit the form
-        handleFindMatches(routeInfos);
-      }
-      console.log('handleFindMatchesBtn OK');
+  // find matches for a route button
+  const handleFindMatchesBtn = () => {
+    // Verify that all the required information is filled
+    const routeInfos = getValideRouteInfos();
+    if (routeInfos) {
+      // If the conditions are met, submit the form
+      handleFindMatches(routeInfos);
     }
+    console.log('handleFindMatchesBtn OK');
+  }
+
+
 /*
   // for the adress search
   const [startAddress, setStartAddress] = useState('');
@@ -454,157 +466,174 @@ export default function NvxTrajet() {
 
 
     return (
-    <div className='general'>
+    <div>
         <Toaster position="" reverseOrder={false}></Toaster>
         <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
 
+
             {/* Navigation Bar */}
-            <nav className="navbar">
-                <Link className="navutil" to="/map">
+            <nav class="navbar d-flex justify-content-end p-2 float-end">
+                <Link class="border border-4 border-success rounded-3 mx-1 mt-2" to="/nvxtrajet">
                     <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
                 </Link>
-                <Link className="navutil" to="/chat">
+                <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/chat">
                     <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
                 </Link>
-                <Link className="navutil" to="/profile">
+                <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/profile">
                     <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
                 </Link>
             </nav>
 
+            <div class="p-4 mb-4">
+              <div>
+                <h1 class="fw-bold text-large">Covelotage</h1>
+                <h2 >Votre Communaute Cycliste</h2>
+              </div>
+            </div>
 
 
-            <div className='container-carte-trajet' >
 
-                {/* Intégrez le composant ListRouteForm */}
-                <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute}/>
-
-                <button onClick={handleFindMatchesBtn}>
-                  Trouver les correspondances
-                </button>
-
-                {/* Intégrez le composant MatchList */}
-                { true && (
-                    <MatchList routes={matchingRoutes} handleFindMatches={handleFindMatches} onSelectMatchingRoute={handleSelecMatchingRoute}/>
-                )}
-
-                <div>
-                <MapContainer
-                    center={[48.65, 6.15]}
-                    zoom={17}
-                    style={{
-                        border: '1px solid #ccc',
-                        height: '700px',
-                        width: '700px',
-                        margin: '10px',
-                        position: 'relative',
-                    }}
-                    >
-                    <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    />
-
-                    { /** Starting point */
-                        startPoint && (
-                        <Marker
-                            position={[startPoint.lat, startPoint.lng]}
-                            //altitude={[startPoint.altitude, startPoint.altitude]}
-                            icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
-                            draggable={true}
-                            eventHandlers={{
-                            dragend: (event) => { handleDragEnd(event, true) }
-                            }}
-                        >          
-                        </Marker>
+            <div class="light-gray rounded-3 p-4 mx-auto my-3 mx-md-5 my-md-4" >
+                <div class="row">
+                  {/*<!-- Left Column: ListRoute -->*/}
+                  <div class="col-md-5">
+                    <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute} />
+                  </div>
+                  {/*<!-- Right Column: MatchList -->*/}
+                  <div class="col-md-7">
+                    {true && (
+                      <MatchList routes={matchingRoutes} handleFindMatches={handleFindMatches} onSelectMatchingRoute={handleSelecMatchingRoute} />
                     )}
+                  </div>
+                  <div>
+                    <button class='event-button' id="findMatchesBtn" onClick={handleFindMatchesBtn} style={{display: routeSelected ? 'block' : 'none' }}>
+                      TROUVER UN COVELOTEUR !
+                    </button>
+                  </div>
+                </div>
 
-                    { /** End point */
-                        endPoint && (
-                        <Marker
-                            position={[endPoint.lat, endPoint.lng]}
-                            icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
-                            draggable={true}
-                            eventHandlers={{
-                            dragend: (event) => { handleDragEnd(event, false) }
-                            }}
-                        >
-                        </Marker>
-                    )}
 
-                    {/** Matching routes */
-                    matchingRoutes.length > 0 &&
-                        matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
-                            (<Marker 
-                            key={index}
-                            position={point}
-                            icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
-                            >
-                            </Marker>)
-                        ))       
-                    }
-
-                    {/** Path */
-                    matchingRoutes.length > 0 && (
-                        <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
-                    )}
-
-                    {/** Path */
-                    receivedPoints && (
-                        <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
-                    )}
-                    
-                    {/** Dynamics points */
-                        receivedPoints.map((point, index) => (
-                        <Marker 
-                        key={index}
-                        position={point}
-                        icon={L.icon({ iconUrl: marker_dynamic, iconSize: [10, 10] })}
-                        // draggable only if not start or end point
-                        draggable={(index !== 0) && (index !== receivedPoints.length - 1)}
+                <div class="d-flex flex-column align-items-center">
+                  <h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
+                  <MapContainer
+                      center={[48.65, 6.15]}
+                      zoom={17}
+                      style={{
+                          border: '1px solid #ccc',
+                          height: '700px',
+                          width: '700px',
+                          margin: '10px',
+                          position: 'relative',
+                      }}
+                      >
                         
-                        eventHandlers={{
-                            dragend: (event) => {
-                            // set the drag end event flag
-                            setIsDragEndEvent(true);
+                        
+                      <TileLayer
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      
 
-                            // reformat the event
-                            const modifiedPoint = {
-                                latlng: event.target._latlng,
-                                index: index,
-                            };
+                      { /** Starting point */
+                          startPoint && (
+                          <Marker
+                              position={[startPoint.lat, startPoint.lng]}
+                              //altitude={[startPoint.altitude, startPoint.altitude]}
+                              icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
+                              draggable={true}
+                              eventHandlers={{
+                              dragend: (event) => { handleDragEnd(event, true) }
+                              }}
+                          >          
+                          </Marker>
+                      )}
 
-                            // retrieve the list of points previously moved manually
-                            const points = [...intermediatePoints];
-                                            
-                            // Check if the index already exists.
-                            const existingIndex = points.findIndex(
-                                (point) => point.index === index
-                            );
+                      { /** End point */
+                          endPoint && (
+                          <Marker
+                              position={[endPoint.lat, endPoint.lng]}
+                              icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
+                              draggable={true}
+                              eventHandlers={{
+                              dragend: (event) => { handleDragEnd(event, false) }
+                              }}
+                          >
+                          </Marker>
+                      )}
 
-                            // update the temporary list
-                            if (existingIndex !== -1) {
-                                // update the existing point
-                                points[existingIndex] = modifiedPoint;
-                            } else {
-                                // add the new point
-                                points.push(modifiedPoint);
-                                // sort the list of points
-                                points.sort((a, b) => a.index - b.index);
-                            }
+                      {/** Matching routes */
+                      matchingRoutes.length > 0 &&
+                          matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
+                              (<Marker 
+                              key={index}
+                              position={point}
+                              icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
+                              >
+                              </Marker>)
+                          ))       
+                      }
 
-                            // update the list of intermediate points
-                            setIntermediatePoints(points);
-                            // enable the update of the path
-                            setShouldUpdatePath(true);                
-                            }
-                        }}
-                        >
-                        { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
-                        </Marker>
-                    ))}
-                    <MapClickHandler />
-                </MapContainer>
-                <Link to="/map"><button>Retour</button></Link>
+                      {/** Path */
+                      matchingRoutes.length > 0 && (
+                          <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
+                      )}
+
+                      {/** Path */
+                      receivedPoints && (
+                          <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
+                      )}
+                      
+                      {/** Dynamics points */
+                          receivedPoints.map((point, index) => (
+                          <Marker 
+                          key={index}
+                          position={point}
+                          icon={L.icon({ iconUrl: marker_dynamic, iconSize: [10, 10] })}
+                          // draggable only if not start or end point
+                          draggable={(index !== 0) && (index !== receivedPoints.length - 1)}
+                          
+                          eventHandlers={{
+                              dragend: (event) => {
+                              // set the drag end event flag
+                              setIsDragEndEvent(true);
+
+                              // reformat the event
+                              const modifiedPoint = {
+                                  latlng: event.target._latlng,
+                                  index: index,
+                              };
+
+                              // retrieve the list of points previously moved manually
+                              const points = [...intermediatePoints];
+                                              
+                              // Check if the index already exists.
+                              const existingIndex = points.findIndex(
+                                  (point) => point.index === index
+                              );
+
+                              // update the temporary list
+                              if (existingIndex !== -1) {
+                                  // update the existing point
+                                  points[existingIndex] = modifiedPoint;
+                              } else {
+                                  // add the new point
+                                  points.push(modifiedPoint);
+                                  // sort the list of points
+                                  points.sort((a, b) => a.index - b.index);
+                              }
+
+                              // update the list of intermediate points
+                              setIntermediatePoints(points);
+                              // enable the update of the path
+                              setShouldUpdatePath(true);                
+                              }
+                          }}
+                          >
+                          { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
+                          </Marker>
+                      ))}
+                      <MapClickHandler />
+                  </MapContainer>
                 </div>
                 
             </div>

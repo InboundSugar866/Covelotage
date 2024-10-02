@@ -169,6 +169,22 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     setSelectedPeriodicTimes(selectedRoute.planning.periodic);
   }, [selectedRoute, selectionUpdate]);
 
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.search-container')) {
+        setShowSuggestions(false);
+      }
+    };
+  
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+  
+
   return (
     <div>
 
@@ -187,9 +203,8 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
 
         {/** start point adress */}
         <div>
-          
           <label>Adresse de depart :</label>
-            <div>
+          <div className="search-container">
             <input 
               type="search"
               name="startPointSearch"
@@ -198,37 +213,44 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
                 setStartAddress(e.target.value);
                 handleSearch(e.target.value, true);
               }}
+              onFocus={() => setShowSuggestions(true)}
             />
-            </div>
-            {startAddressSuggestions.map((suggestion, index) => (
-              <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
-                {suggestion.label}
+            {showSuggestions && (
+              <div className="suggestions-list">
+                {startAddressSuggestions.map((suggestion, index) => (
+                  <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
+                    {suggestion.label}
+                  </div>
+                ))}
               </div>
-            ))}
-          
+            )}
+          </div>
         </div>
 
         {/** end point adress */}
         <div>
-          
           <label>Adresse d'arrivee :</label>
-            <div>
+          <div className="search-container">
             <input 
               type="search"
               name="endPointSearch"
               value={endAddress}
               onChange={(e) => {
                 setEndAddress(e.target.value);
-                handleSearch(e.target.value, false);
+                handleSearch(e.target.value, true);
               }}
+              onFocus={() => setShowSuggestions(true)}
             />
-            </div>
-            {endAddressSuggestions.map((suggestion, index) => (
-              <div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
-                {suggestion.label}
+            {showSuggestions && (
+              <div className="suggestions-list">
+                {endAddressSuggestions.map((suggestion, index) => (
+                  <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
+                    {suggestion.label}
+                  </div>
+                ))}
               </div>
-            ))}
-          
+            )}
+          </div>
         </div>
 
         <div>

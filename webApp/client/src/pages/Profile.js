@@ -68,7 +68,7 @@ export default function Profile() {
     <div>
       <Toaster position="bottom-center" reverseOrder={false}></Toaster>
       <div
-        className="container-fluid d-flex align-items-center justify-content-center"
+        class="container-fluid d-flex align-items-center justify-content-center"
         style={{
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
@@ -82,7 +82,7 @@ export default function Profile() {
       >
 
 <div
-        className="rounded p-4"
+        class="rounded p-4"
         style={{
           width: '40%',
           backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -93,18 +93,18 @@ export default function Profile() {
       >
       
 
-        {/* Navigation Bar */}
-        <nav className="navbar">
-          <NavLink className="navutil" activeClassName="active" to="/map">
-              <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
-          </NavLink>
-          <NavLink className="navutil" activeClassName="active" to="/chat">
-              <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
-          </NavLink>
-          <NavLink className="navutil" activeClassName="active" to="/profile">
-              <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
-          </NavLink>
-        </nav>
+            {/* Navigation Bar */}
+            <nav class="navbar d-flex justify-content-end p-2 float-end" style={{ zIndex: '2' }}>
+                <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/nvxtrajet">
+                    <Trajet style={{ width: '100px', height: '100px', filter: 'invert(1) hue-rotate(180deg)' }} alt='commencer'/>
+                </Link>
+                <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/chat">
+                    <Messagerie style={{ width: '100px', height: '100px', filter: 'invert(1) hue-rotate(180deg)' }} alt='commencer'/>
+                </Link>
+                <Link class="border border-4 border-success rounded-3 mx-1 mt-2" to="/profile">
+                    <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
+                </Link>
+            </nav>
 
 {/*
         <div className="text-center mb-4">
@@ -113,33 +113,33 @@ export default function Profile() {
           <span>You can update the details.</span>
         </div>
 */}
-        <form onSubmit={formik.handleSubmit}>
-          <div className="mb-3 text-center">
+        <form onSubmit={formik.handleSubmit} style={{ zIndex: '1' }}>
+          <div class="mb-3 text-center">
             <label htmlFor="profile">
-              <img src={file || apiData?.profile || avatar} className="img-fluid rounded-circle" alt="avatar" style={{ maxWidth: '120px' }} />
+              <img src={file || apiData?.profile || avatar} class="img-fluid rounded-circle" alt="avatar" style={{ maxWidth: '120px' }} />
             </label>
 
             <input onChange={onUpload} type="file" id="profile" name="profile" style={{ display: 'none' }} />
           </div>
 
-          <div className="mb-3">
-            <input {...formik.getFieldProps('firstName')} className="form-control" type="text" placeholder="Prénom" />
+          <div class="mb-3">
+            <input {...formik.getFieldProps('firstName')} class="form-control" type="text" placeholder="Prénom" />
           </div>
-          <div className="mb-3">
-            <input {...formik.getFieldProps('lastName')} className="form-control" type="text" placeholder="Nom" />
+          <div class="mb-3">
+            <input {...formik.getFieldProps('lastName')} class="form-control" type="text" placeholder="Nom" />
           </div>
-          <div className="mb-3">
-            <input {...formik.getFieldProps('mobile')} className="form-control" type="text" placeholder="Numéro de téléphone" />
+          <div class="mb-3">
+            <input {...formik.getFieldProps('mobile')} class="form-control" type="text" placeholder="Numéro de téléphone" />
           </div>
-          <div className="mb-3">
-            <input {...formik.getFieldProps('email')} className="form-control" type="text" placeholder="Email" />
+          <div class="mb-3">
+            <input {...formik.getFieldProps('email')} class="form-control" type="text" placeholder="Email" />
           </div>
-          <div className="mb-3">
-            <input {...formik.getFieldProps('address')} className="form-control" type="text" placeholder="Addresse" />
+          <div class="mb-3">
+            <input {...formik.getFieldProps('address')} class="form-control" type="text" placeholder="Addresse" />
           </div>
 
-          <div className="mb-3 text-center">
-            <button className="btn btn-primary w-100" type="submit">
+          <div class="mb-3 text-center">
+            <button class="btn btn-primary w-100" type="submit">
               Mettre à jour
             </button>
           </div>
@@ -151,7 +151,7 @@ export default function Profile() {
 
       {/* The following div creates the blurred overlay */}
       <div
-        className="position-absolute top-0 end-0 bottom-0 start-0"
+        class="position-absolute top-0 end-0 bottom-0 start-0"
         style={{
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           backdropFilter: 'blur(5px)',

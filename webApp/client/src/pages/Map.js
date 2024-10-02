@@ -26,7 +26,7 @@ import _ from 'lodash';
 import { Toast } from 'bootstrap';
 
 
-import backgroundImage from '../assets/Fond_urbain1.jpg';
+import backgroundImage from '../assets/Fond_urbain.jpg';
 import Footer from '../components/Footer';
 import { ReactComponent as Profil } from '../assets/Profil.svg';
 import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
@@ -355,7 +355,6 @@ export default function Map() {
 
   // Function to place a marker based on address
   const handleSearch = _.debounce(async (address, isStartPoint) => {
-    // Check cache first
     if (searchCache[address]) {
       if (isStartPoint) {
         setStartAddressSuggestions(searchCache[address]);
@@ -366,24 +365,36 @@ export default function Map() {
       try {
         const results = await provider.search({ query: address });
         if (results.length > 0) {
-          // Store results in cache
-          searchCache[address] = results;
+          const formattedResults = results.map(result => {
+            const parts = result.label.split(', ');
+            const formattedLabel = parts.slice(0, 3).join(', '); // Customize this line to show only the first three parts
+            return {
+              label: formattedLabel,
+              x: result.x,
+              y: result.y
+            };
+          });
+          searchCache[address] = formattedResults;
           if (isStartPoint) {
-            setStartAddressSuggestions(results);
+            setStartAddressSuggestions(formattedResults);
           } else {
-            setEndAddressSuggestions(results);
+            setEndAddressSuggestions(formattedResults);
+          }
+        } else {
+          if (isStartPoint) {
+            setStartAddressSuggestions([{ label: 'No results found' }]);
+          } else {
+            setEndAddressSuggestions([{ label: 'No results found' }]);
           }
         }
       } catch (error) {
-        if (error.message === 'Failed to fetch') {
-          toast.error('Network error: Failed to fetch');
-        }
-        else {
-          toast.error(`Unexpected error: ${error.message}`);
-        }
+        toast.error(`Unexpected error: ${error.message}`);
       }
     }
-  }, 500); // Debounce time (ms)
+  }, 500);
+  
+  
+  
   
   const handleSuggestionClick = (suggestion, isStartPoint) => {
     try {
@@ -421,25 +432,27 @@ export default function Map() {
         
     <Toaster position='top-center' reverseOrder={false}></Toaster>
       <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
-        {/* Navigation Bar */}
-        <nav className="navbar">
-            <NavLink className="navutil" activeClassName="active" to="/map">
-                <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
-            </NavLink>
-            <NavLink className="navutil" activeClassName="active" to="/chat">
-                <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
-            </NavLink>
-            <NavLink className="navutil" activeClassName="active" to="/profile">
-                <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
-            </NavLink>
-        </nav>
+            {/* Navigation Bar */}
+            <nav class="navbar d-flex justify-content-end p-2 float-end">
+                <Link class="nav-link border border-2 border-dark rounded-3 mx-1 mt-2" to="/nvxtrajet">
+                    <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
+                </Link>
+                <Link class="nav-link border border-2 border-dark rounded-3 mx-1 mt-2" to="/chat">
+                    <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
+                </Link>
+                <Link class="nav-link border border-2 border-dark rounded-3 mx-1 mt-2" to="/profile">
+                    <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
+                </Link>
+            </nav>
 
-        <div className="cov">
-              <h2 className="text1">Covelotage</h2>
-              <p className="text11">Votre Communaute Cycliste</p>
-        </div>
+            <div class="p-4 mb-4">
+              <div>
+                <h1 class="fw-bold text-large">Covelotage</h1>
+                <h2 >Votre Communaute Cycliste</h2>
+              </div>
+            </div>
 
-        <div className='container-carte' >
+        <div class="light-gray rounded-3 p-4 mx-auto my-3 mx-md-5 my-md-4" >
 
         {/** Display the form above the map */}
         <div style={{ position: 'relative', zIndex : 1001 }}>
@@ -491,6 +504,9 @@ export default function Map() {
           </label>
         </div>*/}
 
+
+<div class="d-flex flex-column align-items-center">
+<h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
         <MapContainer
           center={[48.65, 6.15]}
           zoom={17}
@@ -611,7 +627,8 @@ export default function Map() {
           ))}
           <MapClickHandler />
         </MapContainer>
-
+        </div>
+        
 {/*
         // Intégrez le composant ListRouteForm 
         <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute}/>
@@ -622,7 +639,7 @@ export default function Map() {
           )}
 
 */}
-        <Link to="/NvxTrajet" style={{color:'#414833'}}>Revenir à la page trajet</Link>
+        <Link to="/NvxTrajet" style={{color:'#414833'}}>Retour</Link>
 
 
 

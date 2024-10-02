@@ -53,3 +53,38 @@ input {
 .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
     padding: 0px
 }
+
+.search-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column !important; /* Ensure the suggestions are stacked vertically */
+  }
+  
+  .suggestions-list div {
+    padding: 10px;
+    cursor: pointer;
+    display: block; /* Ensure each suggestion is a block element */
+  }
+  
+  .suggestions-list div:hover {
+    background-color: #f0f0f0;
+  }
+  
+  
+  

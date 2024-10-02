@@ -9,52 +9,32 @@ import { ReactComponent as Route } from '../assets/Route.svg';
 
 const Footer = () => {
     return (
-        <footer style={{
-        backgroundColor: '#4F772D',
-        color: 'black',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        height: '25VH',
-        fontWeight:'bold',
-        fontSize:'1.3rem',
-        }}>
+<footer class="footer text-black text-center d-flex flex-column align-items-center" style={{height: "25vh", fontweight: "bold", fontsize: "1.3rem", backgroundColor: '#588157'}}>
+  <div class="w-100">
+    <Route class="w-100" />
+  </div>
 
-        <div >
-            <Route style={{ width: '100vw'}}/>
-        </div> 
+  <div class="d-flex flex-column justify-content-center align-items-center w-100 py-2" style={{flex: "1"}}>
+    <div class="d-flex justify-content-between w-100 mb-2">
+      <div class="d-flex flex-column align-items-center justify-content-center me-5" style={{flex: "1"}}>
+        <h3>COVELOTAGE</h3>
+        <Link to="/login">
+          <YourSvg class="w-100" style={{width: "300px", height: "100px"}}/>
+        </Link>
+      </div>
 
+      <div class="d-flex flex-column align-items-center justify-content-center" style={{flex: "1"}}>
+        <h3>UNE INITIATIVE DU PDIE <br/> TECHONOPOLE NANCY BRABOIS</h3>
+        <a href="https://pdiebrabois.wordpress.com/">
+          <img src={logoPdie} target='_blank' alt='logo_pdie' class="w-100" style={{width: "400px", height: "100px"}}/>
+        </a>
+      </div>
+    </div>
 
-        <div style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            padding: '10px 0',
-        }}>
-            <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            width: '100%',
-            marginBottom: '10px',
-            }}>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginRight: '30vh' }}>
-                <span>COVELOTAGE</span>
-                <YourSvg style={{ width: '300px', height: '100px' }}/>
-            </div>
+    <span>© {new Date().getFullYear()} Covélotage - PDIE Technopôle Nancy-Brabois - <Link to="/Mentions" class="text-black">Mentions légales</Link></span>
+  </div>
+</footer>
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginLeft: '30vh' }}>
-                <span>UNE INITIATIVE DU PDIE <br/> TECHONOPOLE NANCY BRABOIS</span>
-                <img src={logoPdie} target='_blank' alt='logo_pdie' style={{ width: '400px', height: '100px' }}/>
-            </div>
-            </div>
-
-            <span>© {new Date().getFullYear()} Covélotage - PDIE Technopôle Nancy-Brabois - <Link to="/Mentions" style={{ color: 'black' }}>Mentions légales</Link></span>
-        </div>
-        </footer>
     );
   };
   

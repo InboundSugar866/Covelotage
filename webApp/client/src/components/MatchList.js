@@ -4,6 +4,10 @@ import { getDayOfWeek } from '../helper/routeHelper';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'rc-time-picker/assets/index.css';
 
+import { ReactComponent as Emplacement} from '../assets/emplacement.svg';
+import { ReactComponent as Horloge} from '../assets/horloge.svg';
+import { ReactComponent as Calendrier} from '../assets/calendrier.svg';
+
 export const MatchList = ({ routes, onSelectMatchingRoute, handleFindMatches}) => {
 
   // state to store the selected route
@@ -36,15 +40,35 @@ export const MatchList = ({ routes, onSelectMatchingRoute, handleFindMatches}) =
     setLoading(false);
   }
 
+  function BetterAdress(route)  {
+    console.log(route);
+    let addressStart = route.startAdress;
+    let addressEnd = route.endAdress;
+  
+    let parts1 = addressStart.split(", ");
+    let parts2 = addressEnd.split(", ");
+  
+    // Check if the 7th part is a number
+  let postalCodeIndex1 = isNaN(parts1[7]) ? 8 : 7;
+  let postalCodeIndex2 = isNaN(parts2[7]) ? 8 : 7;
+  
+  // Extract the required parts
+  let newAddressSart = `${parts1[1]}, ${parts1[2]}, ${parts1[postalCodeIndex1]}, ${parts1[4]}`;
+  let newAddressEnd = `${parts2[1]}, ${parts2[2]}, ${parts2[postalCodeIndex2]}, ${parts2[4]}`;
+  
+  return {newAddressSart, newAddressEnd};
+   }
+
 
   return (
     <div>
-      <h2>Trajets correspondant</h2>
+      <h2 class='me-5' style = {{color: '#4F772D'}}>Trajets correspondant</h2>
 
-      <div style={{ height: '300px', overflowY: 'auto', border: '1px solid #ccc' }}>
+      <div style={{ height: '100%', overflowY: 'auto', border: '1px solid #ccc' }}>
         <ul>
           {routes.map((route, index) => (
-            <li key={route.name} onClick={() => handleRouteClick(route, index)} style={{ cursor: 'pointer', border: selectedRoute === route ? '2px solid blue' : 'none' }}>
+            <li key={route.name} onClick={() => handleRouteClick(route, index)} style={{ cursor: 'pointer', border: selectedRoute === route ? '4px solid #4F772D' : '1px solid #414833', borderRadius: '10px', marginTop:'1rem'}}>
+              {/*
               <p>{route.name}</p>
               <ul> Dates :
                 {route.planning.dates.map((date, index) => {
@@ -61,6 +85,68 @@ export const MatchList = ({ routes, onSelectMatchingRoute, handleFindMatches}) =
                   <li key={index}>{getDayOfWeek(periodic.dayOfWeek)} {periodic.time}</li>
                 ))}
               </ul>
+              */}
+              <div class="rounded-3 p-4 mx-auto" style={{position: "relative"}}>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="fw-bold fs-4 text-dark">{route.username}</span>
+                </div>
+
+                <div class="d-flex align-items-center mt-3">
+                  <Emplacement style={{ width: '20px', height: '20px' }} class="icon me-3"/> 
+                  <div>
+                    <p class="mb-0">{BetterAdress(route).newAddressSart}</p>
+                    <p class="mb-0">{BetterAdress(route).newAddressEnd}</p>
+                  </div>
+                </div>
+
+
+                <div class="d-flex align-items-center mt-3">
+                  {route.planning.dates.map((date, index) => {
+                    // create a new date object from the date string
+                    const d = new Date(date);
+                    // formated the date
+                    const formattedDate = `${d.toLocaleDateString('fr-FR')}`;
+                    return (<li key={index}>
+                      <Calendrier style={{ width: '20px', height: '20px' }} class="icon"/>
+                      {formattedDate}
+                    </li>);
+                  })}
+                </div>
+
+                <div class="d-flex align-items-center mt-3">
+                  {route.planning.dates.map((date, index) => {
+                    // create a new date object from the date string
+                    const d = new Date(date);
+                    // formated the date
+                    const formattedTime = `${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                    return <li key={index}>
+                      <Horloge style={{ width: '20px', height: '20px' }} class="icon"/> 
+                      {formattedTime}
+                    </li>
+                  })}
+                </div>
+
+                <ul> Horaires hebdomadaires :
+                {route.planning.periodic.map((periodic, index) => (
+                  <li key={index}>
+                    {getDayOfWeek(periodic.dayOfWeek)+" "} 
+                    {periodic.time.toLocaleTimeString([], { 
+                      hour: '2-digit', 
+                      minute: '2-digit', 
+                      hour12: false
+                    })}
+                  </li>
+                  ))}
+                </ul>
+
+                <div class="d-flex flex-column">
+                  <span class="fs-5">Commentaire de {route.username}</span>
+                  <div>
+                    {route.comment}
+                  </div>
+                </div>
+                {/*<button class="event-button">TROUVER UN COVELOTEUR!</button>*/}
+              </div>
             </li>
           ))}
         </ul>
