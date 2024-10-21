@@ -237,8 +237,19 @@ export default function NvxTrajet() {
     }).catch((error) => {"fail to update the list of routes"});
   };
 
+    // Submit the form
+  const handleUpdateRoute1 = (e) => {
+    e.preventDefault();
+    // Verify that all the required information is filled
+    const routeInfos = getValideRouteInfos();
+    if (routeInfos) {
+      // If the conditions are met, submit the form
+      handleUpdateRoute2(routeInfos);
+    }
+  };
+
   // Handle the update of a route
-  const handleUpdateRoute = (formData) => {
+  const handleUpdateRoute2 = (formData) => {
 
     // format the data for the server
     const data = formatRoute(formData, receivedPoints);
@@ -247,7 +258,7 @@ export default function NvxTrajet() {
 
     toast.promise(updateRoutePromise, {
       loading: 'Updating route...',
-      success: <b>Route Mmise à jour</b>,
+      success: <b>Route mise à jour</b>,
       error: (err) => <b>{err.response.data.error}</b>,
     });
 
@@ -256,6 +267,7 @@ export default function NvxTrajet() {
       setRefresh(!refresh);
     }).catch((error) => {"fail to update the list of routes"});
   };
+
 
   // Update innfomations displayed when a route is selected
   const handleSelectMyRoute = (route) => {
@@ -293,12 +305,6 @@ export default function NvxTrajet() {
    const handleSelecMatchingRoute = (id) => {
     setMacthingRouteSelectedId(id);
   };
-
-  // Get route name
-  const getRouteName = (route) => {
-    const RouteName = route.name;
-    return RouteName;
-  }
 
 
   // ----------------------- MatchList.js -----------------------
@@ -464,9 +470,21 @@ export default function NvxTrajet() {
     }
   };*/
 
+    // update the form when a route is selected
+    useEffect(() => {
+      // if no route is selected, return
+      if (!selectedRoute) return;
+      // update the name of the route
+      setRouteName(selectedRoute.name);
+      // update the selected dates
+      setSelectedDates(selectedRoute.planning.dates);
+      // update the selected periodic times
+      setSelectedPeriodicTimes(selectedRoute.planning.periodic);
+    }, [selectedRoute, selectionUpdate]);
+
 
     return (
-    <div>
+      <div>
         <Toaster position="" reverseOrder={false}></Toaster>
         <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
 
@@ -506,9 +524,16 @@ export default function NvxTrajet() {
                     )}
                   </div>
                   <div>
-                    <button class='event-button' id="findMatchesBtn" onClick={handleFindMatchesBtn} style={{display: routeSelected ? 'block' : 'none' }}>
+                    <button class='event-button mt-2' id="findMatchesBtn" onClick={handleFindMatchesBtn} style={{display: routeSelected ? 'block' : 'none' }}>
                       TROUVER UN COVELOTEUR !
                     </button>
+                  </div>
+                  <div>
+                    {selectedRoute && (
+                      <button class='event-button mt-2' id="findMatchesBtn" onClick={handleUpdateRoute1} style={{display: routeSelected ? 'block' : 'none' }}>
+                        Modifier le trajet
+                      </button>
+                    )}
                   </div>
                 </div>
 

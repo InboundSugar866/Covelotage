@@ -8,15 +8,6 @@ body, html {
     border: 0;
     height: 100%;
 }
-
-.container1 {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-.content {
-  flex: 1;
-}
   
 .backgroundImage {
   /* Set the background repeat to no-repeat */
@@ -48,5 +39,5 @@ p {
 }
 
 .bg-white-50 {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.8);
 }

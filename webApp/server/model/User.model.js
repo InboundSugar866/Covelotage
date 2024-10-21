@@ -21,7 +21,7 @@ export const UserSchema = new mongoose.Schema({
         required : [true, "Please provide your phone number"],
         unique : false
     },
-    adress : {
+    address : {
         type : String,
         required : [true, "Please provide your adress"],
         unique : false

@@ -24,7 +24,7 @@ const Footer = () => {
       </div>
 
       <div class="d-flex flex-column align-items-center justify-content-center" style={{flex: "1"}}>
-        <h3>UNE INITIATIVE DU PDIE <br/> TECHONOPOLE NANCY BRABOIS</h3>
+        <h3>UNE INITIATIVE DU PDIE <br/> TECHNOPOLE NANCY BRABOIS</h3>
         <a href="https://pdiebrabois.wordpress.com/">
           <img src={logoPdie} target='_blank' alt='logo_pdie' class="w-100" style={{width: "400px", height: "100px"}}/>
         </a>

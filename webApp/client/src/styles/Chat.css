@@ -1,4 +1,4 @@
-/* CSS file */
+/* CSS file 
 .main-container {
     display: flex;
     height: 100vh;
@@ -114,3 +114,9 @@
     border-radius: 0.125rem;
   }
   
+*/
+
+
+  .bg-green {
+    background-color: #63A3A0;
+  }

@@ -10,7 +10,7 @@ import { registerUser } from '../helper/userHelper';
 import backgroundImage from '../assets/Fond_urbain1.jpg';
 import Footer from '../components/Footer';
 
-import '../styles/Login.css';
+//import '../styles/Login.css';
 
 export default function Register() {
 

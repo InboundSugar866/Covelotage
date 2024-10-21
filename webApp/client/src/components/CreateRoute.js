@@ -28,6 +28,11 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
   
   const periodicDateRef = new Date(1970, 0, 1);
 
+    // received points from the server
+    const [receivedPoints, setReceivedPoints] = useState([]);
+      // refresh the list of routes
+  const [refresh, setRefresh] = useState(false);
+
   // for the adress search
 
 
@@ -118,16 +123,53 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     }
   };
 
-   // Submit the form
-  const handleUpdateRoute = (e) => {
-    e.preventDefault();
-    // Verify that all the required information is filled
-    const routeInfos = getValideRouteInfos();
-    if (routeInfos) {
-      // If the conditions are met, submit the form
-      updateRoute(routeInfos);
-    }
-  };
+    // Format the route for the server
+    function formatRoute(formData, points) {
+      // verify the existence of the route
+      if (!points || points.length === 0) {
+        toast.error('Veuillez créer un chemin');
+        return null;
+      }
+      // transform the points to a JSON format
+      const transformedPoints = points.map(point => {
+        const [lng, lat] = point;
+        return JSON.stringify([lat, lng]);
+      });
+      // Add the path to the form data
+      formData.route = transformedPoints;
+      return formData;
+    };
+
+    // Submit the form
+    const handleUpdateRoute = (e) => {
+      e.preventDefault();
+      // Verify that all the required information is filled
+      const routeInfos = getValideRouteInfos();
+      if (routeInfos) {
+        // If the conditions are met, submit the form
+        handleUpdateRoute2(routeInfos);
+      }
+    };
+  
+    // Handle the update of a route
+    const handleUpdateRoute2 = (formData) => {
+  
+      // format the data for the server
+      const data = formatRoute(formData, receivedPoints);
+      // add the route to the server
+      const updateRoutePromise = updateRoute(data);
+  
+      toast.promise(updateRoutePromise, {
+        loading: 'Updating route...',
+        success: <b>Route mise à jour</b>,
+        error: (err) => <b>{err.response.data.error}</b>,
+      });
+  
+      updateRoutePromise.then(() => {
+        // update the list of routes
+        setRefresh(!refresh);
+      }).catch((error) => {"fail to update the list of routes"});
+    };
 
   // find matches for a route button
   const handleFindMatchesBtn = () => {
@@ -169,110 +211,146 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     setSelectedPeriodicTimes(selectedRoute.planning.periodic);
   }, [selectedRoute, selectionUpdate]);
 
-  const [showSuggestions, setShowSuggestions] = useState(false);
+// State for showing suggestions list
+const [showStartSuggestions, setShowStartSuggestions] = useState(false);
+const [showEndSuggestions, setShowEndSuggestions] = useState(false);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.search-container')) {
-        setShowSuggestions(false);
-      }
-    };
-  
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-  
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (!event.target.closest('.search-container')) {
+      setShowStartSuggestions(false);
+      setShowEndSuggestions(false);
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+  return () => {
+    document.removeEventListener('click', handleClickOutside);
+  };
+}, []);
+
+function autoResizeTextarea(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
 
   return (
     <div>
 
-      <form onSubmit={handleCreateRoute}>
-        <h2>Entrer un nouveau trajet</h2>
+      <form onSubmit={handleCreateRoute} class="d-flex row justify-content-center">
+
   
-        <div>
-          <label>Nom du trajet :</label>
-            <div>
-            <input required={true} type="text" value={routeName} onChange={(e) => setRouteName(e.target.value)} />
+        <h2 style = {{color: '#4F772D'}}>Entrer un nouveau trajet</h2>
+          <div class="form-group d-flex align-items-center">
+            <div class="row w-100">
+              <div class="col-4">
+                <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Nom du trajet :</h3>
+              </div>
+              <div class="col-8">
+                <input 
+                  required={true} 
+                  type="text" 
+                  class="form-control border border-dark w-50" 
+                  value={routeName} 
+                  onChange={(e) => setRouteName(e.target.value)} 
+                />
+              </div>
             </div>
-          
-        </div>
-  
+          </div>
 
-
-        {/** start point adress */}
-        <div>
-          <label>Adresse de depart :</label>
-          <div className="search-container">
-            <input 
-              type="search"
-              name="startPointSearch"
-              value={startAddress}
-              onChange={(e) => {
-                setStartAddress(e.target.value);
-                handleSearch(e.target.value, true);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-            />
-            {showSuggestions && (
-              <div className="suggestions-list">
-                {startAddressSuggestions.map((suggestion, index) => (
-                  <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
-                    {suggestion.label}
+        {/** start point address */}
+        <div class="form-group d-flex align-items-center position-relative">
+          <div class="row w-100">
+            <div class="col-4">
+              <h3 class="align-self-start" style={{marginLeft: '2rem'}}>Adresse de depart :</h3>
+            </div>
+            <div class="col-8 search-container">
+              <div class="w-50">
+                <input class="form-control border border-dark w-100"
+                      type="search"
+                      name="startPointSearch"
+                      value={startAddress}
+                      onChange={(e) => {
+                        setStartAddress(e.target.value);
+                        handleSearch(e.target.value, true);
+                      }}
+                      onFocus={() => setShowStartSuggestions(true)}
+                />
+                {showStartSuggestions && (
+                  <div class="suggestions-list position-absolute w-100">
+                    {startAddressSuggestions.map((suggestion, index) => (
+                      <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
+                        {suggestion.label}
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
+            </div>
+          </div>
+        </div>                  
+
+        {/** end point address */}
+        <div class="form-group d-flex align-items-center">
+          <div class="row w-100">
+            <div class="col-4">
+              <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Adresse d'arrivee :</h3>
+            </div>
+            <div class="col-8 search-container">
+              <div class="w-50">
+                <input class="form-control border border-dark w-100"
+                      type="search"
+                      name="endPointSearch"
+                      value={endAddress}
+                      onChange={(e) => {
+                        setEndAddress(e.target.value);
+                        handleSearch(e.target.value, false);
+                      }}
+                      onFocus={() => setShowEndSuggestions(true)}
+                />
+                {showEndSuggestions && (
+                  <div className="suggestions-list position-absolute w-100">
+                    {endAddressSuggestions.map((suggestion, index) => (
+                      <div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
+                        {suggestion.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/** end point adress */}
-        <div>
-          <label>Adresse d'arrivee :</label>
-          <div className="search-container">
-            <input 
-              type="search"
-              name="endPointSearch"
-              value={endAddress}
-              onChange={(e) => {
-                setEndAddress(e.target.value);
-                handleSearch(e.target.value, true);
-              }}
-              onFocus={() => setShowSuggestions(true)}
-            />
-            {showSuggestions && (
-              <div className="suggestions-list">
-                {endAddressSuggestions.map((suggestion, index) => (
-                  <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
-                    {suggestion.label}
-                  </div>
-                ))}
-              </div>
-            )}
+        <div class="form-group d-flex align-items-center">
+          <div class="row w-100">
+            <div class="col-4 d-flex align-items-center">
+              <h3 style={{marginLeft:'2rem'}}>Date et heure de depart :</h3>
+            </div>
+            <div class="col-4 d-flex align-items-center" style={{paddingRight:'0'}}>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(value) => setSelectedDate(value)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={5}
+                timeCaption="Time"
+                dateFormat="dd/MM/yyyy HH:mm"
+                isClearable
+                placeholderText="Sélectionnez une date"
+                popperPlacement="bottom-start"
+                portalId="root-portal"
+              />
+            </div>
+            <div class="col-4 d-flex justify-content-center align-items-center">
+              <button type="button" class='event-button' style={{marginLeft:'2rem'}} onClick={handleAddDate}>
+                Confirmer la date et l'heure
+              </button>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label>Date et heure de depart :</label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(value) => setSelectedDate(value)}
-            showTimeSelect
-            timeFormat="HH:mm"
-            timeIntervals={5}
-            timeCaption="Time"
-            dateFormat="dd/MM/yyyy HH:mm"
-            isClearable
-            placeholderText="Sélectionnez une date"
-            popperPlacement="bottom-start"
-            portalId="root-portal"
-          />
-          <button type="button" onClick={handleAddDate}>
-            +
-          </button>
-          
-        </div>
+
   
         <div>
           <ul>
@@ -280,94 +358,112 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
               <li key={index}>
                 {formatSelectedDate(date)}
                 <button type="button" onClick={() => handleRemoveDate(index)}>
-                  -
+                  Supprimer
                 </button>
               </li>
             ))}
           </ul>
         </div>
 
-        <div>
-          <label>Ajouter un commentaire :</label>
-            <div>
-            <input required={false} type="text" value={comment} onChange={(e) => setComment(e.target.value)} />
+
+
+        <div class="form-group d-flex align-items-center">
+          <div class="row w-100">
+            <div class="col-4">
+              <h3 class="align-self-start" style={{marginLeft: '2rem'}}>Ajouter un commentaire :</h3>
             </div>
-          
+            <div class="col-8">
+              <textarea
+                required={false}
+                value={comment}
+                class="form-control border border-dark w-100"
+                id="exampleFormControlTextarea1"
+                rows="3"
+                style={{overflow: 'hidden', resize: 'none'}}
+                onChange={(e) => {
+                  setComment(e.target.value);
+                  autoResizeTextarea(e.target);
+                }}
+              ></textarea>
+            </div>
+          </div>
         </div>
+
   
         <div>
-          <h2>Ajouter une periodicite : </h2>
+          <h2 style = {{color: '#4F772D'}}>Ajouter une periodicite : </h2>
           </div>
 
-          <div>
-            <label>Jour de la semaine : </label>
-            <select
-              value={selectedDayOfWeek}
-              onChange={(e) => setSelectedDayOfWeek(parseInt(e.target.value, 10))}
-            >
-              <option value={1}>Lundi</option>
-              <option value={2}>Mardi</option>
-              <option value={3}>Mercredi</option>
-              <option value={4}>Jeudi</option>
-              <option value={5}>Vendredi</option>
-              <option value={6}>Samedi</option>
-              <option value={0}>Dimanche</option>
-            </select>
+          <div class="form-group d-flex align-items-center">
+            <div class="row w-100">
+              <div class="col-4">
+                <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Jour de la semaine :</h3>
+              </div>
+              <div class="col-8">
+                <select
+                  class="event-button"
+                  value={selectedDayOfWeek}
+                  onChange={(e) => setSelectedDayOfWeek(parseInt(e.target.value, 10))}
+                >
+                  <option value={1}>Lundi</option>
+                  <option value={2}>Mardi</option>
+                  <option value={3}>Mercredi</option>
+                  <option value={4}>Jeudi</option>
+                  <option value={5}>Vendredi</option>
+                  <option value={6}>Samedi</option>
+                  <option value={0}>Dimanche</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div>
-            <label>Heure : </label>
-            <TimePicker
-              showSecond={false}
-              defaultValue={selectedTime}
-              onChange={(value) => {setSelectedTime(value)}}
-            />
-            <button type="button" onClick={handleAddPeriodicTime}>
-              +
-            </button>
-          </div>
-  
-          <ul>
-            {selectedPeriodicTimes.map((periodicTime, index) => (
-              <li key={index}>
-                {`
-                  ${getDayOfWeek(periodicTime.dayOfWeek)} 
-                  ${periodicTime.time.toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit', 
-                      hour12: false
-                    })}
-                `}
-                <button type="button" onClick={() => handleRemovePeriodicTime(index)}>
-                  -
-                </button>
-              </li>
-            ))}
-          </ul>
 
+
+          <div class="form-group d-flex align-items-center">
+  <div class="row w-100">
+    <div class="col-4">
+      <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Heure :</h3>
+    </div>
+    <div class="col-8 d-flex align-items-center">
+      <TimePicker
+        showSecond={false}
+        defaultValue={selectedTime}
+        onChange={(value) => {setSelectedTime(value)}}
+      />
+      <button class="event-button" type="button" style={{marginLeft:'2rem'}} onClick={handleAddPeriodicTime}>
+        Confirmer la date et l'heure
+      </button>
+    </div>
+  </div>
+</div>
+
+  
           <div>
-          <h2>Carte </h2>
-          </div>
+            <ul>
+              {selectedPeriodicTimes.map((periodicTime, index) => (
+                <li key={index}>
+                  {`
+                    ${getDayOfWeek(periodicTime.dayOfWeek)} 
+                    ${periodicTime.time.toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: false
+                      })}
+                  `}
+                  <button type="button" onClick={() => handleRemovePeriodicTime(index)}>
+                    Supprimer
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div> 
   
-        
-  
-        <button type="submit">
+        <button type="submit" class="btn w-auto">
           <CreerTrajet/>
         </button>
 
 
 
       </form>
-     {/*       <button onClick={handleFindMatchesBtn}>
-        Trouver les correspondances
-      </button> */}
-
-
-      {/* Bouton pour mettre à jour le trajet */}
-      {selectedRoute && (
-        <button type="button" onClick={handleUpdateRoute}>
-          Modifier le trajet
-        </button>
-      )}
 
     </div>
   );

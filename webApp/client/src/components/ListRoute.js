@@ -56,9 +56,6 @@ const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
     onSelectRoute(route);
   };
 
-  const showDiv = (route) => {
-    //handleFindMatchesBtn(route);
- }
 
  function BetterAdress(route)  {
   let addressStart = route.startAdress;
@@ -78,20 +75,7 @@ let newAddressEnd = `${parts2[1]}, ${parts2[2]}, ${parts2[postalCodeIndex2]}, ${
 return {newAddressSart, newAddressEnd};
  }
 
- const Menu = () => {
-  document.getElementById('menu-icon').addEventListener('click', function(event) {
-    event.stopPropagation();
-    const menu = document.getElementById('menu');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-  });
 
-  document.addEventListener('click', function(event) {
-    const menu = document.getElementById('menu');
-    if (menu.style.display === 'block' && !menu.contains(event.target)) {
-      menu.style.display = 'none';
-    }
-  });
-}
 
 
   return (
@@ -116,10 +100,10 @@ return {newAddressSart, newAddressEnd};
               <div class="rounded-3 p-4 mx-auto" style={{maxwidth: "600px", position: "relative"}}>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="fw-bold fs-4 text-dark">{route.name}</span>
-                  <Setting style={{ width: '20px', height: '20px' }} class="menu-icon" id="menu-icon" onClick={() => Menu()}/>
-                  <div class="menu" id="menu">
-                    <button type="button" onClick={() => deleteRoute(route.name)}>Supprimer</button>
-                  </div>
+                  
+                  <button type="button" class="delete" onClick={() => deleteRoute(route.name)}>
+                Supprimer
+              </button>
                 </div>
 
                 <div class="d-flex align-items-center mt-3">

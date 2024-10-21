@@ -7,7 +7,7 @@ import '../styles/Mentions.css';
 const Mentions = () => {
     return (
       <div >
-        <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
+        <div className='backgroundImage' style={{backgroundColor: `#63A3A0`}}>
           <div class="p-5 rounded text-justify fw-bold">
 
             <div class='mb-5'>
@@ -61,7 +61,11 @@ const Mentions = () => {
                   <br/>
                   En tout état de cause le PDIE Technopôle Nancy Brabois ne collecte des informations personnelles relatives à l’utilisateur que pour le besoin des services proposés par le site www.covelotage.fr :<br/>
                   <br/>
-                  · [liste des informations collectées...]<br/>
+                  - Nom<br/>
+                  - Prénom<br/>
+                  - Adresse<br/>
+                  - Numéro de téléphone<br/>
+                  - Email<br/>
                   <br/>
                   L’utilisateur consent à fournir ces informations lorsqu’il procède par lui-même à leur saisie dans un formulaire. Il est alors précisé à l’utilisateur du site www.covelotage.fr l’obligation ou non de fournir ces informations.<br/>
                   <br/>
