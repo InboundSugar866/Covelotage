@@ -26,10 +26,10 @@ export default function Profile() {
 
   const formik = useFormik({
     initialValues : {
-      firstName : apiData?.firstName || '',
-      lastName: apiData?.lastName || '',
+      name : apiData?.name || '',
+      surname: apiData?.surname || '',
       email: apiData?.email || '',
-      mobile: apiData?.mobile || '',
+      phone: apiData?.phone || '',
       address : apiData?.address || ''
     },
     enableReinitialize : true,
@@ -114,7 +114,7 @@ export default function Profile() {
         </div>
 */}
         <form onSubmit={formik.handleSubmit} style={{ zIndex: '1' }}>
-          <div class="mb-3 text-center">
+          <div class="mb-2 text-center">
             <label htmlFor="profile">
               <img src={file || apiData?.profile || avatar} class="img-fluid rounded-circle" alt="avatar" style={{ maxWidth: '120px' }} />
             </label>
@@ -122,23 +122,23 @@ export default function Profile() {
             <input onChange={onUpload} type="file" id="profile" name="profile" style={{ display: 'none' }} />
           </div>
 
-          <div class="mb-3">
-            <input {...formik.getFieldProps('firstName')} class="form-control" type="text" placeholder="Prénom" />
+          <div class="mb-2">
+            <input {...formik.getFieldProps('name')} class="form-control" type="text" placeholder="Prénom" />
           </div>
-          <div class="mb-3">
-            <input {...formik.getFieldProps('lastName')} class="form-control" type="text" placeholder="Nom" />
+          <div class="mb-2">
+            <input {...formik.getFieldProps('surname')} class="form-control" type="text" placeholder="Nom" />
           </div>
-          <div class="mb-3">
-            <input {...formik.getFieldProps('mobile')} class="form-control" type="text" placeholder="Numéro de téléphone" />
+          <div class="mb-2">
+            <input {...formik.getFieldProps('phone')} class="form-control" type="text" placeholder="Numéro de téléphone" />
           </div>
-          <div class="mb-3">
+          <div class="mb-2">
             <input {...formik.getFieldProps('email')} class="form-control" type="text" placeholder="Email" />
           </div>
-          <div class="mb-3">
+          <div class="mb-2">
             <input {...formik.getFieldProps('address')} class="form-control" type="text" placeholder="Addresse" />
           </div>
 
-          <div class="mb-3 text-center">
+          <div class="mb-2 text-center">
             <button class="btn btn-primary w-100" type="submit">
               Mettre à jour
             </button>

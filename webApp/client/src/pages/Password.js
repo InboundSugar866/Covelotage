@@ -47,14 +47,14 @@ export default function Password() {
     return <h1>isLoading</h1>
   };
   if (serverError) {
-    return <h1 className="">{serverError}</h1>
+    return <h1 class="">{serverError}</h1>
   }
 
   return (
 <div>
 <Toaster position="" reverseOrder={false}></Toaster>
     <div
-      className="container-fluid d-flex align-items-center justify-content-center "
+      class="container-fluid d-flex align-items-center justify-content-center "
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
@@ -67,31 +67,31 @@ export default function Password() {
       }}
     >
 
-      <div className="position-absolute top-0 end-0 bottom-0 start-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(5px)' }}></div>
+      <div class="position-absolute top-0 end-0 bottom-0 start-0" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(5px)' }}></div>
 
 
 
-      <div className="card p-4" style={{ width: '45%', borderRadius: '15px' }}>
-        <div className="text-center mb-4">
-          <h4 className="mb-0">Bonjour {apiData?.firstName || apiData?.username}</h4>
+      <div class="card p-4" style={{ borderRadius: '15px' }}>
+        <div class="text-center mb-4">
+          <h4 class="mb-0">Bonjour {apiData?.firstName || apiData?.username}</h4>
           <span>Explorez plus en vous connectant avec nous.</span>
         </div>
 
-        <form className="row g-3" onSubmit={formik.handleSubmit}>
-          <div className="col-md-6">
-            <img src={apiData?.profile || avatar} className="img-fluid rounded-circle" alt="avatar" />
+        <form class="form-container text-center" onSubmit={formik.handleSubmit}>
+          <div class="mb-2">
+            <img src={apiData?.profile || avatar} class="img-fluid rounded-circle" style={{ width: '200px' }} alt="avatar" />
           </div>
 
-          <divcon className="col-md-6">
-            <input {...formik.getFieldProps('password')} type="password" className="form-control" placeholder="Password" />
-            <button type="submit" className="btn btn-primary w-100">
+          <div class="mb-2">
+            <input {...formik.getFieldProps('password')} type="password" class="form-control mb-2" placeholder="Password" />
+            <button type="submit" class="btn btn-primary w-100">
               Se connecter
             </button>
-          </divcon>
+          </div>
 
-          <div className="col-12">
+          <div class="col-12">
             <span>
-              Vous avez oublié votre mot-de-passe ? <Link className="text-decoration-none" to="/Recovery">
+              Vous avez oublié votre mot-de-passe ? <Link  to="/Recovery">
                 Récupérer
               </Link>
             </span>

@@ -17,7 +17,7 @@ export const UserSchema = new mongoose.Schema({
         unique : [true, "Username Exist"]
     },
     phone : {
-        type : Number,
+        type : String,
         required : [true, "Please provide your phone number"],
         unique : false
     },
@@ -38,7 +38,7 @@ export const UserSchema = new mongoose.Schema({
     },
     name : { type: String},
     surname : { type: String},
-    phone : { type : Number},
+    phone : { type : String},
     address : { type: String},
     profile : { type: String},
 

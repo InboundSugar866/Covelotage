@@ -52,7 +52,7 @@ export async function register(req, res) {
 
     try {
         console.log(req.body);
-        const {username, password, profile, email, name, surname, phone, adress} = req.body;
+        const {username, password, profile, email, name, surname, phone, address} = req.body;
 
         // check the existing user
         const existUsername = new Promise((resolve, reject) => {
@@ -93,7 +93,7 @@ export async function register(req, res) {
                             name,
                             surname,
                             phone,
-                            adress
+                            address
                         });
                         // save the user in the database
                         user.save()
@@ -240,6 +240,7 @@ body: {
     profile : ''
 }
 */
+
 export async function updateUser(req, res) {
     try {
         // Get the user ID from the request
@@ -263,6 +264,43 @@ export async function updateUser(req, res) {
         return res.status(401).send({ error });
     }
 }
+/*
+export async function updateUser(req, res) {
+    try {
+      // Get the user ID from the request
+      const { userId } = req.user;
+  
+      // If the user ID is not found, return an error
+      if (!userId) {
+        return res.status(401).send({ error: "User Not Found...!" });
+      }
+  
+      const body = req.body;
+  
+      // Log userId and body to check if they're correct
+      console.log('User ID:', userId);
+      console.log('Request Body:', body);
+  
+      UserModel.updateOne({ _id: userId }, body)
+        .then(data => {
+          // Check if data is returned and log it
+          console.log('Update Data:', data);
+          if (data.nModified > 0) {
+            return res.status(200).send({ msg: "Record Updated...!" });
+          } else {
+            return res.status(400).send({ error: "No record updated" });
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          return res.status(500).send({ error: "Internal Server Error" });
+        });
+    } catch (error) {
+      console.error('Error:', error);
+      return res.status(500).send({ error: "Internal Server Error" });
+    }
+  }
+*/
 
 /** POST: http://localhost:8080/api/generateOTP 
  * @param: {
