@@ -16,7 +16,7 @@ import { getDayOfWeek } from '../helper/routeHelper';
 
 export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updateRoute, handleFindMatches, 
                               startAddress, setStartAddress, endAddress, setEndAddress, 
-                              startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick}) => {
+                              startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick, handlePathSubmit}) => {
   const [routeName, setRouteName] = useState('');
   const [comment, setComment] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
@@ -234,6 +234,7 @@ function autoResizeTextarea(textarea) {
   textarea.style.height = textarea.scrollHeight + 'px';
 }
 
+
   return (
     <div>
 
@@ -264,8 +265,8 @@ function autoResizeTextarea(textarea) {
             <div class="col-4">
               <h3 class="align-self-start" style={{marginLeft: '2rem'}}>Adresse de depart :</h3>
             </div>
-            <div class="col-8 search-container">
-              <div class="w-50">
+            <div class="col-4 search-container" style={{paddingRight:'0'}}>
+              <div>
                 <input class="form-control border border-dark w-100"
                       type="search"
                       name="startPointSearch"
@@ -286,6 +287,11 @@ function autoResizeTextarea(textarea) {
                   </div>
                 )}
               </div>
+            </div>
+            <div class="col-4 d-flex justify-content-center align-items-center">
+              <button type="button" class='event-button' style={{marginLeft:'2rem'}} onClick={handlePathSubmit}>
+                Recalculer le trajet
+              </button>
             </div>
           </div>
         </div>                  

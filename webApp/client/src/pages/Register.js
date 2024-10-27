@@ -114,7 +114,7 @@ export default function Register() {
               <input {...formik.getFieldProps('phone')} type="tel" class="form-control" placeholder="Phone" required />
             </div>
             <div class="mb-2">
-              <input {...formik.getFieldProps('address')} type="text" class="form-control" placeholder="Adresse" required />
+              <input {...formik.getFieldProps('address')} type="text" class="form-control" placeholder="Ville" required />
             </div>
             <div class="mb-2">
               <input {...formik.getFieldProps('email')} type="text" class="form-control" placeholder="Email*" required />

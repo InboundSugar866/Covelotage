@@ -115,10 +115,11 @@ export default function Map() {
 
    /** Updates the path when modifying points of the path */
   useEffect(() => {
+    console.log("useeffect",firstSelection);
     // not calculate the path if a route is selected
     if (isRouteSelected.current === true) return;
     // allow to avoid the first call of the function
-    if (firstSelection.current) return;
+    //if (firstSelection.current) return;
     // if the update of the path is not allowed, return
     if (!shouldUpdatePath) return;
 
@@ -472,6 +473,8 @@ export default function Map() {
             endAddressSuggestions={endAddressSuggestions}
             handleSearch={handleSearch}
             handleSuggestionClick={handleSuggestionClick}
+
+            handlePathSubmit={handlePathSubmit}
           />
         </div>
 
