@@ -31,7 +31,12 @@ export default function Register() {
     validateOnChange : false,
     onSubmit : async values => {
       // < || '' > <=> If the file is empty return nothing
-      values = await Object.assign(values, {profile : file || ''});
+      const date = new Date();
+      const formattedDate = date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+      
+      console.log(formattedDate);
+      values = await Object.assign(values, { profile: file || '', created: formattedDate });
+  
 
       let registerPromise = registerUser(values)
 

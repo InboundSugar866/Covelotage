@@ -52,7 +52,7 @@ export async function register(req, res) {
 
     try {
         console.log(req.body);
-        const {username, password, profile, email, name, surname, phone, address} = req.body;
+        const {username, password, profile, email, name, surname, phone, address, created} = req.body;
 
         // check the existing user
         const existUsername = new Promise((resolve, reject) => {
@@ -93,7 +93,8 @@ export async function register(req, res) {
                             name,
                             surname,
                             phone,
-                            address
+                            address,
+                            created
                         });
                         // save the user in the database
                         user.save()

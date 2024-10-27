@@ -36,12 +36,17 @@ export const UserSchema = new mongoose.Schema({
         required : [true, "Please provide a unique email"],
         unique: true
     },
+    created : {
+        type: String,
+        required : [false, "Date created"],
+        unique: false
+    },
     name : { type: String},
     surname : { type: String},
     phone : { type : String},
     address : { type: String},
     profile : { type: String},
-
+    created : { type: String}
 });
 
 // Use the existing model; otherwise, use the new one

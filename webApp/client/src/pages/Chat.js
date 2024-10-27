@@ -19,15 +19,26 @@ import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
 
 import { ReactComponent as Search } from '../assets/Search.svg';
 
+import { getUser } from '../helper/userHelper';
+
 export default function Chat() {
   const [ws,setWs] = useState(null);
   const [onlinePeople,setOnlinePeople] = useState({});
   const [offlinePeople,setOfflinePeople] = useState({});
   const [selectedUserId,setSelectedUserId] = useState(null);
+  const [selectedUsername] = useState(null);
   const [newMessageText,setNewMessageText] = useState('');
   const [messages,setMessages] = useState([]);
   const {username,setUsername,id,setId} = useContext(UserContext);
   const divUnderMessages = useRef();
+
+  const [created,setCreated] = useState(null);
+  const [address, setAdress] = useState(null);
+
+
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
     connectToWs();
@@ -51,6 +62,10 @@ export default function Chat() {
       people[userId] = username;
     });
     setOnlinePeople(people);
+
+    if (selectedUserId) {
+      setSelectedUsername(selectedUserId)
+    }
   }
 
   function handleMessage(ev) {
@@ -131,6 +146,44 @@ export default function Chat() {
 
   const messagesWithoutDupes = uniqBy(messages, '_id');
 
+
+
+  async function setSelectedUsername(selectedUserId) {
+    const selectedUsername = onlinePeople[selectedUserId] || offlinePeople[selectedUserId]?.username;
+    console.log(selectedUsername);
+
+      axios.get(`/api/user/${selectedUsername}`).then(res => {
+        //console.log(res.data.created);
+        setCreated(res.data.created);
+        setAdress(res.data.address);
+      });
+  }
+
+
+
+  // Update the suggestions based on the search query
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSuggestions([]);
+      return;
+    }
+    
+    const allPeople = { ...onlinePeople, ...offlinePeople };
+    const filteredSuggestions = Object.keys(allPeople)
+      .filter(userId => {
+        const username = allPeople[userId]?.username; // Safely access username
+        return username && username.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+      .map(userId => ({ userId, username: allPeople[userId].username }));
+    setSuggestions(filteredSuggestions);
+  }, [searchQuery, onlinePeople, offlinePeople]);
+
+  // Handle when a suggestion is clicked
+  const handleSuggestionClick = (userId) => {
+    setSelectedUserId(userId);
+    setSearchQuery(''); // Clear the search input
+  };
+
   
   return (
     <div>
@@ -164,30 +217,53 @@ export default function Chat() {
                 {/*<Logo />*/}
                 <div class="input-group">
                   <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-search">
-                      <Search style={{ width: '20px', height: '20px' }} alt='commencer'/></i>
+                    <span class="input-group-text">
+                      <i class="fa fa-search">
+                        <Search style={{ width: '20px', height: '20px' }} alt='commencer' />
+                      </i>
                     </span>
                   </div>
-                  <input type="text" class="form-control" placeholder="Rechercher un utilisateur"></input>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Rechercher un utilisateur"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  {suggestions.length > 0 && (
+                    <div class="suggestions-list">
+                      {suggestions.map(suggestion => (
+                        <div
+                          key={suggestion.userId}
+                          onClick={() => handleSuggestionClick(suggestion.userId)}
+                          class="suggestion-item"
+                        >
+                          {suggestion.username}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                {Object.keys(onlinePeopleExclOurUser).map(userId => (
-                  <Contact
-                    key={userId}
-                    id={userId}
-                    online={true}
-                    username={onlinePeopleExclOurUser[userId]}
-                    onClick={() => {setSelectedUserId(userId)}}
-                    selected={userId === selectedUserId} />
-                ))}
-                {Object.keys(offlinePeople).map(userId => (
-                  <Contact
-                    key={userId}
-                    id={userId}
-                    online={false}
-                    username={offlinePeople[userId].username}
-                    onClick={() => {setSelectedUserId(userId)}}
-                    selected={userId === selectedUserId} />
-                ))}
+                <div style={{maxHeight: '60vh', overflowY: 'auto'}}>
+                  {Object.keys(onlinePeopleExclOurUser).map(userId => (
+                    <Contact
+                      key={userId}
+                      id={userId}
+                      online={true}
+                      username={onlinePeopleExclOurUser[userId]}
+                      onClick={() => {setSelectedUserId(userId)}}
+                      selected={userId === selectedUserId} />
+                  ))}
+                  {Object.keys(offlinePeople).map(userId => (
+                    <Contact
+                      key={userId}
+                      id={userId}
+                      online={false}
+                      username={offlinePeople[userId].username}
+                      onClick={() => {setSelectedUserId(userId)}}
+                      selected={userId === selectedUserId} />
+                  ))}
+                </div>
               </div>
               <div class="p-2 text-center d-flex align-items-center justify-content-center">
                 <span class="mr-2 small text-secondary d-flex align-items-center">
@@ -218,14 +294,14 @@ export default function Chat() {
                       <div class="d-flex align-items-center">
                         <Emplacement style={{ width: '20px', height: '20px' }} class="icon ms-3"/> {/* me = margin right ms = margin left*/}
                         <div>
-                          <p class="mb-0">{selectedUserId}</p>
+                          <p class="mb-0">{address}</p>
                         </div>
                       </div>
 
                       <div class="d-flex align-items-center">
                         <Membre style={{ width: '20px', height: '20px' }} class="icon ms-3"/> {/* me = margin right*/}
                         <div>
-                          <p class="mb-0">Placeholder</p>
+                          <p class="mb-0">Membre depuis {created}</p>
                         </div>
                       </div>
 
@@ -266,12 +342,14 @@ export default function Chat() {
                       onChange={ev => setNewMessageText(ev.target.value)}
                       placeholder="Écrivez votre message ici"
                       class="bg-white flex-grow-1 border rounded p-2"/>
+{/*
                 <label class="bg-light p-2 text-secondary cursor-pointer rounded border border-light">
                   <input type="file" class="d-none" onChange={sendFile} />
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{width: '1.5rem', height: '1.5rem'}}>
                     <path fillRule="evenodd" d="M18.97 3.659a2.25 2.25 0 00-3.182 0l-10.94 10.94a3.75 3.75 0 105.304 5.303l7.693-7.693a.75.75 0 011.06 1.06l-7.693 7.693a5.25 5.25 0 11-7.424-7.424l10.939-10.94a3.75 3.75 0 115.303 5.304L9.097 18.835l-.008.008-.007.007-.002.002-.003.002A2.25 2.25 0 015.91 15.66l7.81-7.81a.75.75 0 011.061 1.06l-7.81 7.81a.75.75 0 001.054 1.068L18.97 6.84a2.25 2.25 0 000-3.182z" clipRule="evenodd" />
                   </svg>
                 </label>
+*/}
                 <button type="submit" class="bg-primary p-2 text-white rounded">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width: '1.5rem', height: '1.5rem'}}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />

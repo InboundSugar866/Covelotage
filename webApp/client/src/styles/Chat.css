@@ -120,3 +120,28 @@
   .bg-green {
     background-color: #63A3A0;
   }
+
+  .contacts-list {
+    max-height: 300px; /* Set your desired fixed height */
+    overflow-y: auto;
+  }
+  
+  .suggestions-list {
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    width: 100%;
+    z-index: 1000;
+  }
+  
+  .suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .suggestion-item:hover {
+    background-color: #f0f0f0;
+  }
+  
