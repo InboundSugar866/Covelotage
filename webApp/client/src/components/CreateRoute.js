@@ -16,7 +16,8 @@ import { getDayOfWeek } from '../helper/routeHelper';
 
 export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updateRoute, handleFindMatches, 
                               startAddress, setStartAddress, endAddress, setEndAddress, 
-                              startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick, handlePathSubmit}) => {
+                              startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick,
+                              handlePathSubmit}) => {
   const [routeName, setRouteName] = useState('');
   const [comment, setComment] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);

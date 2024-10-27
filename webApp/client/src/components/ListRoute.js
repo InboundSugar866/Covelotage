@@ -109,8 +109,8 @@ return {newAddressSart, newAddressEnd};
                 <div class="d-flex align-items-center mt-3">
                   <Emplacement style={{ width: '20px', height: '20px' }} class="icon me-3"/> 
                   <div>
-                    <p class="mb-0">{BetterAdress(route).newAddressSart}</p>
-                    <p class="mb-0">{BetterAdress(route).newAddressEnd}</p>
+                    <p class="mb-0">{route.startAdress}</p>
+                    <p class="mb-0">{route.endAdress}</p>
                   </div>
                 </div>
 

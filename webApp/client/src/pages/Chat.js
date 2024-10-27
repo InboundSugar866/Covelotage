@@ -82,25 +82,28 @@ export default function Chat() {
 
   function sendMessage(ev, file = null) {
     if (ev) ev.preventDefault();
-    ws.send(JSON.stringify({
+    const message = {
       recipient: selectedUserId,
       text: newMessageText,
       file,
-    }));
+      sender: id,
+      createdAt: new Date(), // Set the current date and time
+    };
+    ws.send(JSON.stringify(message));
+  
     if (file) {
-      axios.get('/messages/'+selectedUserId).then(res => {
+      axios.get(`/messages/${selectedUserId}`).then((res) => {
         setMessages(res.data);
       });
     } else {
       setNewMessageText('');
-      setMessages(prev => ([...prev,{
-        text: newMessageText,
-        sender: id,
-        recipient: selectedUserId,
-        _id: Date.now(),
-      }]));
+      setMessages((prev) => [
+        ...prev,
+        { ...message, _id: Date.now() }, // Ensure createdAt is set
+      ]);
     }
   }
+  
   
   function sendFile(ev) {
     const reader = new FileReader();

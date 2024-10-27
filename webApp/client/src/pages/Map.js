@@ -119,7 +119,7 @@ export default function Map() {
     // not calculate the path if a route is selected
     if (isRouteSelected.current === true) return;
     // allow to avoid the first call of the function
-    //if (firstSelection.current) return;
+    if (firstSelection.current) return;
     // if the update of the path is not allowed, return
     if (!shouldUpdatePath) return;
 
@@ -294,6 +294,7 @@ export default function Map() {
    const handleSelecMatchingRoute = (id) => {
     setMacthingRouteSelectedId(id);
   };
+
 
 
   // ----------------------- MatchList.js -----------------------
@@ -510,6 +511,7 @@ export default function Map() {
 
 <div class="d-flex flex-column align-items-center">
 <h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
+Vous pourrez modifier le chemin une fois le trajet créé.
         <MapContainer
           center={[48.65, 6.15]}
           zoom={17}
@@ -579,7 +581,7 @@ export default function Map() {
             <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
           )}
           
-          {/** Dynamics points */
+          {/** Dynamics points 
             receivedPoints.map((point, index) => (
             <Marker 
               key={index}
@@ -627,7 +629,7 @@ export default function Map() {
             >
               { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
             </Marker>
-          ))}
+          ))*/}
           <MapClickHandler />
         </MapContainer>
         </div>
