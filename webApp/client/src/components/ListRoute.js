@@ -142,13 +142,7 @@ return {newAddressSart, newAddressEnd};
                     </li>
                   })}
                 </div>
-
-                {/*<button class="event-button">TROUVER UN COVELOTEUR!</button>*/}
               </div>
-              
-              
-            
-
               <ul> Horaires hebdomadaires :
                 {route.planning.periodic.map((periodic, index) => (
                   <li key={index}> {getDayOfWeek(periodic.dayOfWeek)+" "}
