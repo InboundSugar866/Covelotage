@@ -75,7 +75,10 @@ let newAddressEnd = `${parts2[1]}, ${parts2[2]}, ${parts2[postalCodeIndex2]}, ${
 return {newAddressSart, newAddressEnd};
  }
 
-
+  // Helper function to check if the date is valid 
+  function isValidDate(d) { 
+    return d instanceof Date && !isNaN(d); 
+  }
 
 
   return (
@@ -148,14 +151,13 @@ return {newAddressSart, newAddressEnd};
 
               <ul> Horaires hebdomadaires :
                 {route.planning.periodic.map((periodic, index) => (
-                  <li key={index}>
-                    {getDayOfWeek(periodic.dayOfWeek)+" "} 
-                    {periodic.time.toLocaleTimeString([], { 
-                      hour: '2-digit', 
-                      minute: '2-digit', 
-                      hour12: false
-                    })}
-                  </li>
+                  <li key={index}> {getDayOfWeek(periodic.dayOfWeek)+" "}
+                  {isValidDate(periodic.time) ? periodic.time.toLocaleTimeString([],{
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false })
+                  : 'Invalid Time' } 
+                </li>
                 ))}
               </ul>
                {/* Bouton de suppression 

@@ -59,6 +59,11 @@ export const MatchList = ({ routes, onSelectMatchingRoute, handleFindMatches}) =
   return {newAddressSart, newAddressEnd};
    }
 
+  // Helper function to check if the date is valid 
+  function isValidDate(d) { 
+    return d instanceof Date && !isNaN(d); 
+  }
+
 
   return (
     <div>
@@ -94,8 +99,8 @@ export const MatchList = ({ routes, onSelectMatchingRoute, handleFindMatches}) =
                 <div class="d-flex align-items-center mt-3">
                   <Emplacement style={{ width: '20px', height: '20px' }} class="icon me-3"/> 
                   <div>
-                    <p class="mb-0">{BetterAdress(route).newAddressSart}</p>
-                    <p class="mb-0">{BetterAdress(route).newAddressEnd}</p>
+                    <p class="mb-0">{route.startAdress}</p>
+                    <p class="mb-0">{route.endAdress}</p>
                   </div>
                 </div>
 
@@ -128,13 +133,12 @@ export const MatchList = ({ routes, onSelectMatchingRoute, handleFindMatches}) =
 
                 <ul> Horaires hebdomadaires :
                 {route.planning.periodic.map((periodic, index) => (
-                  <li key={index}>
-                    {getDayOfWeek(periodic.dayOfWeek)+" "} 
-                    {periodic.time.toLocaleTimeString([], { 
+                  <li key={index}> {getDayOfWeek(periodic.dayOfWeek)+" "}
+                    {isValidDate(periodic.time) ? periodic.time.toLocaleTimeString([],{
                       hour: '2-digit', 
                       minute: '2-digit', 
-                      hour12: false
-                    })}
+                      hour12: false })
+                    : 'Invalid Time' } 
                   </li>
                   ))}
                 </ul>
