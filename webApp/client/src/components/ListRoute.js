@@ -160,14 +160,6 @@ return {newAddressSart, newAddressEnd};
                 </li>
                 ))}
               </ul>
-               {/* Bouton de suppression 
-               <button type="button" onClick={() => deleteRoute(route.name)}>
-                Supprimer
-              </button>
-              
-              <button id="findMatchesBtn" onClick={() => showDiv(route)} style={{display: 'block'}}>
-                Trouver les correspondances
-              </button>*/}
             </li>
           ))}
         </ul>
