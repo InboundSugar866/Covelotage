@@ -1,23 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+// React and Related Hooks
+import React, { useState, useEffect } from 'react';
+
+// Date and Time Pickers
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import TimePicker from 'rc-time-picker';
 import 'rc-time-picker/assets/index.css';
+
+// Notification Library
 import toast from 'react-hot-toast';
 
-import { Link } from 'react-router-dom'
+// Styles
 import '../styles/CreateRoute.css';
 
+// Assets
 import { ReactComponent as CreerTrajet } from '../assets/CreerTrajer.svg';
 
-
+// Helper Functions
 import { getDayOfWeek } from '../helper/routeHelper';
 
-
+// Html
 export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updateRoute, handleFindMatches, 
                               startAddress, setStartAddress, endAddress, setEndAddress, 
                               startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick,
                               handlePathSubmit}) => {
+  
   const [routeName, setRouteName] = useState('');
   const [comment, setComment] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
@@ -29,21 +36,13 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
   
   const periodicDateRef = new Date(1970, 0, 1);
 
-    // received points from the server
-    const [receivedPoints, setReceivedPoints] = useState([]);
-      // refresh the list of routes
-  const [refresh, setRefresh] = useState(false);
-
-  // for the adress search
-
-
-  // Check if the hour is valid
+  /* Check if the hour is valid */
   const isValidHour = (date) => {
     const hour = date.getHours();
     return hour >= 0 && hour <= 23;
   };
 
-  // Add a date
+  /* Add a date */
   const handleAddDate = () => {
     if (selectedDate && isValidHour(selectedDate)) {
       setSelectedDates([...selectedDates, selectedDate]);
@@ -53,14 +52,14 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     }
   };
 
-  // Remove a date
+  /* Remove a date */
   const handleRemoveDate = (index) => {
     const updatedDates = [...selectedDates];
     updatedDates.splice(index, 1);
     setSelectedDates(updatedDates);
   };
 
-  // Add a periodic time
+  /* Add a periodic time */
   const handleAddPeriodicTime = () => {
     // Check that the time and day of the week are selected
     if (selectedTime == null || selectedDayOfWeek == null) {
@@ -80,13 +79,14 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     setSelectedPeriodicTimes([...selectedPeriodicTimes, newPeriodicTime]);
   };
 
-  // Remove a periodic time
+  /* Remove a periodic time */
   const handleRemovePeriodicTime = (index) => {
     const updatedPeriodicTimes = [...selectedPeriodicTimes];
     updatedPeriodicTimes.splice(index, 1);
     setSelectedPeriodicTimes(updatedPeriodicTimes);
   };
 
+  /* Verify that the route is valid */
   function getValideRouteInfos() {
     // Verify that the name is filled
     if (!routeName.trim()) {
@@ -113,7 +113,7 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     return routeInfos;
   }
 
-  // Submit the form to create a new route
+  /* Submit the form to create a new route */
   const handleCreateRoute = (e) => {
     e.preventDefault();
     // Verify that all the required information is filled
@@ -123,67 +123,8 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
       createRoute(routeInfos);
     }
   };
-
-    // Format the route for the server
-    function formatRoute(formData, points) {
-      // verify the existence of the route
-      if (!points || points.length === 0) {
-        toast.error('Veuillez créer un chemin');
-        return null;
-      }
-      // transform the points to a JSON format
-      const transformedPoints = points.map(point => {
-        const [lng, lat] = point;
-        return JSON.stringify([lat, lng]);
-      });
-      // Add the path to the form data
-      formData.route = transformedPoints;
-      return formData;
-    };
-
-    // Submit the form
-    const handleUpdateRoute = (e) => {
-      e.preventDefault();
-      // Verify that all the required information is filled
-      const routeInfos = getValideRouteInfos();
-      if (routeInfos) {
-        // If the conditions are met, submit the form
-        handleUpdateRoute2(routeInfos);
-      }
-    };
   
-    // Handle the update of a route
-    const handleUpdateRoute2 = (formData) => {
-  
-      // format the data for the server
-      const data = formatRoute(formData, receivedPoints);
-      // add the route to the server
-      const updateRoutePromise = updateRoute(data);
-  
-      toast.promise(updateRoutePromise, {
-        loading: 'Updating route...',
-        success: <b>Route mise à jour</b>,
-        error: (err) => <b>{err.response.data.error}</b>,
-      });
-  
-      updateRoutePromise.then(() => {
-        // update the list of routes
-        setRefresh(!refresh);
-      }).catch((error) => {"fail to update the list of routes"});
-    };
-
-  // find matches for a route button
-  const handleFindMatchesBtn = () => {
-    // Verify that all the required information is filled
-    const routeInfos = getValideRouteInfos();
-    if (routeInfos) {
-      // If the conditions are met, submit the form
-      handleFindMatches(routeInfos);
-    }
-    console.log('handleFindMatchesBtn OK');
-  }
-  
-  // Formated the selected date
+  /* Formated the selected date */
   const formatSelectedDate = (date) => {
 
     const formattedDate = new Intl.DateTimeFormat('fr-FR', {
@@ -197,8 +138,7 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     return formattedDate;
   };
 
-
-  // update the form when a route is selected
+  /* update the form when a route is selected */
   useEffect(() => {
     // if no route is selected, return
     if (!selectedRoute) return;
@@ -212,53 +152,51 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     setSelectedPeriodicTimes(selectedRoute.planning.periodic);
   }, [selectedRoute, selectionUpdate]);
 
-// State for showing suggestions list
-const [showStartSuggestions, setShowStartSuggestions] = useState(false);
-const [showEndSuggestions, setShowEndSuggestions] = useState(false);
+  // State for showing suggestions list
+  const [showStartSuggestions, setShowStartSuggestions] = useState(false);
+  const [showEndSuggestions, setShowEndSuggestions] = useState(false);
 
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    if (!event.target.closest('.search-container')) {
-      setShowStartSuggestions(false);
-      setShowEndSuggestions(false);
-    }
-  };
+  /* suggestion list */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.search-container')) {
+        setShowStartSuggestions(false);
+        setShowEndSuggestions(false);
+      }
+    };
 
-  document.addEventListener('click', handleClickOutside);
-  return () => {
-    document.removeEventListener('click', handleClickOutside);
-  };
-}, []);
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
-function autoResizeTextarea(textarea) {
-  textarea.style.height = 'auto';
-  textarea.style.height = textarea.scrollHeight + 'px';
-}
-
+  /* change the size of the comment area automatically */
+  function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
 
   return (
     <div>
-
       <form onSubmit={handleCreateRoute} class="d-flex row justify-content-center">
-
-  
         <h2 style = {{color: '#4F772D'}}>Entrer un nouveau trajet</h2>
-          <div class="form-group d-flex align-items-center">
-            <div class="row w-100">
-              <div class="col-4">
-                <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Nom du trajet :</h3>
-              </div>
-              <div class="col-8">
-                <input 
-                  required={true} 
-                  type="text" 
-                  class="form-control border border-dark w-50" 
-                  value={routeName} 
-                  onChange={(e) => setRouteName(e.target.value)} 
-                />
-              </div>
+        <div class="form-group d-flex align-items-center">
+          <div class="row w-100">
+            <div class="col-4">
+              <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Nom du trajet :</h3>
+            </div>
+            <div class="col-8">
+              <input 
+                required={true} 
+                type="text" 
+                class="form-control border border-dark w-50" 
+                value={routeName} 
+                onChange={(e) => setRouteName(e.target.value)} 
+              />
             </div>
           </div>
+        </div>
 
         {/** start point address */}
         <div class="form-group d-flex align-items-center position-relative">
@@ -356,9 +294,6 @@ function autoResizeTextarea(textarea) {
             </div>
           </div>
         </div>
-
-
-  
         <div>
           <ul>
             {selectedDates.map((date, index) => (
@@ -371,9 +306,6 @@ function autoResizeTextarea(textarea) {
             ))}
           </ul>
         </div>
-
-
-
         <div class="form-group d-flex align-items-center">
           <div class="row w-100">
             <div class="col-4">
@@ -395,12 +327,10 @@ function autoResizeTextarea(textarea) {
             </div>
           </div>
         </div>
-
   
         <div>
           <h2 style = {{color: '#4F772D'}}>Ajouter une periodicite : </h2>
           </div>
-
           <div class="form-group d-flex align-items-center">
             <div class="row w-100">
               <div class="col-4">
@@ -424,25 +354,23 @@ function autoResizeTextarea(textarea) {
             </div>
           </div>
 
-
           <div class="form-group d-flex align-items-center">
-  <div class="row w-100">
-    <div class="col-4">
-      <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Heure :</h3>
-    </div>
-    <div class="col-8 d-flex align-items-center">
-      <TimePicker
-        showSecond={false}
-        defaultValue={selectedTime}
-        onChange={(value) => {setSelectedTime(value)}}
-      />
-      <button class="event-button" type="button" style={{marginLeft:'2rem'}} onClick={handleAddPeriodicTime}>
-        Confirmer la date et l'heure
-      </button>
-    </div>
-  </div>
-</div>
-
+            <div class="row w-100">
+              <div class="col-4">
+                <h3 class="align-self-start" style={{marginLeft:'2rem'}}>Heure :</h3>
+              </div>
+              <div class="col-8 d-flex align-items-center">
+                <TimePicker
+                  showSecond={false}
+                  defaultValue={selectedTime}
+                  onChange={(value) => {setSelectedTime(value)}}
+                />
+                <button class="event-button" type="button" style={{marginLeft:'2rem'}} onClick={handleAddPeriodicTime}>
+                  Confirmer la date et l'heure
+                </button>
+              </div>
+            </div>
+          </div>
   
           <div>
             <ul>
@@ -463,15 +391,10 @@ function autoResizeTextarea(textarea) {
               ))}
             </ul>
           </div> 
-  
         <button type="submit" class="btn w-auto">
           <CreerTrajet/>
         </button>
-
-
-
       </form>
-
     </div>
   );
 };

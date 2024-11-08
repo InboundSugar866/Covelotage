@@ -317,6 +317,7 @@ export async function generateOTP(req, res) {
         otp = await otpGenerator.generate(6, { lowerCaseAlphabets: false, upperCaseAlphabets: false, specialChars: false});
         // store the OTP in the app.locals
         req.app.locals.OTP = otp;
+        console.log("otp:",otp);
 
         /** SEND AN EMAIL */
         // get the username from the request

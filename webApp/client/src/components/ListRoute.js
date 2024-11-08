@@ -1,18 +1,23 @@
+// React and Related Hooks
 import React, { useState, useEffect } from 'react';
+
+// Helper Functions
 import { getAllRoutes, getDayOfWeek } from '../helper/routeHelper';
+
+// Styles
 import 'react-datepicker/dist/react-datepicker.css';
 import 'rc-time-picker/assets/index.css';
-import { Link, Route } from 'react-router-dom'
-
-import { ReactComponent as Emplacement} from '../assets/emplacement.svg';
-import { ReactComponent as Horloge} from '../assets/horloge.svg';
-import { ReactComponent as Calendrier} from '../assets/calendrier.svg';
-import { ReactComponent as Setting} from '../assets/setting.svg';
-
 import '../styles/ListRoute.css';
 
-//import {handleFindMatchesBtn} from '../pages/NvxTrajet';
+// Router
+import { Link } from 'react-router-dom';
 
+// Assets
+import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
+import { ReactComponent as Horloge } from '../assets/horloge.svg';
+import { ReactComponent as Calendrier } from '../assets/calendrier.svg';
+
+// Html
 const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
 
   // state to store the list of routes
@@ -56,34 +61,12 @@ const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
     onSelectRoute(route);
   };
 
-
- function BetterAdress(route)  {
-  let addressStart = route.startAdress;
-  let addressEnd = route.endAdress;
-
-  let parts1 = addressStart.split(", ");
-  let parts2 = addressEnd.split(", ");
-
-  // Check if the 7th part is a number
-let postalCodeIndex1 = isNaN(parts1[7]) ? 8 : 7;
-let postalCodeIndex2 = isNaN(parts2[7]) ? 8 : 7;
-
-// Extract the required parts
-let newAddressSart = `${parts1[1]}, ${parts1[2]}, ${parts1[postalCodeIndex1]}, ${parts1[4]}`;
-let newAddressEnd = `${parts2[1]}, ${parts2[2]}, ${parts2[postalCodeIndex2]}, ${parts2[4]}`;
-
-return {newAddressSart, newAddressEnd};
- }
-
   // Helper function to check if the date is valid 
   function isValidDate(d) { 
     return d instanceof Date && !isNaN(d); 
   }
 
-
   return (
-
-    
     <div>
       <div class="d-flex align-items-center">
         <h2 class='me-5' style = {{color: '#4F772D'}}>Mes Trajets</h2>
@@ -95,8 +78,7 @@ return {newAddressSart, newAddressEnd};
       </div>
       <div style={{ height: '100%', overflowY: 'auto', border: '1px solid #ccc' }}>
 
-
-        <ul>
+        <ul >
           {routes.map((route, index) => (
             <li key={route.name} onClick={() => handleRouteClick(route)} style={{ cursor: 'pointer', border: selectedRoute === route ? '4px solid #414833' : '1px solid #414833' }}>
               

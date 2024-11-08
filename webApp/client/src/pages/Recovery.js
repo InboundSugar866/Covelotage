@@ -1,14 +1,21 @@
-import React, { useEffect, useState, useRef } from 'react'
-import toast, {Toaster} from 'react-hot-toast'
-import { useAuthStore } from '../store/store'
-import { generateOTP, verifyOTP } from '../helper/userHelper';
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
+// Store
+import { useAuthStore } from '../store/store';
+
+// Helper Functions
+import { generateOTP, verifyOTP } from '../helper/userHelper';
+
+// Assets
 import backgroundImage from '../assets/Fond_urbain1.jpg';
+
+// Components
 import Footer from '../components/Footer';
 
-import '../styles/Login.css';
 
+// Html
 export default function Recovery() {
 
   const { username } = useAuthStore(state => state.auth);
@@ -16,7 +23,7 @@ export default function Recovery() {
   const [OTP, setOTP] = useState();
   const navigate = useNavigate();
 
-  /** 
+  /* 
    * Skip the initial render and then every time the value of username changes, 
    * the code inside useEffect will be re-executed. 
    */
@@ -55,73 +62,72 @@ export default function Recovery() {
     );      
   }
 
-
+// Html
   return (
 
     <div>
-          <Toaster position="top-center" reverseOrder={false}></Toaster>
-    <div
-    className="container-fluid d-flex align-items-center justify-content-center position-relative"
-    style={{
-      backgroundImage: `url(${backgroundImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      color: 'black',
-      position: 'relative',
-      backgroundRepeat: 'no-repeat',
-      flex: 1,
-      minHeight: '75vh',
-    }}
-  >
-
-
-    <div
-      className="position-absolute top-0 end-0 bottom-0 start-0"
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
+      <div
+      class="container-fluid d-flex align-items-center justify-content-center position-relative"
       style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-        backdropFilter: 'blur(5px)', 
-      }}
-    ></div>
-
-    <div
-      className="rounded p-4"
-      style={{
-        width: '40%',
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        boxShadow: '0px 0px 15px 0px rgba(0,0,0,0.1)',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        color: 'black',
         position: 'relative',
-        zIndex: 1, // Ensure the card is above the blurred background
+        backgroundRepeat: 'no-repeat',
+        flex: 1,
+        minHeight: '75vh',
       }}
-    >
-      <div className="text-center">
-        <h4 className="mb-0">Récupération</h4>
-      </div>
+      >
 
-      <form onSubmit={onSubmit} className="mt-4">
-        <div className="mb-3">
-          <span>Entrez le code envoyé par mail :</span>
-          <input
-            onChange={(e) => setOTP(e.target.value)}
-            type="password"
-            className="form-control"
-            placeholder="OTP"
-          />
+        <div
+          class="position-absolute top-0 end-0 bottom-0 start-0"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+            backdropFilter: 'blur(5px)', 
+          }}
+        >
         </div>
 
-        <button type="submit" className="btn btn-primary w-100">
-          Réinitialiser
-        </button>
-      </form>
+        <div
+          class="rounded p-4"
+          style={{
+            width: '40%',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            boxShadow: '0px 0px 15px 0px rgba(0,0,0,0.1)',
+            position: 'relative',
+            zIndex: 1, // Ensure the card is above the blurred background
+          }}
+        >
+          <div class="text-center">
+            <h4 class="mb-0">Récupération</h4>
+          </div>
 
-      <div className="text-center mt-3">
-        <span>
-          Vous n'avez rien reçu ? <button onClick={resendOTP} className="btn btn-link">Renvoyer</button>
-        </span>
+          <form onSubmit={onSubmit} class="mt-4">
+            <div class="mb-3">
+              <span>Entrez le code envoyé par mail :</span>
+              <input
+                onChange={(e) => setOTP(e.target.value)}
+                type="password"
+                class="form-control"
+                placeholder="OTP"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+              Réinitialiser
+            </button>
+          </form>
+
+          <div class="text-center mt-3">
+            <span>
+              Vous n'avez rien reçu ? <button onClick={resendOTP} class="btn btn-link">Renvoyer</button>
+            </span>
+          </div>
+        </div>
       </div>
+    <Footer/>
     </div>
-  </div>
-  <Footer/>
-  </div> 
-
   )
 }

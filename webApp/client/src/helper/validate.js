@@ -10,7 +10,7 @@ export async function usernameValidate(values) {
         const { status } = await authenticate(values.username);
         // 200 <=> the request was successful
         if (status !== 200) {
-            errors.exist = toast.error('User does not exist');
+            errors.exist = toast.error("L'utilisateur n'a pas été trouvé, vérifiez le nom d'utilisateur");
         }
     }
     return errors;
@@ -53,7 +53,7 @@ export async function profileValidate(values) {
 function resetPasswordVerify(errors = {}, values) {
 
     if(values.password !== values.confirm_pwd){
-        errors.password = toast.error('Password not match...!');
+        errors.password = toast.error("Mauvais mot de passe...!");
     }
     // if (passwordVerify({}, values).password) {
     //     errors.password = passwordVerify({}, values).password;
@@ -68,16 +68,16 @@ function passwordVerify(errors = {}, values) {
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
 
     if(!values.password){
-        errors.password = toast.error('Password required...!');
+        errors.password = toast.error('Mot de passe reqis...!');
     }
     else if(values.password.includes(" ")) {
-        errors.password = toast.error('Wrong Password...!');
+        errors.password = toast.error('Mauvais mot de passe...!');
     } 
-    else if(values.password.length < 4 ) {
-        errors.password = toast.error('Password must be more than 4 characters long');
+    else if(values.password.length < 8 ) {
+        errors.password = toast.error('Le mot de passe doit faire au moins 8 caractères');
     } 
     else if(!specialChars.test(values.password) ) {
-        errors.password = toast.error('Password must have special character');
+        errors.password = toast.error('Le mot de passe doit contenir un caractère spécial');
     }
     return errors;
 }
@@ -86,10 +86,10 @@ function passwordVerify(errors = {}, values) {
 function usernameVerify(errors = {}, values) {
 
     if(!values.username){
-        errors.username = toast.error('Usename required...!');
+        errors.username = toast.error("Nom d'utilisateur requis...!");
     } 
     else if(values.username.includes(" ")) {
-        errors.username = toast.error('Invalide Username...!');
+        errors.username = toast.error("Nom d'utilisateur inconnu...!");
     }
     return errors;
 }
@@ -98,13 +98,13 @@ function usernameVerify(errors = {}, values) {
 function emailVerify(errors = {}, values) {
 
     if(!values.email){
-        errors.email = toast.error('Email required...!');
+        errors.email = toast.error('Email requis...!');
     } 
     else if(values.email.includes(" ")) {
-        errors.email = toast.error('Wrong Email...!');
+        errors.email = toast.error('Email non reconnu...!');
     }
     else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-        errors.email = toast.error('Invalide email adress...!');
+        errors.email = toast.error('Email invalide...!');
     }
     return errors;
 }

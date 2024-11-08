@@ -1,49 +1,35 @@
-import React, { useState, useRef, useEffect} from 'react';
-import { Link } from 'react-router-dom'
-import { useFormik } from 'formik';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import { getShortestPath, updateIndex, findMatches } from '../helper/mapHelper';
-import { addRouteToServer, updateRoute, deleteRoute } from '../helper/routeHelper';
 
-/** Components */
+// Helper Functions
+import { getShortestPath, updateIndex, findMatches } from '../helper/mapHelper';
+import { addRouteToServer, updateRoute } from '../helper/routeHelper';
+
+// Components
 import { LogoutButton } from '../components/LogoutButton';
 import { CreateRoute } from '../components/CreateRoute';
-import ListRoute from '../components/ListRoute';
-import { MatchList } from '../components/MatchList';
+import Footer from '../components/Footer';
 
-/** Display OpenSteetMap with leaflet module */
-import { MapContainer, TileLayer, useMapEvents, Marker, Popup, Polyline} from 'react-leaflet';
+// Leaflet (OpenStreetMap) Integration
+import { MapContainer, TileLayer, useMapEvents, Marker, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { OpenStreetMapProvider } from 'leaflet-geosearch';
+
+// Assets
 import marker_1 from '../assets/map-marker-icon-1.png';
 import marker_2 from '../assets/map-marker-icon-2.png';
-import marker_dynamic from '../assets/map-marker-icon-dynamic.png';
 import marker_dynamic_2 from '../assets/map-marker-icon-dynamic-2.png';
-
-import { OpenStreetMapProvider } from 'leaflet-geosearch';
-import _ from 'lodash';
-
-import { Toast } from 'bootstrap';
-
-
 import backgroundImage from '../assets/Fond_urbain.jpg';
-import Footer from '../components/Footer';
 import { ReactComponent as Profil } from '../assets/Profil.svg';
 import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
 import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
-import '../styles/Map.css';
-import { NavLink } from 'react-router-dom';
 
-/**
- * ------------------- TODO -------------------
- * - Localisation auto
- * - Entrer une adresse pour placer un point /// FAIT ///
- * - Changer la couleur des points déplacés - reset ?
- * - Changer la couleur de la partie commune entre deux chemins
- * - Permettre de s'approprier le chemin d'un autre utilisateur
- */
+// Utility Library
+import _ from 'lodash';
 
-
+// Html
 export default function Map() {
 
   // ergonomics variable for the first selection
@@ -67,22 +53,21 @@ export default function Map() {
   // is a route is selected in the list of my routes
   const isRouteSelected = useRef(false);
   // route selected in the list of my routes
-  const [selectedRoute, setSelectedRoute] = useState(null);
+  const [selectedRoute] = useState(null);
   // enables updating the displayed information when the same route is re-selected.
-  const [selectionUpdate, setSelectionUpdate] = useState(false);
+  const [selectionUpdate] = useState(false);
   // refresh the list of routes
   const [refresh, setRefresh] = useState(false);
   
   //  id of the selected matching route
-  const [macthingRouteSelectedId, setMacthingRouteSelectedId] = useState(0);
+  const [macthingRouteSelectedId] = useState(0);
   // matching routes 
   const [matchingRoutes, setMatchingRoutes] = useState([]);
 
   // Path color
   const blueOptions = { fillColor: 'blue' }
-
   
-  /** Updates the path */
+  /* Updates the path */
   const handlePathSubmit = async (values) => {
 
     // verify that the starting point and the arrival point are defined
@@ -94,9 +79,9 @@ export default function Map() {
     const getPathPromise = getShortestPath(formatedPoints);
 
     toast.promise(getPathPromise, {
-        loading: 'Calculating path...',
-        success: <b>Path calculated</b>,
-        error: <b>Path calculation failed</b>,
+        loading: 'Calcul du trajet...',
+        success: <b>Trajet calculé</b>,
+        error: <b>Problème lors du calcul du trajet</b>,
     });
 
     getPathPromise.then((points) => {
@@ -108,12 +93,12 @@ export default function Map() {
         const updatedIntermediatePoints = updateIndex(points, [...intermediatePoints]);
         updatedIntermediatePoints.then((res) => {  
           setIntermediatePoints(res);
-        }).catch((error) => {"fail to update the index of the intermediate points"});
+        }).catch((error) => {"Problème lors de la mise à jour du trajet"});
       }
-    }).catch((error) => {"fail to get the path from the server"});
+    }).catch((error) => {"Problème lors de la récupération du trajet"});
   }
 
-   /** Updates the path when modifying points of the path */
+   /* Updates the path when modifying points of the path */
   useEffect(() => {
     console.log("useeffect",firstSelection);
     // not calculate the path if a route is selected
@@ -131,7 +116,7 @@ export default function Map() {
   // call the function when a point is modified
   [startPoint, endPoint, intermediatePoints]);
 
-  /** Use the useMapEvents function to handle map events */
+  /* Use the useMapEvents function to handle map events */
   function MapClickHandler() {
     useMapEvents({
       click: (event) => {
@@ -151,7 +136,7 @@ export default function Map() {
     return null;
   }
 
-  /** Handle map click (set startPoint and EndPoint) */
+  /* Handle map click (set startPoint and EndPoint) */
   const handleMapClick = (event, isStart) => {
 
     // ergonomics operations for the first selection
@@ -186,7 +171,7 @@ export default function Map() {
 
   // -------------- CreateRoute.js && ListRoute.js --------------
 
-  // Format the route for the server
+  /* Format the route for the server */
   function formatRoute(formData, points) {
     // verify the existence of the route
     if (!points || points.length === 0) {
@@ -203,24 +188,7 @@ export default function Map() {
     return formData;
   };
 
-  // Handle the deletion of a route
-  const handleDeleteRoute = (routeName) => {
-    // delete the route from the server
-    const deleteRoutePromise = deleteRoute(routeName);
-
-    toast.promise(deleteRoutePromise, {
-      loading: 'Deleting route...',
-      success: <b>Route deleted</b>,
-      error: <b>Fail to delete the route</b>,
-    });
-
-    deleteRoutePromise.then(() => {
-      // update the list of routes
-      setRefresh(!refresh);
-    }).catch((error) => {"fail to update the list of routes"});
-  }
-
-  // Handle the creation of a route
+  /* Handle the creation of a route */
   const handleCreateRoute = (formData) => {
 
     // format the data for the server
@@ -230,18 +198,18 @@ export default function Map() {
     const addRoutePromise = addRouteToServer(data);
 
     toast.promise(addRoutePromise, {
-      loading: 'Adding route...',
-      success: <b>Route added</b>,
+      loading: 'Ajout du trajet...',
+      success: <b>Trajet ajouté</b>,
       error: (err) => <b>{err.response.data.error}</b>,
     });
 
     addRoutePromise.then(() => {
       // update the list of routes
       setRefresh(!refresh);
-    }).catch((error) => {"fail to update the list of routes"});
+    }).catch((error) => {"Problème lors de la création du trajet"});
   };
 
-  // Handle the update of a route
+  /* Handle the update of a route */
   const handleUpdateRoute = (formData) => {
 
     // format the data for the server
@@ -250,56 +218,20 @@ export default function Map() {
     const updateRoutePromise = updateRoute(data);
 
     toast.promise(updateRoutePromise, {
-      loading: 'Updating route...',
-      success: <b>Route Mmise à jour</b>,
+      loading: 'Mise à jour du trajet...',
+      success: <b>Trajet mise à jour</b>,
       error: (err) => <b>{err.response.data.error}</b>,
     });
 
     updateRoutePromise.then(() => {
       // update the list of routes
       setRefresh(!refresh);
-    }).catch((error) => {"fail to update the list of routes"});
+    }).catch((error) => {"Problème lors de la mise à jour du trajet"});
   };
-
-  // Update innfomations displayed when a route is selected
-  const handleSelectMyRoute = (route) => {
-    // disable the first selection flag
-    firstSelection.current = false;
-    // set the flag to true
-    isRouteSelected.current = true;
-    // transform the points to a list of points [lat, lng]
-    const transformedPoints = route.route.map(point => {
-      const [lng, lat] = JSON.parse(point);
-      return [lat, lng];
-    });
-    // update the path
-    setReceivedPoints(transformedPoints);
-    // get the starting point and the arrival point
-    const startPoint = transformedPoints[0];
-    const endPoint = transformedPoints[transformedPoints.length - 1];
-    // transform the points to a JSON format
-    const formatedStartPoint = { "lat": startPoint[0], "lng": startPoint[1]};
-    const formatedEndPoint = {"lat": endPoint[0], "lng": endPoint[1]};
-    // update the starting point and the arrival point
-    setStartPoint(formatedStartPoint);
-    setEndPoint(formatedEndPoint);
-    // update the selected route
-    setSelectedRoute(route);
-    isRouteSelected.current = false;
-    setSelectionUpdate(!selectionUpdate);
-  };
-
-
-   // Update innfomations displayed when a route is selected
-   const handleSelecMatchingRoute = (id) => {
-    setMacthingRouteSelectedId(id);
-  };
-
-
 
   // ----------------------- MatchList.js -----------------------
 
-  // Handle the update of a route
+  /* Handle the update of a route */
   const handleFindMatches = (formData) => {
     
     // format the data for the server
@@ -311,7 +243,7 @@ export default function Map() {
     const findMatchesPromise = findMatches(data);
 
     toast.promise(findMatchesPromise, {
-      loading: 'Findings routes...',
+      loading: 'Recherche de trajets corresspondants...',
       success: <b>Trajets récupérés</b>,
       error: (err) => <b>{err.response.data.error}</b>,
     });
@@ -334,10 +266,10 @@ export default function Map() {
       setMatchingRoutes(formatedData);
       // update the list of routes
       // setRefresh(!refresh);
-    }).catch((error) => {"fail to get matching routes"});
+    }).catch((error) => {"Problème lors de la récupération des trajets corresspondants"});
   };
 
-  // for the adress search
+  /* for the adress search */
   const [startAddress, setStartAddress] = useState('');
   const [endAddress, setEndAddress] = useState('');
   const [startAddressSuggestions, setStartAddressSuggestions] = useState([]);
@@ -355,7 +287,7 @@ export default function Map() {
   // Cache for search results
   const searchCache = {};
 
-  // Function to place a marker based on address
+  /* Function to place a marker based on address */
   const handleSearch = _.debounce(async (address, isStartPoint) => {
     if (searchCache[address]) {
       if (isStartPoint) {
@@ -384,20 +316,18 @@ export default function Map() {
           }
         } else {
           if (isStartPoint) {
-            setStartAddressSuggestions([{ label: 'No results found' }]);
+            setStartAddressSuggestions([{ label: 'Pas de résultats trouvés' }]);
           } else {
-            setEndAddressSuggestions([{ label: 'No results found' }]);
+            setEndAddressSuggestions([{ label: 'Pas de résultats trouvés' }]);
           }
         }
       } catch (error) {
-        toast.error(`Unexpected error: ${error.message}`);
+        toast.error(`Erreur : ${error.message}`);
       }
     }
   }, 500);
-  
-  
-  
-  
+
+  /* Function to handle the suggestion list */
   const handleSuggestionClick = (suggestion, isStartPoint) => {
     try {
       const { x: lng, y: lat } = suggestion;
@@ -423,16 +353,13 @@ export default function Map() {
       }
     }
     catch (error) {
-      toast.error("error");
+      toast.error(`Erreur : ${error.message}`);
     }
   };
 
-
-
   return (
     <div>
-        
-    <Toaster position='top-center' reverseOrder={false}></Toaster>
+      <Toaster position='top-center' reverseOrder={false}></Toaster>
       <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
             {/* Navigation Bar */}
             <nav class="navbar d-flex justify-content-end p-2 float-end">
@@ -456,201 +383,103 @@ export default function Map() {
 
         <div class="light-gray rounded-3 p-4 mx-auto my-3 mx-md-5 my-md-4" >
 
-        {/** Display the form above the map */}
-        <div style={{ position: 'relative', zIndex : 1001 }}>
-          {/* Formulaire pour le nom du chemin et la planification */}
-          <CreateRoute 
-            createRoute={handleCreateRoute} 
-            selectedRoute={selectedRoute} 
-            selectionUpdate={selectionUpdate}
-            updateRoute={handleUpdateRoute}
-            handleFindMatches={handleFindMatches}
+          {/** Display the form above the map */}
+          <div style={{ position: 'relative', zIndex : 1001 }}>
+            {/* Formulaire pour le nom du chemin et la planification */}
+            <CreateRoute 
+              createRoute={handleCreateRoute} 
+              selectedRoute={selectedRoute} 
+              selectionUpdate={selectionUpdate}
+              updateRoute={handleUpdateRoute}
+              handleFindMatches={handleFindMatches}
 
-            startAddress={startAddress}
-            setStartAddress={setStartAddress}
-            endAddress={endAddress}
-            setEndAddress={setEndAddress}
-            startAddressSuggestions={startAddressSuggestions}
-            endAddressSuggestions={endAddressSuggestions}
-            handleSearch={handleSearch}
-            handleSuggestionClick={handleSuggestionClick}
+              startAddress={startAddress}
+              setStartAddress={setStartAddress}
+              endAddress={endAddress}
+              setEndAddress={setEndAddress}
+              startAddressSuggestions={startAddressSuggestions}
+              endAddressSuggestions={endAddressSuggestions}
+              handleSearch={handleSearch}
+              handleSuggestionClick={handleSuggestionClick}
 
-            handlePathSubmit={handlePathSubmit}
-          />
-        </div>
-
-        {// start point selection button
-        /*
-        <div>
-            <label>
-                <input
-                    type="checkbox"
-                    name="startingPointCheckbox"
-                    checked={isStartPointSelected}
-                    onChange={() => {
-                      setIsStartPointSelected(!isStartPointSelected)}
-                    }
-                />
-                Point de départ
-            </label>
-        </div>
-        
-        // arrival point selection button 
-        <div>
-          <label>
-            <input
-                type="checkbox"
-                name="arrivalPointCheckbox"
-                checked={!isStartPointSelected}
-                onChange={() => setIsStartPointSelected(!isStartPointSelected)}
+              handlePathSubmit={handlePathSubmit}
             />
-            Point d'arrivée
-          </label>
-        </div>*/}
+          </div>
 
-
-<div class="d-flex flex-column align-items-center">
-<h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
-Vous pourrez modifier le chemin une fois le trajet créé.
-        <MapContainer
-          center={[48.65, 6.15]}
-          zoom={17}
-          style={{
-            border: '1px solid #ccc',
-            height: '700px',
-            width: '700px',
-            margin: '10px',
-            position: 'relative',
-          }}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-
-          { /** Starting point */
-            startPoint && (
-              <Marker
-                position={[startPoint.lat, startPoint.lng]}
-                //altitude={[startPoint.altitude, startPoint.altitude]}
-                icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
-                draggable={true}
-                eventHandlers={{
-                  dragend: (event) => { handleDragEnd(event, true) }
-                }}
-              >          
-              </Marker>
-          )}
-
-          { /** End point */
-            endPoint && (
-              <Marker
-                position={[endPoint.lat, endPoint.lng]}
-                icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
-                draggable={true}
-                eventHandlers={{
-                  dragend: (event) => { handleDragEnd(event, false) }
-                }}
-              >
-              </Marker>
-          )}
-
-
-          {/** Matching routes */
-          matchingRoutes.length > 0 &&
-            matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
-                (<Marker 
-                  key={index}
-                  position={point}
-                  icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
-                >
-                </Marker>)
-                
-
-          
-              ))       
-          }
-
-          {/** Path */
-          matchingRoutes.length > 0 && (
-            <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
-          )}
-
-          {/** Path */
-          receivedPoints && (
-            <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
-          )}
-          
-          {/** Dynamics points 
-            receivedPoints.map((point, index) => (
-            <Marker 
-              key={index}
-              position={point}
-              icon={L.icon({ iconUrl: marker_dynamic, iconSize: [10, 10] })}
-              // draggable only if not start or end point
-              draggable={(index !== 0) && (index !== receivedPoints.length - 1)}
-              
-              eventHandlers={{
-                dragend: (event) => {
-                  // set the drag end event flag
-                  setIsDragEndEvent(true);
-
-                  // reformat the event
-                  const modifiedPoint = {
-                    latlng: event.target._latlng,
-                    index: index,
-                  };
-
-                  // retrieve the list of points previously moved manually
-                  const points = [...intermediatePoints];
-                                
-                  // Check if the index already exists.
-                  const existingIndex = points.findIndex(
-                    (point) => point.index === index
-                  );
-
-                  // update the temporary list
-                  if (existingIndex !== -1) {
-                    // update the existing point
-                    points[existingIndex] = modifiedPoint;
-                  } else {
-                    // add the new point
-                    points.push(modifiedPoint);
-                    // sort the list of points
-                    points.sort((a, b) => a.index - b.index);
-                  }
-
-                  // update the list of intermediate points
-                  setIntermediatePoints(points);
-                  // enable the update of the path
-                  setShouldUpdatePath(true);                
-                }
+          <div class="d-flex flex-column align-items-center">
+            <h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
+            Vous pourrez modifier le chemin une fois le trajet créé.
+            <MapContainer
+              center={[48.65, 6.15]}
+              zoom={17}
+              style={{
+                border: '4px solid #414833',
+                height: '50vw',
+                width: '50vw',
+                position: 'relative',
               }}
             >
-              { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
-            </Marker>
-          ))*/}
-          <MapClickHandler />
-        </MapContainer>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+
+              { /** Starting point */
+                startPoint && (
+                  <Marker
+                    position={[startPoint.lat, startPoint.lng]}
+                    //altitude={[startPoint.altitude, startPoint.altitude]}
+                    icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
+                    draggable={true}
+                    eventHandlers={{
+                      dragend: (event) => { handleDragEnd(event, true) }
+                    }}
+                  >          
+                  </Marker>
+              )}
+
+              { /** End point */
+                endPoint && (
+                  <Marker
+                    position={[endPoint.lat, endPoint.lng]}
+                    icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
+                    draggable={true}
+                    eventHandlers={{
+                      dragend: (event) => { handleDragEnd(event, false) }
+                    }}
+                  >
+                  </Marker>
+              )}
+
+              {/** Matching routes */
+              matchingRoutes.length > 0 &&
+                matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
+                    (<Marker 
+                      key={index}
+                      position={point}
+                      icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
+                    >
+                    </Marker>)
+                  ))       
+              }
+
+              {/** Path */
+              matchingRoutes.length > 0 && (
+                <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
+              )}
+
+              {/** Path */
+              receivedPoints && (
+                <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
+              )}
+
+              <MapClickHandler />
+            </MapContainer>
+          </div>
+          <Link to="/NvxTrajet" style={{color:'#414833'}}>Retour</Link>
+          <LogoutButton />
         </div>
-        
-{/*
-        // Intégrez le composant ListRouteForm 
-        <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute}/>
-
-          // Intégrez le composant MatchList 
-          { true && (
-            <MatchList routes={matchingRoutes} handleFindMatches={handleFindMatches} onSelectMatchingRoute={handleSelecMatchingRoute}/>
-          )}
-
-*/}
-        <Link to="/NvxTrajet" style={{color:'#414833'}}>Retour</Link>
-
-
-
-        <LogoutButton />
-        </div>
-        </div>
+      </div>
       <Footer/>
     </div>
   );

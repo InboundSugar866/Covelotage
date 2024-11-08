@@ -1,5 +1,5 @@
 import axios from 'axios';
-// library tfo advanced geospatial analysis 
+// library to advanced geospatial analysis 
 import * as turf from '@turf/turf';
 
 axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;
@@ -8,7 +8,7 @@ axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;
  * Manage map 
  */
 
-/** get the shortest path between 2 points */
+/* get the shortest path between 2 points */
 export async function getShortestPath(userPoints) {
     try {
         // formate the points
@@ -29,11 +29,11 @@ export async function getShortestPath(userPoints) {
 
         return Promise.resolve(transformedPoints);
     } catch (error) {
-        return Promise.reject({ error : "Servor error : distance could not be calculated"});
+        return Promise.reject({ error : "Problème lors du calcul du trajet"});
     }
 }
 
-// function to find matches for a route
+/* function to find matches for a route */
 export async function findMatches(routeData) {
     try {
         // get the token from the local storage
@@ -49,14 +49,14 @@ export async function findMatches(routeData) {
             routes.push(similaritie.route);
         });
 
-        return Promise.resolve(routes);
+        return Promise.resolve({ routes, similarities });
         // return response.data;
     } catch (error) {
         return Promise.reject(error);
     }
 }
 
-/** update the index of the intermediate points */
+/* update the index of the intermediate points */
 export async function updateIndex(receivedPoints, intermediatePoints) {
     try {
         // transform the points to a list of points [lat, lng]
@@ -80,11 +80,11 @@ export async function updateIndex(receivedPoints, intermediatePoints) {
         // return the updated list of intermediate points
         return Promise.resolve(newIntermediatePoints);
     } catch (error) {
-        return Promise.reject({ error : "Servor error : distance could not be calculated"});
+        return Promise.reject({ error : "Problème lors de la mise à jour du trajet"});
     } 
 }
 
-/** find the index of the nearest point in a list*/
+/* find the index of the nearest point in a list*/
 function findClosestPointIndex(point, pointsList) {
 
   // Convertir les points reçus en une ligne

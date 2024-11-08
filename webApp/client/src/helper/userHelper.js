@@ -22,7 +22,7 @@ export async function authenticate(username){
     try {
         return await axios.post('/api/authenticate', { username })
     } catch (error) {
-        return { error : "Username doesn't exist...!"}
+        return { error : "Le nom d'utilisateur n'existe pas...!"}
     }
 }
 
@@ -32,7 +32,7 @@ export async function getUser({ username }){
         const { data } = await axios.get(`/api/user/${username}`);
         return { data };
     } catch (error) {
-        return { error : "Password doesn't Match...!"}
+        return { error : "Mot de passe erroné...!"}
     }
 }
 
@@ -43,7 +43,7 @@ export async function registerUser(credentials){
         const { data : { msg, error }, status } = await axios.post(`/api/register`, credentials);
         // If the username or the email are already registered
         if (status !== 201) {
-            return Promise.reject({ error  :'Fail to request the register mail'})
+            return Promise.reject({ error  :"Problème lors de la récupération de l'adresse mail"})
         }      
         if (error) {
             return Promise.reject({ error  : error, msg : msg})
@@ -63,7 +63,7 @@ export async function verifyPassword({ username, password }){
             return Promise.resolve({ data });
         }
     } catch (error) {
-        return Promise.reject({ error : "Password doesn't Match...!"})
+        return Promise.reject({ error : "Mot de passe erroné...!"})
     }
 }
 
@@ -77,7 +77,7 @@ export async function updateUser(response){
 
         return Promise.resolve({ data })
     } catch (error) {
-        return Promise.reject({ error : "Couldn't Update Profile...!"})
+        return Promise.reject({ error : "Problème lors de la mise à jour du profil...!"})
     }
 }
 
@@ -90,7 +90,7 @@ export async function generateOTP(username){
         if(status === 201){
             return Promise.resolve(status);
         }
-        return Promise.reject({ error : 'Problem while generating OTP!' });
+        return Promise.reject({ error : "Problème lors de la génération de l'OTP!" });
     } catch (error) {
         return Promise.reject({ error });
     }

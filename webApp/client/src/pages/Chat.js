@@ -1,49 +1,54 @@
-import {useContext, useEffect, useRef, useState} from "react";
-import { Link, Route } from 'react-router-dom'
-import Avatar from "./Avatar";
-import Logo from "./Logo";
-import Footer from '../components/Footer';
-import {UserContext} from "./UserContext";
-import {uniqBy} from "lodash";
-import axios from "axios";
-import Contact from "./Contact";
-import { LogoutButton } from '../components/LogoutButton';
-import backgroundImage from '../assets/Fond_urbain.jpg';
-import '../styles/Chat.css';
-import { ReactComponent as Emplacement} from '../assets/emplacement.svg';
-import { ReactComponent as Membre} from '../assets/membre.svg';
+// React and Related Hooks
+import { useContext, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
+// Components
+import Footer from '../components/Footer';
+import { LogoutButton } from '../components/LogoutButton';
+import Contact from './Contact';
+
+// Context
+import { UserContext } from './UserContext';
+
+// Utilities
+import { uniqBy } from 'lodash';
+import axios from 'axios';
+
+// Assets
+import backgroundImage from '../assets/Fond_urbain.jpg';
+import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
+import { ReactComponent as Membre } from '../assets/membre.svg';
 import { ReactComponent as Profil } from '../assets/Profil.svg';
 import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
 import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
-
 import { ReactComponent as Search } from '../assets/Search.svg';
 
-import { getUser } from '../helper/userHelper';
+// Styles
+import '../styles/Chat.css';
 
+// Html
 export default function Chat() {
   const [ws,setWs] = useState(null);
   const [onlinePeople,setOnlinePeople] = useState({});
   const [offlinePeople,setOfflinePeople] = useState({});
   const [selectedUserId,setSelectedUserId] = useState(null);
-  const [selectedUsername] = useState(null);
   const [newMessageText,setNewMessageText] = useState('');
   const [messages,setMessages] = useState([]);
-  const {username,setUsername,id,setId} = useContext(UserContext);
+  const {username,id} = useContext(UserContext);
   const divUnderMessages = useRef();
 
   const [created,setCreated] = useState(null);
   const [address, setAdress] = useState(null);
 
-
-
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
 
+  /* Open the server connection */
   useEffect(() => {
     connectToWs();
   }, [selectedUserId]);
 
+  /* Connect the client and the server for the chat*/
   function connectToWs() {
     const ws = new WebSocket('ws://localhost:8080');
     setWs(ws);
@@ -56,6 +61,7 @@ export default function Chat() {
     });
   }
 
+  /* Function to show the people currently connected */
   function showOnlinePeople(peopleArray) {
     const people = {};
     peopleArray.forEach(({userId,username}) => {
@@ -68,6 +74,7 @@ export default function Chat() {
     }
   }
 
+  /* Function to create messages */
   function handleMessage(ev) {
     const messageData = JSON.parse(ev.data);
     //console.log({ev,messageData});
@@ -80,6 +87,7 @@ export default function Chat() {
     }
   }
 
+  /* Function to send the message */
   function sendMessage(ev, file = null) {
     if (ev) ev.preventDefault();
     const message = {
@@ -104,18 +112,7 @@ export default function Chat() {
     }
   }
   
-  
-  function sendFile(ev) {
-    const reader = new FileReader();
-    reader.readAsDataURL(ev.target.files[0]);
-    reader.onload = () => {
-      sendMessage(null, {
-        name: ev.target.files[0].name,
-        data: reader.result,
-      });
-    };
-  }
-
+  /* hide the chat  */
   useEffect(() => {
     const div = divUnderMessages.current;
     if (div) {
@@ -123,6 +120,7 @@ export default function Chat() {
     }
   }, [messages]);
 
+  /* check all the people in the server */
   useEffect(() => {
     axios.get('/people').then(res => {
       const offlinePeopleArr = res.data
@@ -136,6 +134,7 @@ export default function Chat() {
     });
   }, [onlinePeople]);
   
+  /* select a user in the list and show the chat */
   useEffect(() => {
     if (selectedUserId) {
       axios.get('/messages/'+selectedUserId).then(res => {
@@ -149,8 +148,7 @@ export default function Chat() {
 
   const messagesWithoutDupes = uniqBy(messages, '_id');
 
-
-
+  /* Function to open the chat when a user is selected */
   async function setSelectedUsername(selectedUserId) {
     const selectedUsername = onlinePeople[selectedUserId] || offlinePeople[selectedUserId]?.username;
     console.log(selectedUsername);
@@ -162,9 +160,7 @@ export default function Chat() {
       });
   }
 
-
-
-  // Update the suggestions based on the search query
+  /* Update the suggestions based on the search query */
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setSuggestions([]);
@@ -181,12 +177,11 @@ export default function Chat() {
     setSuggestions(filteredSuggestions);
   }, [searchQuery, onlinePeople, offlinePeople]);
 
-  // Handle when a suggestion is clicked
+  /* Handle when a suggestion is clicked */
   const handleSuggestionClick = (userId) => {
     setSelectedUserId(userId);
     setSearchQuery(''); // Clear the search input
   };
-
   
   return (
     <div>
@@ -269,7 +264,7 @@ export default function Chat() {
                 </div>
               </div>
               <div class="p-2 text-center d-flex align-items-center justify-content-center">
-                <span class="mr-2 small text-secondary d-flex align-items-center">
+                <span class="mx-2 small text-secondary d-flex align-items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{width: '1rem', height: '1rem'}}>
                     <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
                   </svg>
@@ -285,7 +280,7 @@ export default function Chat() {
               <div class="flex-grow-1">
                 {!selectedUserId && (
                   <div class="d-flex flex-grow-1 align-items-center justify-content-center" style={{height:"75vh"}}>
-                    <div class="text-secondary">&larr; Séléctionnez un utilisateur dans la barre latérale</div>
+                    <div class="text-secondary">&larr; Séléctionnez un utilisateur dans la barre latérale ou recherez un utilisateur dans la barre de recherche</div>
                   </div>
                 )}
                 {!!selectedUserId && (
@@ -345,14 +340,6 @@ export default function Chat() {
                       onChange={ev => setNewMessageText(ev.target.value)}
                       placeholder="Écrivez votre message ici"
                       class="bg-white flex-grow-1 border rounded p-2"/>
-{/*
-                <label class="bg-light p-2 text-secondary cursor-pointer rounded border border-light">
-                  <input type="file" class="d-none" onChange={sendFile} />
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{width: '1.5rem', height: '1.5rem'}}>
-                    <path fillRule="evenodd" d="M18.97 3.659a2.25 2.25 0 00-3.182 0l-10.94 10.94a3.75 3.75 0 105.304 5.303l7.693-7.693a.75.75 0 011.06 1.06l-7.693 7.693a5.25 5.25 0 11-7.424-7.424l10.939-10.94a3.75 3.75 0 115.303 5.304L9.097 18.835l-.008.008-.007.007-.002.002-.003.002A2.25 2.25 0 015.91 15.66l7.81-7.81a.75.75 0 011.061 1.06l-7.81 7.81a.75.75 0 001.054 1.068L18.97 6.84a2.25 2.25 0 000-3.182z" clipRule="evenodd" />
-                  </svg>
-                </label>
-*/}
                 <button type="submit" class="bg-primary p-2 text-white rounded">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width: '1.5rem', height: '1.5rem'}}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
@@ -361,17 +348,6 @@ export default function Chat() {
               </form>
               )}
             </div>
-
-{/*
-            <div class="border-start border-secondary border-2"></div>
-
-            <div class="w-25 d-flex flex-column rounded-3">
-              <div class="flex-grow-1">
-              </div>
-            </div>
-*/}
-
-
           </div>
         </div>
       </div>

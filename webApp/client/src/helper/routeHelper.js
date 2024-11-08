@@ -24,7 +24,7 @@ export async function addRouteToServer(routeData) {
         const { status } = await axios.post('/api/addroute', routeData, { headers : { "Authorization" : `Bearer ${token}`}});
         // If the route failed to be added
         if (status !== 201) {
-            return Promise.reject({ error  :'Fail to add the route'})
+            return Promise.reject({ error  :"Problème lors de l'ajout du trajet"})
         }      
         return Promise.resolve();
     } catch (error) {
@@ -41,7 +41,7 @@ export async function updateRoute(routeData) {
         const { status } = await axios.put('/api/updateRoute', routeData, { headers : { "Authorization" : `Bearer ${token}`}});
         // If the route failed to be added
         if (status !== 201) {
-            return Promise.reject({ error  :'Fail to update the route'})
+            return Promise.reject({ error  :'Problème lors de la mise à jour du trajet'})
         }      
         return Promise.resolve();
     } catch (error) {
@@ -62,7 +62,7 @@ export async function deleteRoute(routeName) {
         });
         // If the route failed to be deleted
         if (status !== 201) {
-            return Promise.reject({ error  :'Fail to add the route'})
+            return Promise.reject({ error  :'Problème lors de la suppression du trajet'})
         }      
         return Promise.resolve();
     } catch (error) {

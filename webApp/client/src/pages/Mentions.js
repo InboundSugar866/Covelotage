@@ -1,13 +1,13 @@
 import React from 'react'
+
+// Components
 import Footer from '../components/Footer';
 
-import backgroundImage from '../assets/Fond_urbain.jpg';
-import '../styles/Mentions.css';
-
+// Html
 const Mentions = () => {
     return (
       <div >
-        <div className='backgroundImage' style={{backgroundColor: `#63A3A0`}}>
+        <div style={{backgroundColor: `#63A3A0`}}>
           <div class="p-5 rounded text-justify fw-bold">
 
             <div class='mb-5'>
@@ -15,7 +15,6 @@ const Mentions = () => {
               <h2>Votre Communaute Cycliste</h2>
               <p>Le covelotage est une initiative visant à rendre l’utilisation du vélo plus accessible au quotidien, en encourageant les cyclistes grâce à la mise en relation avec d’autres utilisateurs partageant des itinéraires similaires.</p>
             </div>
-
 
             <h1>Mentions legales</h1>
             <div class='text-justify px-5'>
@@ -26,14 +25,12 @@ const Mentions = () => {
                 chez ADH - 5 rue de l’aviation - 54600 VILLERS-LES-NANCY
               </div>
 
-
               <h3 class='fw-bold  mt-5'>Conception et animation du site</h3>
               <div class='text px-5'>
                 <div>ENSEM Conseil - 2 avenue de la forêt de Haye 54500 VANDOEUVRE-LES-NANCY<br/>
                       <br/></div>
                 <div>Hébergement - XXXX</div>
               </div>
-              
 
               <h3 class='fw-bold  mt-5'>Conditions generales d'utilisation du site et des services proposes</h3>
               <div class='text px-5'>

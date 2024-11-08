@@ -3,7 +3,6 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 
 import axios from "axios";
 
-
 /** import all components */
 import Username from './pages/Username';
 import Password from './pages/Password';
@@ -24,55 +23,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 /** auth middleware */
 import { AuthorizeUser, ProtectRoute } from './middleware/auth';
 
-/** roor routes */
-/*
-const router = createBrowserRouter([
-  {
-    path : '/',
-    element : <Home/>
-  },
-  {
-    path : '/login',
-    element : <Username/>
-  },
-  {
-    path : '/register',
-    element : <Register/>
-  },
-  {
-    path : '/password',
-    element : <ProtectRoute> <Password /> </ProtectRoute> 
-  },
-  {
-    path : '/Profile',
-    element : <AuthorizeUser> <Profile /> </AuthorizeUser> 
-  },
-  {
-    path : '/Recovery',
-    element : <ProtectRoute> <Recovery/></ProtectRoute>
-  },
-  {
-    path : '/Reset',
-    element : <Reset/>
-  },
-  {
-    path : '/map',
-    element : <AuthorizeUser> <Map/> </AuthorizeUser>
-  },
-  {
-    path : '/PageNotFound',
-    element : <PageNotFound/>
-  },
-  {
-    path : '/Chat',
-    element : <AuthorizeUser> <Chat/> </AuthorizeUser>
-  },
-  {
-    path : '/UserContext',
-    element : <AuthorizeUser> <UserContextProvider/> </AuthorizeUser>
-  }
-])
-*/
+/** root routes */
 const router = createBrowserRouter([
   {
     path : '/',
@@ -123,7 +74,6 @@ const router = createBrowserRouter([
     element : <UserContextProvider><AuthorizeUser> <NvxTrajet/> </AuthorizeUser></UserContextProvider>
   }
 ])
-
 
 function App() {
   axios.defaults.withCredentials = true;
