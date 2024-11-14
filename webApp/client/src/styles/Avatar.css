@@ -1,3 +1,28 @@
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  position: relative;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+}
+
+.username {
+  text-align: center;
+  width: 100%;
+  opacity: 0.7;
+}
+
+.status {
+  position: absolute;
+  width: 0.75rem;
+  height: 0.75rem;
+  bottom: 0;
+  right: 0;
+  border-radius: 50%;
+  border: 1px solid white;
+}
+
 /* Define your colors */
   .online {
     background-color: #48bb78;

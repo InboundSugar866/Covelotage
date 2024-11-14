@@ -78,11 +78,11 @@ const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
       </div>
       <div style={{ height: '100%', overflowY: 'auto', border: '1px solid #ccc' }}>
 
-        <ul >
+        <ul style={{ maxheight: '100vh', overflowY: 'auto'}}>
           {routes.map((route, index) => (
             <li key={route.name} onClick={() => handleRouteClick(route)} style={{ cursor: 'pointer', border: selectedRoute === route ? '4px solid #414833' : '1px solid #414833' }}>
               
-              <div class="rounded-3 p-4 mx-auto" style={{maxwidth: "600px", position: "relative"}}>
+              <div class="rounded-3 p-4 mx-auto" style={{position: "relative"}}>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="fw-bold fs-4 text-dark">{route.name}</span>
                   

@@ -34,7 +34,9 @@ export default function Profile() {
       surname: apiData?.surname || '',
       email: apiData?.email || '',
       phone: apiData?.phone || '',
-      address : apiData?.address || ''
+      street : apiData?.street || '',
+      postCode : apiData?.postCode || '',
+      city : apiData?.city || ''
     },
     enableReinitialize : true,
     validate : profileValidate,
@@ -131,7 +133,13 @@ export default function Profile() {
               <input {...formik.getFieldProps('email')} class="form-control" type="text" placeholder="Email" />
             </div>
             <div class="mb-2">
-              <input {...formik.getFieldProps('address')} class="form-control" type="text" placeholder="Addresse" />
+              <input {...formik.getFieldProps('street')} class="form-control" type="text" placeholder="Numéro et rue" />
+            </div>
+            <div class="mb-2">
+              <input {...formik.getFieldProps('postCode')} class="form-control" type="text" placeholder="Code postal" />
+            </div>
+            <div class="mb-2">
+              <input {...formik.getFieldProps('city')} class="form-control" type="text" placeholder="Ville" />
             </div>
 
             <div class="mb-2 text-center">

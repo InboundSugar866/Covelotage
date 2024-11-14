@@ -1,6 +1,19 @@
 import '../styles/Avatar.css';
 
 export default function Avatar({userId,username,online}) {
+  console.log(userId);
+
+  // Check if userId and username are defined and have the expected value 
+  if (!userId || userId.length < 10) { 
+    console.error("Invalid userId:", userId); 
+    return null; 
+  } 
+  
+  if (!username || username.length === 0) { 
+    console.error("Invalid username:", username); 
+    return null; 
+  }
+
   const colors = ['teal', 'red', 'green', 'purple', 'blue', 'yellow', 'orange', 'pink', 'fuchsia', 'rose', 'online', 'offline'];
   const userIdBase10 = parseInt(userId.substring(10), 16);
   const colorIndex = userIdBase10 % colors.length;

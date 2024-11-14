@@ -28,7 +28,10 @@ export default function Register() {
       username: '',
       password : '',
       name : '',
-      surname : ''
+      surname : '',
+      street : '',
+      postCode : '',
+      city : ''
     },
     validate : registerValidate,
     validateOnBlur : false,
@@ -113,7 +116,13 @@ export default function Register() {
               <input {...formik.getFieldProps('phone')} type="tel" class="form-control" placeholder="Téléphone" required />
             </div>
             <div class="mb-2">
-              <input {...formik.getFieldProps('address')} type="text" class="form-control" placeholder="Ville" required />
+              <input {...formik.getFieldProps('street')} type="text" class="form-control" placeholder="Numéro et rue" required />
+            </div>
+            <div class="mb-2">
+              <input {...formik.getFieldProps('postCode')} type="text" class="form-control" placeholder="Code postal" required />
+            </div>
+            <div class="mb-2">
+              <input {...formik.getFieldProps('city')} type="text" class="form-control" placeholder="Ville" required />
             </div>
             <div class="mb-2">
               <input {...formik.getFieldProps('email')} type="text" class="form-control" placeholder="Email" required />

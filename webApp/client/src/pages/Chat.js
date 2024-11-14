@@ -38,7 +38,7 @@ export default function Chat() {
   const divUnderMessages = useRef();
 
   const [created,setCreated] = useState(null);
-  const [address, setAdress] = useState(null);
+  const [address, setAddress] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -156,7 +156,7 @@ export default function Chat() {
       axios.get(`/api/user/${selectedUsername}`).then(res => {
         //console.log(res.data.created);
         setCreated(res.data.created);
-        setAdress(res.data.address);
+        setAddress(res.data.city);
       });
   }
 
@@ -249,7 +249,8 @@ export default function Chat() {
                       id={userId}
                       online={true}
                       username={onlinePeopleExclOurUser[userId]}
-                      onClick={() => {setSelectedUserId(userId)}}
+                      onClick={() => {setSelectedUserId(userId); 
+                                      console.log(userId);}}
                       selected={userId === selectedUserId} />
                   ))}
                   {Object.keys(offlinePeople).map(userId => (
