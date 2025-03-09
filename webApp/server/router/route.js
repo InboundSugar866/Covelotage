@@ -1,3 +1,8 @@
+/**
+ * @fileOverview Router configuration for handling API endpoints connecting the frontend and backend.
+ * Includes user, route, map, and message-related operations.
+ */
+
 import { Router } from "express";
 
 const router = Router();

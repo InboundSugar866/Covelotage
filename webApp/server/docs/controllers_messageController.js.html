@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: middleware/auth.js</title>
+    <title>JSDoc: Source: controllers/messageController.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: middleware/auth.js</h1>
+    <h1 class="page-title">Source: controllers/messageController.js</h1>
 
     
 
@@ -27,54 +27,74 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @fileOverview Middleware to authenticate, authorize and manage sessions for the user.
+ * @fileOverview Handles API routes for sending an email when a notification is received.
  */
 
-import jwt from 'jsonwebtoken';
-import ENV from '../config.js'
+import UserModel from "../model/User.model.js"
+
+// Mailer function to send the email 
+import { sendMail } from '../utils/mailer.js';
 
 /**
- * Middleware to authenticate and authorize user requests based on the provided token.
+ * Sends a message notification email to a user.
  *
- * @async
- * @function Auth
  * @param {Object} req - The request object.
- * @param {Object} req.headers - The headers of the request.
- * @param {string} req.headers.authorization - The authorization header containing the token.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.username - The username of the recipient.
+ * @param {string} req.body.messageContent - The content of the message to include in the email.
  * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @throws {Error} Returns a 401 status with an error message if authentication fails.
+ *
+ * @returns {Promise&lt;void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The username is not provided.
+ * - The user with the specified username is not found.
+ * - There is a server error during the email sending process.
  */
-export default async function Auth(req, res, next){
-    try {        
-        // access authorize header to validate request
-        const token = req.headers.authorization.split(" ")[1];
+export async function sendMessageNotification(req, res) {
+    try {
+        /** SEND AN EMAIL */
+        // get the username from the request
+        const { username, messageContent } = req.body;
+        
+        // If the username is not set, return an error
+        if (!username) return res.status(501).send({ error: "Invalid Username" });
 
-        // retrieve the user details fo the logged in user
-        const decodedToken = await jwt.verify(token, ENV.JWT_SECRET);
-        req.user = decodedToken;
+        // Find the user with the username for the email
+        UserModel.findOne({ username })
+            .then(async user => {
+                // If the user is not found, return an error
+                if (!user) return res.status(501).send({ error: "Couldn't Find the User" });
 
-        next()
+                // get the email from the user
+                const { email } = Object.assign({}, user.toJSON());
+
+                // Create the email message with the message content
+                const message = {
+                    body: {
+                        name: username,
+                        intro: `You have received a new message: "${messageContent}"`,
+                        outro: 'Need help, or have questions? Placeholder'
+                    }
+                };
+                console.log("new message", message);
+                // Create the email subject
+                const subject = "New Message Notification";
+
+                // Send the email with the message content
+                await sendMail(email, subject, message);
+
+                // Send the response to the client with a success message
+                res.status(201).send({});
+            })
+            .catch(err => {
+                return res.status(500).send({ error: err });
+            });
     } catch (error) {
-        res.status(401).json({ error : "Authentication échouée!"})
+        return res.status(500).send({ error });
     }
 }
-
-/**
- * Middleware to create local variables for the application, used when generating OTP or managing sessions.
- *
- * @function localVariables
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- */
-export function localVariables(req, res, next){
-    req.app.locals = {
-        OTP : null,
-        resetSession : false
-    }
-    next()
-}</code></pre>
+</code></pre>
         </article>
     </section>
 

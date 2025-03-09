@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: middleware/auth.js</title>
+    <title>JSDoc: Source: router/route.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: middleware/auth.js</h1>
+    <h1 class="page-title">Source: router/route.js</h1>
 
     
 
@@ -27,54 +27,65 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @fileOverview Middleware to authenticate, authorize and manage sessions for the user.
+ * @fileOverview Router configuration for handling API endpoints connecting the frontend and backend.
+ * Includes user, route, map, and message-related operations.
  */
 
-import jwt from 'jsonwebtoken';
-import ENV from '../config.js'
+import { Router } from "express";
+
+const router = Router();
 
 /**
- * Middleware to authenticate and authorize user requests based on the provided token.
- *
- * @async
- * @function Auth
- * @param {Object} req - The request object.
- * @param {Object} req.headers - The headers of the request.
- * @param {string} req.headers.authorization - The authorization header containing the token.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @throws {Error} Returns a 401 status with an error message if authentication fails.
+ *  FRONTEND &lt;-> BACKEND
  */
-export default async function Auth(req, res, next){
-    try {        
-        // access authorize header to validate request
-        const token = req.headers.authorization.split(" ")[1];
 
-        // retrieve the user details fo the logged in user
-        const decodedToken = await jwt.verify(token, ENV.JWT_SECRET);
-        req.user = decodedToken;
+/** import all controllers */
+import * as controller from '../controllers/userController.js'
+import * as mapController from '../controllers/mapController.js'
+import * as routeController from '../controllers/routeController.js';
+import * as messageController from '../controllers/messageController.js'; // Import the message controller
+import Auth, {localVariables} from '../middleware/auth.js';
 
-        next()
-    } catch (error) {
-        res.status(401).json({ error : "Authentication échouée!"})
-    }
-}
+/** POST Methods for Users*/
+router.route('/register').post(controller.register); // register user
+router.route('/authenticate').post(controller.verifyUser, (req, res) => res.end()); // authenticate user
+router.route('/login').post(controller.verifyUser, controller.login); // login in app
+router.route('/generateOTP').post(controller.verifyUser, localVariables, controller.generateOTP); // generate random OTP
+
+/** POST Methods for Routes */
+router.route('/addroute').post(Auth, routeController.addRoute); // add route
+router.route('/findMatches').post(Auth, mapController.findMatches); // find matches
+
+/** POST Method for Message Notifications */
+router.route('/send-message-notification').post(messageController.sendMessageNotification); // send message notification
+
+/** GET Methods for Users */
+router.route('/user/:username').get(controller.getUser); // user with username
+router.route('/verifyOTP').get(controller.verifyUser, controller.verifyOTP); // verify generated OTP
+router.route('/createResetSession').get(controller.createResetSession); // reset all the variables
+
+/** GET Methods for Routes */
+router.route('/getroutes').get(Auth, routeController.getRoutes); // get user routes
+
+/** PUT Methods for Users */
+router.route('/updateUser').put(Auth, controller.updateUser); // update the user profile
+router.route('/resetPassword').put(controller.verifyUser, controller.resetPassword); //  reset the password
+
+/** PUT Methods for Routes */
+router.route('/updateRoute').put(Auth, routeController.updateRoute); // update route
+
+/** DELETE Methods for Routes */
+router.route('/deleteRoute').delete(Auth, routeController.deleteRoute); // delete route
 
 /**
- * Middleware to create local variables for the application, used when generating OTP or managing sessions.
- *
- * @function localVariables
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
+ * BACKEND &lt;-> MAP API PYTHON
  */
-export function localVariables(req, res, next){
-    req.app.locals = {
-        OTP : null,
-        resetSession : false
-    }
-    next()
-}</code></pre>
+
+/** call the python API */
+router.route('/shortestPath').post(mapController.shortestPath)
+
+export default router;
+</code></pre>
         </article>
     </section>
 

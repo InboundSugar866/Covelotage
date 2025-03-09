@@ -1,3 +1,7 @@
+/**
+ * @fileOverview Handles API routes for CRUD operations on routes.
+ */
+
 import RouteModel from "../model/Route.model.js";
 import ENV from '../config.js'
 import axios from 'axios';
@@ -5,15 +9,25 @@ import axios from 'axios';
 axios.defaults.baseURL = ENV.MAP_API_URI;
 
 /**
- * POST: http://localhost:8080/api/addroute
- * @param: {
- *   "name": "Route1",
- *   "route": ["[6.149824,48.650483]", "[6.150334,48.650811]", ...],
- *   "planning": {
- *       "dates": [2023-12-07, ...],
- *       "periodic": [{"dayOfWeek": 1, "time": "08:35"}, ...]
- *   }
- * }
+ * Adds a new route for a user.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.user - The user object from the token.
+ * @param {string} req.user.username - The username of the user.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.name - The name of the route.
+ * @param {string} req.body.route - The route details.
+ * @param {Object} req.body.planning - The planning details of the route.
+ * @param {string} req.body.startAdress - The starting address of the route.
+ * @param {string} req.body.endAdress - The ending address of the route.
+ * @param {string} [req.body.comment] - An optional comment for the route.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The route already exists with the given name.
+ * - There is a server error during the route creation process.
  */
 export async function addRoute(req, res) {
     try {
@@ -38,7 +52,7 @@ export async function addRoute(req, res) {
         });
         // Save the new route to the database
         newRoute.save()
-            .then(() => {res.status(201).send({ msg: "Route added successfully!" })})
+            .then(() => {res.status(201).send({ msg: "La route a bien été ajoutée." })})
             .catch((error) => {res.status(500).send({ error });});
     } catch (error) {
         return res.status(500).send({ error });
@@ -46,15 +60,22 @@ export async function addRoute(req, res) {
 }
 
 /**
- * PUT: http://localhost:8080/api/updateRoute
- * @param: {
- *   "name": "Route1",
- *   "newRoute": ["[updated coordinates]", ...],
- *   "newPlanning": {
- *       "dates": ["updated date", ...],
- *       "periodic": [{"dayOfWeek": 1, "time": "updated time"}, ...]
- *   }
- * }
+ * Updates an existing route for a user.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.user - The user object from the token.
+ * @param {string} req.user.username - The username of the user.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.name - The name of the route.
+ * @param {string} req.body.route - The updated route details.
+ * @param {Object} req.body.planning - The updated planning details of the route.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The route does not exist with the given name.
+ * - There is a server error during the route update process.
  */
 export async function updateRoute(req, res) {
     try {
@@ -75,7 +96,7 @@ export async function updateRoute(req, res) {
         exitingRoute.planning = planning;
 
         exitingRoute.save()
-            .then(() => res.status(201).send({ msg: "Route updated successfully!" }))
+            .then(() => res.status(201).send({ msg: "La route a bien été mise à jour." }))
             .catch((error) => res.status(500).send({ error }));
     } catch (error) {
         return res.status(500).send({ error });
@@ -83,10 +104,20 @@ export async function updateRoute(req, res) {
 }
 
 /**
- * DELETE: http://localhost:8080/api/deleteRoute
- * @param: {
- *   "name": "Route1"
- * }
+ * Deletes an existing route for a user.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.user - The user object from the token.
+ * @param {string} req.user.username - The username of the user.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.name - The name of the route to delete.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The route does not exist with the given name.
+ * - There is a server error during the route deletion process.
  */
 export async function deleteRoute(req, res) {
     try {
@@ -101,14 +132,25 @@ export async function deleteRoute(req, res) {
             return res.status(404).send({ error: "Route non trouvée" });
         }
 
-        return res.status(201).send({ msg: "Route deleted successfully!" });
+        return res.status(201).send({ msg: "La route a bien été supprimée." });
     } catch (error) {
         return res.status(500).send({ error });
     }
 }
 
 /**
- * GET: http://localhost:8080/api/getroutes
+ * Retrieves all routes for a user.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.user - The user object from the token.
+ * @param {string} req.user.username - The username of the user.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response containing the user's routes or an error.
+ *
+ * @throws Will return an HTTP error response if:
+ * - No routes are found for the user.
+ * - There is a server error during the route retrieval process.
  */
 export async function getRoutes(req, res) {
     try {
@@ -118,7 +160,7 @@ export async function getRoutes(req, res) {
         // get all the routes for the user
         const routes = await RouteModel.find({ username });
         if (!routes || routes.length === 0) {
-            return res.status(404).send({ error: "No routes found for the user!" });
+            return res.status(404).send({ error: "Aucune route trouvée." });
         }
 
         return res.status(200).send(routes);

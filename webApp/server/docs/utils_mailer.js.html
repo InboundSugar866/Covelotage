@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: middleware/auth.js</title>
+    <title>JSDoc: Source: utils/mailer.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: middleware/auth.js</h1>
+    <h1 class="page-title">Source: utils/mailer.js</h1>
 
     
 
@@ -27,53 +27,66 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @fileOverview Middleware to authenticate, authorize and manage sessions for the user.
+ * @fileOverview Utility functions for sending emails using nodemailer and Mailgen.
+ * Configures email transport and generates email content for delivery.
  */
 
-import jwt from 'jsonwebtoken';
-import ENV from '../config.js'
+import nodemailer from 'nodemailer';
+import Mailgen from 'mailgen';
+import ENV from '../config.js';
+
+// NodeMailer configuration
+// https://ethereal.email/create
+let nodeConfig = {
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: ENV.EMAIL, // generated ethereal user
+        pass: ENV.PASSWORD, // generated ethereal password
+    }
+};
+
+/** Create a transporter for sending emails */
+let transporter = nodemailer.createTransport(nodeConfig);
+
+/** Create a mail generator for generating email content */
+let MailGenerator = new Mailgen({
+    theme: "default",
+    product: {
+        name: "Mailgen",
+        link: 'https://mailgen.js/',
+    },
+});
 
 /**
- * Middleware to authenticate and authorize user requests based on the provided token.
- *
- * @async
- * @function Auth
- * @param {Object} req - The request object.
- * @param {Object} req.headers - The headers of the request.
- * @param {string} req.headers.authorization - The authorization header containing the token.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @throws {Error} Returns a 401 status with an error message if authentication fails.
+ * Sends an email to the specified user.
+ * @param {string} userEmail - The recipient's email address.
+ * @param {string} subject - The subject of the email.
+ * @param {Object} message - The message content to be included in the email body.
+ * @returns {Promise&lt;void>} A promise indicating the success or failure of the email sending process.
  */
-export default async function Auth(req, res, next){
-    try {        
-        // access authorize header to validate request
-        const token = req.headers.authorization.split(" ")[1];
+export async function sendMail(userEmail, subject, message) {
+    try {
+        // Generate the email body using Mailgen
+        const emailBody = MailGenerator.generate(message);
 
-        // retrieve the user details fo the logged in user
-        const decodedToken = await jwt.verify(token, ENV.JWT_SECRET);
-        req.user = decodedToken;
+        // Configure the email details
+        const email = {
+            from: ENV.EMAIL,
+            to: userEmail,
+            subject: subject,
+            html: emailBody,
+        };
 
-        next()
+        // Send the email using the transporter
+        await transporter.sendMail(email);
+        console.log("Email sent");
+        return Promise.resolve();
     } catch (error) {
-        res.status(401).json({ error : "Authentication échouée!"})
+        console.error(error);
+        return Promise.reject(error);
     }
-}
-
-/**
- * Middleware to create local variables for the application, used when generating OTP or managing sessions.
- *
- * @function localVariables
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- */
-export function localVariables(req, res, next){
-    req.app.locals = {
-        OTP : null,
-        resetSession : false
-    }
-    next()
 }</code></pre>
         </article>
     </section>

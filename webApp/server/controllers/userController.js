@@ -1,3 +1,7 @@
+/**
+ * @fileOverview Handles API routes for CRUD operations for users and also password recovery.
+ */
+
 import UserModel from "../model/User.model.js"
 // https://en.wikipedia.org/wiki/Bcrypt
 import bcrypt from 'bcrypt';
@@ -17,27 +21,63 @@ app.use(cookieParser());
 
 const jwtSecret = ENV.JWT_SECRET;
 
-
-/** middleware for verify user */
+/**
+ * Middleware to verify the existence of a user.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.query - The query parameters for GET requests.
+ * @param {Object} req.body - The body of the request object for POST/PUT requests.
+ * @param {string} req.query.username | req.body.username - The username to verify.
+ * @param {Object} res - The response object.
+ * @param {Function} next - The next middleware function.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The user does not exist.
+ * - There is an error during the user verification process.
+ */
 export async function verifyUser(req, res, next) {
     try {
         const { username } = req.method == "GET" ? req.query : req.body;
         // check the user existance
         let exist = await UserModel.findOne({ username });
         if (!exist) {
-            return res.status(404).send({ error : "Can't find User!"});
+            return res.status(404).send({ error : "Aucun utilisateur trouvé."});
         }
         next();
 
     } catch (error) {
-        return res.status(404).send({ error : "Authentification Error"})
+        return res.status(404).send({ error : "Erreur lors de l'authentification"})
     }
 }
 
+/**
+ * Registers a new user.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.username - The username of the user.
+ * @param {string} req.body.password - The plain-text password of the user.
+ * @param {string} [req.body.profile] - An optional profile picture or profile information.
+ * @param {string} req.body.email - The email address of the user.
+ * @param {string} req.body.name - The first name of the user.
+ * @param {string} req.body.surname - The surname of the user.
+ * @param {string} req.body.phone - The user's phone number.
+ * @param {string} req.body.street - The user's street address.
+ * @param {string} req.body.postCode - The user's postal code.
+ * @param {string} req.body.city - The user's city.
+ * @param {string} [req.body.created] - An optional creation timestamp.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The username or email already exists.
+ * - The password is missing or cannot be hashed.
+ * - There is a server error during the user registration process.
+ */
 export async function register(req, res) {
 
     try {
-        console.log(req.body);
         const {username, password, profile, email, name, surname, phone, street, postCode, city, created} = req.body;
 
         // check the existing user
@@ -45,7 +85,7 @@ export async function register(req, res) {
             UserModel.findOne({ username })
                 .then(user => {
                     if(user) {
-                        reject({ error : "AlreadyExisting", msg : "Username already exists"});
+                        reject({ error : "AlreadyExisting", msg : "L'utilisateur existe déjà."});
                     }
                     resolve();
             }).catch(err => reject({ error : "error", msg: "exist username findone error"}));
@@ -56,7 +96,7 @@ export async function register(req, res) {
             UserModel.findOne({ email })
                 .then(email => {
                     if(email) {
-                        reject({ error : "AlreadyExisting", msg : "Email already exists"});
+                        reject({ error : "AlreadyExisting", msg : "L'email existe déjà."});
                     }
                     resolve();
             }).catch(err => reject({ error : "error", msg: "exist email findone error"}));
@@ -66,7 +106,7 @@ export async function register(req, res) {
             .then(() => {  
                 // check if the password in not empty
                 if (!password)  {
-                    return res.status(400).send({ error : "Don't have Password"})
+                    return res.status(400).send({ error : "Veuillez entrer un mot de passe."})
                 }
                 bcrypt.hash(password, 10)
                     .then( hashedPassword => {
@@ -97,16 +137,16 @@ export async function register(req, res) {
                                   const message = {
                                     body: {
                                       name: username,
-                                      intro: 'Welcome to our service!',
+                                      intro: 'Bienvenue chez Covélotage !',
                                       outro: 'Need help, or have questions? Placeholder'
                                     }
                                   }
                                   // Create the email subject
-                                  const subject = "Signup Successful";
+                                  const subject = "Confirmation d'inscription";
                                   // Send the email to the user
                                   await sendMail(email, subject, message)
                                   // Send the response to the client with a success message
-                                  res.status(201).send({ msg : "User register Successfully"});
+                                  res.status(201).send({ msg : "Utilisateur enregistré"});
                                 
                               })
                               .catch(error => res.status(500).send({error}))
@@ -129,12 +169,28 @@ export async function register(req, res) {
     }
 }
 
+/**
+ * Logs a user into the application.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.username - The username of the user.
+ * @param {string} req.body.password - The plain-text password of the user.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The username does not exist.
+ * - The password is incorrect.
+ * - There is a server error during the login process.
+ */
 export async function login(req, res) {
 
     const { username, password} = req.body;
 
     if(!password) {
-        return res.status(400).send({ error : "Don't have Password"})
+        return res.status(400).send({ error : "Veuillez entrer un mot de passe."})
     }
 
     try {
@@ -147,7 +203,7 @@ export async function login(req, res) {
                         if(!passwordCheck) {
                             return res.status(401).send({
                                 error: "Unauthorized",
-                                message: "Invalid password."
+                                message: "Mot de passe incorrect."
                               });
                         }
                         
@@ -161,7 +217,7 @@ export async function login(req, res) {
                         res.cookie('token', token, { sameSite: 'none', secure: true, path: '/' }); // secure:true pour https only
 
                         return res.status(200).send({
-                            msg : "Login Successful...!",
+                            msg : "Connection réussie.",
                             username : user.username,
                             token
                         });
@@ -170,12 +226,12 @@ export async function login(req, res) {
                         console.error("Error during password comparison:", err);
                         return res.status(500).send({
                             error: "Internal Server Error",
-                            message: "An unexpected error occurred during login."
+                            message: "Une erreur inattendue est survenue."
                         });
                     })
             })
             .catch( error => {
-                return res.status(404).send({ error : "Username not Found"})
+                return res.status(404).send({ error : "L'utilisateur n'existe pas."})
             })
         
     } catch (error) {
@@ -183,17 +239,31 @@ export async function login(req, res) {
     }
 }
 
+/**
+ * Retrieves user details by username.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.params - The route parameters.
+ * @param {string} req.params.username - The username of the user to retrieve.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the user details or an error message.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The username is not provided.
+ * - The user does not exist.
+ * - There is a server error during the user retrieval process.
+ */
 export async function getUser(req, res) {
     
     const { username } = req.params;
-    // console.log(`username : ${username}`);
     try {
         
-        if(!username) return res.status(501).send({ error: "Invalid Username"});
+        if(!username) return res.status(501).send({ error: "L'utilisateur n'existe pas."});
 
         UserModel.findOne({ username })
         .then( user => {
-                if(!user) return res.status(501).send({ error : "Couldn't Find the User"});
+                if(!user) return res.status(501).send({ error : "L'utilisateur n'existe pas."});
                 
                 /** remove password from user */
                 // mongoose return unnecessary data with object so convert it into json
@@ -207,27 +277,42 @@ export async function getUser(req, res) {
 
 
     } catch (error) {
-        return res.status(404).send({ error : "Cannot Find User Data"});
+        return res.status(404).send({ error : "Erreur lors de la réception des données."});
     }
 }
 
+/**
+ * Updates a user's profile by user ID.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.user - The user object extracted from the token.
+ * @param {string} req.user.userId - The ID of the user to update.
+ * @param {Object} req.body - The body of the request containing updated user data.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The user ID is not found.
+ * - There is a server error during the update process.
+ */
 export async function updateUser(req, res) {
     try {
         // Get the user ID from the request
         const { userId } = req.user;
         // If the user ID is not found, return an error
         if(!userId){ 
-            return res.status(401).send({ error : "User Not Found...!"});
+            return res.status(401).send({ error : "L'utilisateur n'existe pas."});
         }
 
         const body = req.body;
 
         UserModel.updateOne({ _id : userId }, body)
             .then( data => {                                    
-                return res.status(201).send({ msg : "Record Updated...!"});
+                return res.status(201).send({ msg : "Profile mise à jour."});
             })
             .catch(err => {
-                return res.status(401).send({ error : "User Not Found...!"});
+                return res.status(401).send({ error : "L'utilisateur n'existe pas."});
             });    
 
     } catch (error) {
@@ -235,6 +320,21 @@ export async function updateUser(req, res) {
     }
 }
 
+/**
+ * Generates a one-time password (OTP) and sends it to the user's email.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.username - The username of the recipient.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with a success or error message.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The username is not provided.
+ * - The user does not exist.
+ * - There is a server error during the OTP generation or email sending process.
+ */
 export async function generateOTP(req, res) {
 
     try {
@@ -250,24 +350,24 @@ export async function generateOTP(req, res) {
         // get the username from the request
         const { username } = req.body;
         // If the username is not set, return an error
-        if(!username) return res.status(501).send({ error: "Invalid Username"});
+        if(!username) return res.status(501).send({ error: "Utilisateur incorrect."});
         // Find the user with the username for the email
         UserModel.findOne({ username })
             .then( async user => {
                 // If the user is not found, return an error
-                if(!user) return res.status(501).send({ error : "Couldn't Find the User"}); 
+                if(!user) return res.status(501).send({ error : "L'utilisateur n'existe pas."}); 
                 // get the email from the user
                 const { email } = Object.assign({}, user.toJSON());
                 // Create the email message with the OTP
                 const message = {
                     body : {
                         name: username,
-                        intro : `Your Password Recovery OTP is ${otp}. Verify and recover your password.`,
+                        intro : `Votre mot de passe temporaire est ${otp}.`,
                         outro: 'Need help, or have questions? Placeholder'
                     }
                 }
                 // Create the email subject
-                const subject = "Password Recovery OTP";
+                const subject = "Double authentification.";
                 // Send the email with the OTP
                 await sendMail(email, subject, message);
                 // Send the response to the client with a success message
@@ -281,6 +381,19 @@ export async function generateOTP(req, res) {
     }
 }
 
+/**
+ * Verifies the provided OTP against the stored OTP.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.query - The query parameters.
+ * @param {string} req.query.code - The OTP code to verify.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The provided OTP is invalid.
+ */
 export async function verifyOTP(req, res) {
     const { code } = req.query;
     // check the OTP is valid or not
@@ -289,22 +402,49 @@ export async function verifyOTP(req, res) {
         req.app.locals.OTP = null;
         // start session for reset password
         req.app.locals.resetSession = true;
-        return res.status(201).send({ msg: 'Verify Successsfully!'})
+        return res.status(201).send({ msg: 'Double authentification validée.'})
     }
-    return res.status(400).send({ error: "Invalid OTP"});
+    return res.status(400).send({ error: "Code incorrect."});
 }
 
+/**
+ * Creates a reset session for password reset.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response with the session status.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The reset session has expired.
+ */
 export async function createResetSession(req, res) {
     if(req.app.locals.resetSession){
         return res.status(201).send({ flag : req.app.locals.resetSession})
    }
-   return res.status(440).send({error : "Session expired!"})
+   return res.status(440).send({error : "La session a expiré."})
 }
 
+/**
+ * Resets the user's password.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.username - The username of the user.
+ * @param {string} req.body.password - The new password for the user.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The reset session has expired.
+ * - The username does not exist.
+ * - There is a server error during the password hashing or updating process.
+ */
 export async function resetPassword(req, res) {
     try {
         
-        if(!req.app.locals.resetSession) return res.status(440).send({error : "Session expired!"});
+        if(!req.app.locals.resetSession) return res.status(440).send({error : "La session a expiré."});
 
         const { username, password } = req.body;
 
@@ -317,17 +457,17 @@ export async function resetPassword(req, res) {
                             UserModel.updateOne({ username : user.username }, { password: hashedPassword})
                                 .then( data => {
                                     req.app.locals.resetSession = false; // reset session
-                                    return res.status(201).send({ msg : "Record Updated...!"})
+                                    return res.status(201).send({ msg : "Mot de passe mise à jour."})
                                 });                                
                         })
                         .catch( e => {
                             return res.status(500).send({
-                                error : "Enable to hashed password"
+                                error : "Problème lors de la mise à jour du mot de passe."
                             })
                         })
                 })
                 .catch(error => {
-                    return res.status(404).send({ error : "Username not Found"});
+                    return res.status(404).send({ error : "L'utilisateur n'existe pas."});
                 })
 
         } catch (error) {

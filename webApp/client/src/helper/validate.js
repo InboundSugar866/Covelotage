@@ -167,7 +167,7 @@ function emailVerify(errors = {}, values) {
   } else if (values.email.includes(" ")) {
     errors.email = toast.error("Email non reconnu...!");
   } else if (
-    !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+    !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
   ) {
     errors.email = toast.error("Email invalide...!");
   }

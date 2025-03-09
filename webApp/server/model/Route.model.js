@@ -1,5 +1,13 @@
+/**
+ * @fileOverview Routes database model.
+ */
+
 import mongoose from "mongoose";
 
+/**
+ * Schema definition for the Route model.
+ * Represents a route associated with a user, including its details, points, and schedule.
+ */
 export const RouteSchema = new mongoose.Schema({
     // Username of the user associated with this route
     username: {

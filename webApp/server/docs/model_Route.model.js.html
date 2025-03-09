@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: middleware/auth.js</title>
+    <title>JSDoc: Source: model/Route.model.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: middleware/auth.js</h1>
+    <h1 class="page-title">Source: model/Route.model.js</h1>
 
     
 
@@ -27,54 +27,80 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * @fileOverview Middleware to authenticate, authorize and manage sessions for the user.
+ * @fileOverview Routes database model.
  */
 
-import jwt from 'jsonwebtoken';
-import ENV from '../config.js'
+import mongoose from "mongoose";
 
 /**
- * Middleware to authenticate and authorize user requests based on the provided token.
- *
- * @async
- * @function Auth
- * @param {Object} req - The request object.
- * @param {Object} req.headers - The headers of the request.
- * @param {string} req.headers.authorization - The authorization header containing the token.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- * @throws {Error} Returns a 401 status with an error message if authentication fails.
+ * Schema definition for the Route model.
+ * Represents a route associated with a user, including its details, points, and schedule.
  */
-export default async function Auth(req, res, next){
-    try {        
-        // access authorize header to validate request
-        const token = req.headers.authorization.split(" ")[1];
-
-        // retrieve the user details fo the logged in user
-        const decodedToken = await jwt.verify(token, ENV.JWT_SECRET);
-        req.user = decodedToken;
-
-        next()
-    } catch (error) {
-        res.status(401).json({ error : "Authentication échouée!"})
+export const RouteSchema = new mongoose.Schema({
+    // Username of the user associated with this route
+    username: {
+        type: String,
+        required: true
+    },
+    // Name of the route
+    name: {
+        type: String,
+        required: true
+    },
+    // Start adress
+    startAdress: {
+        type: String,
+        required: true
+    },
+    // End adress
+    endAdress: {
+        type: String,
+        required: true
+    },
+    // Comment
+    comment: {
+        type: String,
+        required: false
+    },
+    // Array of points representing the route
+    route: {
+        type: [
+            {
+                type: String,
+                required: true
+            }
+        ], // Use an array of strings
+        required: true
+    },
+    // Schedule
+    planning: {
+        // Use an array of objects to store specific dates
+        dates: {
+            type: [Date]
+        },
+        // Use an array of objects to store periodic times
+        periodic: {
+            type: [
+                {
+                    // Day of the week (0 for Sunday, 1 for Monday, etc.)
+                    dayOfWeek: {
+                        type: Number,
+                        required: true,
+                    },
+                    // Time in HH:mm format
+                    time: {
+                        type: Date,
+                        required: true
+                    }
+                }
+            ]
+        }
     }
-}
+});
 
-/**
- * Middleware to create local variables for the application, used when generating OTP or managing sessions.
- *
- * @function localVariables
- * @param {Object} req - The request object.
- * @param {Object} res - The response object.
- * @param {Function} next - The next middleware function.
- */
-export function localVariables(req, res, next){
-    req.app.locals = {
-        OTP : null,
-        resetSession : false
-    }
-    next()
-}</code></pre>
+// Use the "routes" collection
+export default mongoose.model.Routes || mongoose.model('Route', RouteSchema);
+</code></pre>
         </article>
     </section>
 

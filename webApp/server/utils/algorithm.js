@@ -1,6 +1,13 @@
-/** Format the coordinates to exchange with the openrouteservice API */
+/**
+ * @fileOverview Utility functions for formatting coordinates, exchanging data with the openrouteservice API,
+ * and comparing route similarities.
+ */
 
-// Convert coordinates from strings to numbers
+/**
+ * Converts coordinates from strings to numbers.
+ * @param {Array.<string>} coordinates - Array of coordinate strings in the format "[lng,lat]".
+ * @returns {Array.<Array.<number>>} Array of coordinate pairs, each containing longitude and latitude as numbers.
+ */
 export function parseCoordinates(coordinates) {
     return coordinates.map(coordinate => {
         const [lng, lat] = coordinate.replace('[', '').replace(']', '').split(',');
@@ -8,20 +15,24 @@ export function parseCoordinates(coordinates) {
     });
 }
 
-// Convert coordinates to strings 
+/**
+ * Converts coordinates from arrays of numbers to strings.
+ * @param {Array.<Array.<number>>} coordinates - Array of coordinate pairs, each containing longitude and latitude as numbers.
+ * @returns {Array.<string>} Array of coordinate strings in the format "[lng,lat]".
+ */
 export function formatCoordinates(coordinates) {
     return coordinates.map(coord => `[${coord[0]},${coord[1]}]`);
 }
 
-
-/** functions to find similarities between routes */
-
-// Find the longest common subsequence between two lists
+/**
+ * Finds the longest common subsequence (LCS) between two lists.
+ * @param {Array} list1 - First list of elements.
+ * @param {Array} list2 - Second list of elements.
+ * @returns {Array} The longest common subsequence between the two lists.
+ */
 function longestCommonSubsequence(list1, list2) {
-    // Get the lengths of the lists
     const m = list1.length;
     const n = list2.length;
-    // Create a 2D array to store the lengths of the longest common subsequences
     const dp = Array.from(Array(m + 1), () => Array(n + 1).fill(0));
 
     for (let i = 1; i <= m; i++) {
@@ -36,7 +47,6 @@ function longestCommonSubsequence(list1, list2) {
 
     const lcs = [];
     let i = m, j = n;
-    // Reconstruct the longest common subsequence from the 2D array
     while (i > 0 && j > 0) {
         if (list1[i - 1].toString() === list2[j - 1].toString()) {
             lcs.unshift(list1[i - 1]);
@@ -48,36 +58,37 @@ function longestCommonSubsequence(list1, list2) {
             j--;
         }
     }
-    // Return the longest common subsequence
     return lcs;
 }
 
-// Compare two routes and determine the similarity
+/**
+ * Compares two routes and determines their similarity.
+ * @param {Object} route1 - First route object containing a "route" property with coordinates as strings.
+ * @param {Object} route2 - Second route object containing a "route" property with coordinates as strings.
+ * @returns {Object} Contains the longest common subsequence (LCS) and similarity ratio.
+ */
 function compareRoutes(route1, route2) {
-    // Parse the coordinates from the routes
     const coords1 = parseCoordinates(route1.route);
     const coords2 = parseCoordinates(route2.route);
-    // Find the longest common subsequence between the coordinates
     const lcs = longestCommonSubsequence(coords1, coords2);
-    // Calculate the similarity between the routes
     const similarity = lcs.length / Math.min(coords1.length, coords2.length);
-    // Return the longest common subsequence and the similarity
     return { lcs, similarity };
 }
 
-// Compare the user route with all relevant routes
+/**
+ * Compares a user route with a set of relevant routes and finds those with a similarity above the threshold.
+ * @param {Object} userRoute - User's route object containing a "route" property with coordinates as strings.
+ * @param {Array.<Object>} relevantRoutes - Array of route objects to compare against.
+ * @param {number} [similarityThreshold=0.5] - Minimum similarity ratio required to consider a route relevant.
+ * @returns {Promise<Array.<Object>>} Promise that resolves to an array of relevant routes with similarity details.
+ */
 export async function compareUserRouteWithRelevantRoutes(userRoute, relevantRoutes, similarityThreshold = 0.5) {
     const similarities = [];
-    // Go through all relevant routes
     for (const relevantRoute of relevantRoutes) {
-        // Compare the user route with the relevant route
         const { lcs, similarity } = compareRoutes(userRoute, relevantRoute);
-        // If the similarity is above the threshold, add it to the list
         if (similarity > similarityThreshold) {
             similarities.push({ route: relevantRoute, similarity, lcs });
         }
     }
     return similarities;
 }
-
-

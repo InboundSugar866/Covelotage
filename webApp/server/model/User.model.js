@@ -1,5 +1,13 @@
+/**
+ * @fileOverview Users database model.
+ */
+
 import mongoose from "mongoose";
 
+/**
+ * Schema definition for the User model.
+ * Represents user data including personal details, credentials, and profile information.
+ */
 export const UserSchema = new mongoose.Schema({
     name : {
         type : String,

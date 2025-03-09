@@ -1,3 +1,8 @@
+/**
+ * @fileOverview Server setup and configuration for handling routes, WebSocket connections,
+ * database connectivity, and API endpoints.
+ */
+
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -15,10 +20,8 @@ import router from './router/route.js';
 import User from './model/User.model.js';
 import Message from './model/Message.model.js';
 import ENV from './config.js';
-
-// Mailer function to send the email 
 import { sendMail } from './utils/mailer.js';
-import UserModel from "./model/User.model.js"
+import UserModel from './model/User.model.js';
 
 dotenv.config();
 
@@ -30,34 +33,45 @@ const bcryptSalt = bcrypt.genSaltSync(10);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Middleware
+// Middleware configuration
 app.use(express.json({ limit: '5mb' }));
-app.use(cors({
-  credentials: true,
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (ENV.CLIENT_URL.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  }
-}));
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (ENV.CLIENT_URL.indexOf(origin) === -1) {
+        const msg =
+          'The CORS policy for this site does not allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 app.use(morgan('tiny'));
 app.disable('x-powered-by');
 app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use(cookieParser());
 
+/**
+ * Home route to verify server is operational.
+ */
 app.get('/', (req, res) => {
-  res.status(201).json("Home GET Request");
+  res.status(201).json('Home GET Request');
 });
 
+/** Register API routes */
 app.use('/api', router);
 
+/**
+ * Start the server on the specified port.
+ */
 const server = app.listen(port, () => {
   console.log(`Server connected to http://localhost:${port}`);
 });
 
+/** Handle server errors */
 server.on('error', (error) => {
   if (error.code === 'EADDRINUSE') {
     console.log(`Port ${port} is already in use.`);
@@ -66,12 +80,16 @@ server.on('error', (error) => {
   }
 });
 
-connect().then(() => {
-  console.log("Database connected successfully");
-}).catch(error => {
-  console.log("Invalid database connection...!", error);
-});
+/** Connect to the database */
+connect()
+  .then(() => {
+    console.log('Database connected successfully');
+  })
+  .catch((error) => {
+    console.log('Invalid database connection...!', error);
+  });
 
+/** WebSocket setup */
 const require = createRequire(import.meta.url);
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ noServer: true });
@@ -83,9 +101,15 @@ server.on('upgrade', function upgrade(request, socket, head) {
 });
 
 wss.on('connection', (connection, req) => {
+  /**
+   * Notify all connected clients about online users.
+   */
   function notifyAboutOnlinePeople() {
-    const onlineClients = [...wss.clients].map(c => ({ userId: c.userId, username: c.username }));
-    [...wss.clients].forEach(client => {
+    const onlineClients = [...wss.clients].map((c) => ({
+      userId: c.userId,
+      username: c.username,
+    }));
+    [...wss.clients].forEach((client) => {
       client.send(JSON.stringify({ online: onlineClients }));
     });
   }
@@ -106,9 +130,12 @@ wss.on('connection', (connection, req) => {
     clearTimeout(connection.deathTimer);
   });
 
+  // Extract token from cookies
   const cookies = req.headers.cookie;
   if (cookies) {
-    const tokenCookieString = cookies.split(';').find(str => str.trim().startsWith('token='));
+    const tokenCookieString = cookies
+      .split(';')
+      .find((str) => str.trim().startsWith('token='));
     if (tokenCookieString) {
       const token = tokenCookieString.split('=')[1];
       if (token) {
@@ -121,6 +148,9 @@ wss.on('connection', (connection, req) => {
     }
   }
 
+  /**
+   * Handle incoming messages.
+   */
   connection.on('message', async (message) => {
     const messageData = JSON.parse(message.toString());
     const { recipient, text, file } = messageData;
@@ -148,42 +178,49 @@ wss.on('connection', (connection, req) => {
 
       console.log('created message');
       [...wss.clients]
-        .filter(c => c.userId === recipient)
-        .forEach(c => c.send(JSON.stringify({
-          text,
-          sender: connection.userId,
-          recipient,
-          file: file ? filename : null,
-          _id: messageDoc._id,
-        })));
+        .filter((c) => c.userId === recipient)
+        .forEach((c) =>
+          c.send(
+            JSON.stringify({
+              text,
+              sender: connection.userId,
+              recipient,
+              file: file ? filename : null,
+              _id: messageDoc._id,
+            })
+          )
+        );
 
       // Email notification logic
       UserModel.findOne({ _id: recipient })
-      .then(async user => {
+        .then(async (user) => {
           if (user) {
-              const { email } = user;
-              const message = {
-                  body: {
-                      name: user.username,
-                      intro: `You have received a new message from ${connection.username}: "${text || 'You have received a file.'}"`,
-                      outro: 'Need help, or have questions? Placeholder'
-                  }
-              };
-              const subject = "New Message Notification";
-              console.log('Sending email notification to:', email); // Debugging log
-              await sendMail(email, subject, message);
-              console.log('Email notification sent successfully'); // Debugging log
+            const { email } = user;
+            const message = {
+              body: {
+                name: user.username,
+                intro: `You have received a new message from ${connection.username}: "${
+                  text || 'You have received a file.'
+                }"`,
+                outro: 'Need help, or have questions? Placeholder',
+              },
+            };
+            const subject = 'New Message Notification';
+            console.log('Sending email notification to:', email);
+            await sendMail(email, subject, message);
+            console.log('Email notification sent successfully');
           }
-      })
-      .catch(err => {
+        })
+        .catch((err) => {
           console.error('Error finding user for email notification:', err);
-      });
+        });
     }
   });
 
   notifyAboutOnlinePeople();
 });
 
+/** API endpoint to fetch messages between users */
 app.get('/messages/:userId', async (req, res) => {
   const { userId } = req.params;
   const userData = await getUserDataFromRequest(req);
@@ -195,11 +232,13 @@ app.get('/messages/:userId', async (req, res) => {
   res.json(messages);
 });
 
+/** API endpoint to fetch all users */
 app.get('/people', async (req, res) => {
-  const users = await User.find({}, { '_id': 1, username: 1 });
+  const users = await User.find({}, { _id: 1, username: 1 });
   res.json(users);
 });
 
+/** API endpoint to fetch user profile based on token */
 app.get('/profile', (req, res) => {
   const token = req.cookies?.token;
   if (token) {
@@ -212,6 +251,11 @@ app.get('/profile', (req, res) => {
   }
 });
 
+/**
+ * Extract user data from the request using the token.
+ * @param {Object} req - Express request object.
+ * @returns {Promise<Object>} Resolves with user data or rejects with an error.
+ */
 async function getUserDataFromRequest(req) {
   return new Promise((resolve, reject) => {
     const token = req.cookies?.token;

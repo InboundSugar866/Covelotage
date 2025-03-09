@@ -1,8 +1,28 @@
+/**
+ * @fileOverview Handles API routes for sending an email when a notification is received.
+ */
+
 import UserModel from "../model/User.model.js"
 
 // Mailer function to send the email 
 import { sendMail } from '../utils/mailer.js';
 
+/**
+ * Sends a message notification email to a user.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} req.body - The body of the request object.
+ * @param {string} req.body.username - The username of the recipient.
+ * @param {string} req.body.messageContent - The content of the message to include in the email.
+ * @param {Object} res - The response object.
+ *
+ * @returns {Promise<void>} Sends an HTTP response indicating success or failure.
+ *
+ * @throws Will return an HTTP error response if:
+ * - The username is not provided.
+ * - The user with the specified username is not found.
+ * - There is a server error during the email sending process.
+ */
 export async function sendMessageNotification(req, res) {
     try {
         /** SEND AN EMAIL */
