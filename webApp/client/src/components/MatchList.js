@@ -13,23 +13,46 @@ import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
 import { ReactComponent as Horloge } from '../assets/horloge.svg';
 import { ReactComponent as Calendrier } from '../assets/calendrier.svg';
 
-// Html
-export const MatchList = ({ routes, onSelectMatchingRoute, similarities}) => {
-
-  console.log("matchlist: ",similarities);
-  // state to store the selected route
+/**
+ * MatchList component.
+ *
+ * This component displays a list of routes and allows the user to select a specific route. When a route
+ * is selected, it calls the `onSelectMatchingRoute` function passed as a prop with the index of the selected route.
+ *
+ * @component
+ * @param {Array} routes - Array of route objects to be displayed.
+ * @param {Function} onSelectMatchingRoute - Callback function triggered when a route is selected, with the route's index as an argument.
+ * @param {Array} similarities - Array representing similarities or metadata associated with the routes.
+ * @returns {JSX.Element} A JSX element displaying the list of routes and allowing interaction.
+ */
+export const MatchList = ({ routes, onSelectMatchingRoute, similarities }) => {
+  // State to store the selected route
   const [selectedRoute, setSelectedRoute] = useState(null);
 
-  // function to handle the click on a route
+  /**
+   * Handles the user clicking on a route.
+   *
+   * Sets the selected route and triggers the callback to inform the parent component.
+   *
+   * @function
+   * @param {Object} route - The route object that was clicked.
+   * @param {number} index - The index of the clicked route in the routes array.
+   * @returns {void}
+   */
   const handleRouteClick = (route, index) => {
-    setSelectedRoute(route);
-    onSelectMatchingRoute(index);
-    // onSelectRoute(route);
+    setSelectedRoute(route); // Update state with the selected route
+    onSelectMatchingRoute(index); // Call parent callback with the selected index
   };
 
-  // Helper function to check if the date is valid 
-  function isValidDate(d) { 
-    return d instanceof Date && !isNaN(d); 
+  /**
+   * Helper function to check if a given date is valid.
+   *
+   * @function
+   * @param {Date} d - The date to validate.
+   * @returns {boolean} Returns `true` if the date is valid, otherwise `false`.
+   */
+  function isValidDate(d) {
+    return d instanceof Date && !isNaN(d); // Check if the input is a valid Date object
   }
 
   return (

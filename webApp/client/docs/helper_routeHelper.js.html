@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: helper/routeHelper.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: helper/routeHelper.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import axios from 'axios';
+
+axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;
+
+/**
+ * Retrieve all routes of a user.
+ *
+ * This function sends a request to the server to fetch all routes associated with the logged-in user.
+ *
+ * @async
+ * @function
+ * @returns {Promise&lt;Object>} Promise resolving to the response data containing the user's routes.
+ * @throws {Error} Error object if the request fails.
+ */
+export async function getAllRoutes() {
+  try {
+    const token = await localStorage.getItem('token');
+    const response = await axios.get(`/api/getroutes`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Add a new route to the server.
+ *
+ * This function sends the provided route data to the server for storage.
+ *
+ * @async
+ * @function
+ * @param {Object} routeData - The data of the route to be added.
+ * @returns {Promise&lt;void>} Resolves if the route is successfully added.
+ * @throws {Object|Error} Error object if the request fails or the response status is not 201.
+ */
+export async function addRouteToServer(routeData) {
+  try {
+    const token = await localStorage.getItem('token');
+    const { status } = await axios.post('/api/addroute', routeData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (status !== 201) {
+      return Promise.reject({
+        error: "Problème lors de l'ajout du trajet",
+      });
+    }
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+/**
+ * Update an existing route.
+ *
+ * This function sends updated route data to the server.
+ *
+ * @async
+ * @function
+ * @param {Object} routeData - The updated route data.
+ * @returns {Promise&lt;void>} Resolves if the route is successfully updated.
+ * @throws {Object|Error} Error object if the request fails or the response status is not 201.
+ */
+export async function updateRoute(routeData) {
+  try {
+    const token = await localStorage.getItem('token');
+    const { status } = await axios.put('/api/updateRoute', routeData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (status !== 201) {
+      return Promise.reject({
+        error: 'Problème lors de la mise à jour du trajet',
+      });
+    }
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+/**
+ * Delete a route from the server.
+ *
+ * This function sends a request to the server to delete the specified route.
+ *
+ * @async
+ * @function
+ * @param {string} routeName - The name of the route to be deleted.
+ * @returns {Promise&lt;void>} Resolves if the route is successfully deleted.
+ * @throws {Object|Error} Error object if the request fails or the response status is not 201.
+ */
+export async function deleteRoute(routeName) {
+  try {
+    const token = await localStorage.getItem('token');
+    const { status } = await axios.delete('/api/deleteRoute', {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { name: routeName },
+    });
+    if (status !== 201) {
+      return Promise.reject({
+        error: 'Problème lors de la suppression du trajet',
+      });
+    }
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+/**
+ * Get the day of the week.
+ *
+ * This function converts a day index (0 for Sunday, 6 for Saturday) to the corresponding French day name.
+ *
+ * @function
+ * @param {number} dayOfWeek - The index of the day (0 for Sunday, 1 for Monday, ..., 6 for Saturday).
+ * @returns {string} The name of the day in French.
+ */
+export const getDayOfWeek = (dayOfWeek) => {
+  const days = [
+    'Dimanche',
+    'Lundi',
+    'Mardi',
+    'Mercredi',
+    'Jeudi',
+    'Vendredi',
+    'Samedi',
+  ];
+  return days[dayOfWeek];
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Mar 09 2025 18:00:40 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

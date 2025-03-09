@@ -34,20 +34,6 @@ export async function verifyUser(req, res, next) {
     }
 }
 
-/** POST: http://localhost:8080/api/register 
- * @param : {
-  "username" : "example123",
-  "password" : "admin123",
-  "email": "example@gmail.com",
-  "firstName" : "bill",
-  "lastName": "william",
-  "mobile": 8009860560,
-  "address" : "Apt. 556, Kulas Light, Gwenborough",
-  "profile": ""
-}
-*/
-
-
 export async function register(req, res) {
 
     try {
@@ -143,13 +129,6 @@ export async function register(req, res) {
     }
 }
 
-
-/** POST: http://localhost:8080/api/login 
- * @param: {
-  "username" : "example123",
-  "password" : "admin123"
-}
-*/
 export async function login(req, res) {
 
     const { username, password} = req.body;
@@ -204,7 +183,6 @@ export async function login(req, res) {
     }
 }
 
-/** GET: http://localhost:8080/api/user/example123 */
 export async function getUser(req, res) {
     
     const { username } = req.params;
@@ -233,17 +211,6 @@ export async function getUser(req, res) {
     }
 }
 
-/** PUT: http://localhost:8080/api/updateuser 
- * @param: {
-  "id" : "<token>"
-}
-body: {
-    firstName: '',
-    address : '',
-    profile : ''
-}
-*/
-
 export async function updateUser(req, res) {
     try {
         // Get the user ID from the request
@@ -267,49 +234,7 @@ export async function updateUser(req, res) {
         return res.status(401).send({ error });
     }
 }
-/*
-export async function updateUser(req, res) {
-    try {
-      // Get the user ID from the request
-      const { userId } = req.user;
-  
-      // If the user ID is not found, return an error
-      if (!userId) {
-        return res.status(401).send({ error: "User Not Found...!" });
-      }
-  
-      const body = req.body;
-  
-      // Log userId and body to check if they're correct
-      console.log('User ID:', userId);
-      console.log('Request Body:', body);
-  
-      UserModel.updateOne({ _id: userId }, body)
-        .then(data => {
-          // Check if data is returned and log it
-          console.log('Update Data:', data);
-          if (data.nModified > 0) {
-            return res.status(200).send({ msg: "Record Updated...!" });
-          } else {
-            return res.status(400).send({ error: "No record updated" });
-          }
-        })
-        .catch(err => {
-          console.error('Error:', err);
-          return res.status(500).send({ error: "Internal Server Error" });
-        });
-    } catch (error) {
-      console.error('Error:', error);
-      return res.status(500).send({ error: "Internal Server Error" });
-    }
-  }
-*/
 
-/** POST: http://localhost:8080/api/generateOTP 
- * @param: {
-  "username" : "example123"
-}
-*/
 export async function generateOTP(req, res) {
 
     try {
@@ -356,7 +281,6 @@ export async function generateOTP(req, res) {
     }
 }
 
-/** GET: http://localhost:8080/api/verifyOTP */
 export async function verifyOTP(req, res) {
     const { code } = req.query;
     // check the OTP is valid or not
@@ -370,9 +294,6 @@ export async function verifyOTP(req, res) {
     return res.status(400).send({ error: "Invalid OTP"});
 }
 
-/** GET: http://localhost:8080/api/createResetSession 
- *  successfully redirect user when OTP is valid
-*/
 export async function createResetSession(req, res) {
     if(req.app.locals.resetSession){
         return res.status(201).send({ flag : req.app.locals.resetSession})
@@ -380,9 +301,6 @@ export async function createResetSession(req, res) {
    return res.status(440).send({error : "Session expired!"})
 }
 
-/** PUT: http://localhost:8080/api/resetPassword
- *  update the password when we have valid session
- */
 export async function resetPassword(req, res) {
     try {
         

@@ -19,7 +19,25 @@ import { ReactComponent as CreerTrajet } from '../assets/CreerTrajer.svg';
 // Helper Functions
 import { getDayOfWeek } from '../helper/routeHelper';
 
-// Html
+/**
+ * CreateRoute component for creating and managing a route.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {Function} props.createRoute - Function to handle route creation.
+ * @param {Object} props.selectedRoute - The currently selected route.
+ * @param {Function} props.selectionUpdate - Function to update selection.
+ * @param {Function} props.updateRoute - Function to update a route.
+ * @param {Function} props.handleFindMatches - Function to find matching routes.
+ * @param {string} props.startAddress - Starting address for the route.
+ * @param {Function} props.setStartAddress - Function to set the starting address.
+ * @param {string} props.endAddress - Ending address for the route.
+ * @param {Function} props.setEndAddress - Function to set the ending address.
+ * @param {Array} props.startAddressSuggestions - Suggestions for the start address.
+ * @param {Array} props.endAddressSuggestions - Suggestions for the end address.
+ * @param {Function} props.handleSearch - Function to handle search actions.
+ * @param {Function} props.handleSuggestionClick - Function to handle suggestion clicks.
+ * @param {Function} props.handlePathSubmit - Function to handle path submissions.
+ */
 export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updateRoute, handleFindMatches, 
                               startAddress, setStartAddress, endAddress, setEndAddress, 
                               startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick,
@@ -36,13 +54,20 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
   
   const periodicDateRef = new Date(1970, 0, 1);
 
-  /* Check if the hour is valid */
+  /**
+   * Validates if the given hour is valid.
+   * 
+   * @param {Date} date - The date to validate.
+   * @returns {boolean} - Whether the hour is valid.
+   */
   const isValidHour = (date) => {
     const hour = date.getHours();
     return hour >= 0 && hour <= 23;
   };
 
-  /* Add a date */
+  /**
+   * Adds a selected date to the list of selected dates.
+   */
   const handleAddDate = () => {
     if (selectedDate && isValidHour(selectedDate)) {
       setSelectedDates([...selectedDates, selectedDate]);
@@ -52,14 +77,20 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     }
   };
 
-  /* Remove a date */
+  /**
+   * Removes a date from the list of selected dates.
+   * 
+   * @param {number} index - The index of the date to remove.
+   */
   const handleRemoveDate = (index) => {
     const updatedDates = [...selectedDates];
     updatedDates.splice(index, 1);
     setSelectedDates(updatedDates);
   };
 
-  /* Add a periodic time */
+  /**
+   * Adds a periodic time to the list of periodic times.
+   */
   const handleAddPeriodicTime = () => {
     // Check that the time and day of the week are selected
     if (selectedTime == null || selectedDayOfWeek == null) {
@@ -79,14 +110,22 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     setSelectedPeriodicTimes([...selectedPeriodicTimes, newPeriodicTime]);
   };
 
-  /* Remove a periodic time */
+  /**
+   * Removes a periodic time from the list of periodic times.
+   * 
+   * @param {number} index - The index of the periodic time to remove.
+   */
   const handleRemovePeriodicTime = (index) => {
     const updatedPeriodicTimes = [...selectedPeriodicTimes];
     updatedPeriodicTimes.splice(index, 1);
     setSelectedPeriodicTimes(updatedPeriodicTimes);
   };
 
-  /* Verify that the route is valid */
+  /**
+   * Validates and gathers all route information.
+   * 
+   * @returns {Object|undefined} - Validated route information, or undefined if invalid.
+   */
   function getValideRouteInfos() {
     // Verify that the name is filled
     if (!routeName.trim()) {
@@ -109,11 +148,14 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
       "endAdress": endAddress,
       "comment": comment
     }
-    console.log('routeInfos', routeInfos);
     return routeInfos;
   }
 
-  /* Submit the form to create a new route */
+  /**
+   * Handles form submission to create a new route.
+   * 
+   * @param {Event} e - The form submit event.
+   */
   const handleCreateRoute = (e) => {
     e.preventDefault();
     // Verify that all the required information is filled
@@ -124,7 +166,12 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     }
   };
   
-  /* Formated the selected date */
+  /**
+   * Formats the selected date to a specific format.
+   * 
+   * @param {Date} date - The date to format.
+   * @returns {string} - The formatted date.
+   */
   const formatSelectedDate = (date) => {
 
     const formattedDate = new Intl.DateTimeFormat('fr-FR', {
@@ -138,7 +185,9 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     return formattedDate;
   };
 
-  /* update the form when a route is selected */
+  /**
+   * Updates the form when a route is selected.
+   */
   useEffect(() => {
     // if no route is selected, return
     if (!selectedRoute) return;
@@ -156,7 +205,9 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
   const [showStartSuggestions, setShowStartSuggestions] = useState(false);
   const [showEndSuggestions, setShowEndSuggestions] = useState(false);
 
-  /* suggestion list */
+  /**
+   * Closes the suggestion list when clicked outside the box.
+   */
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.search-container')) {
@@ -171,7 +222,11 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
     };
   }, []);
 
-  /* change the size of the comment area automatically */
+  /**
+   * Auto-resizes the textarea as content grows.
+   * 
+   * @param {HTMLTextAreaElement} textarea - The textarea element.
+   */
   function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
@@ -254,7 +309,7 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
                       onFocus={() => setShowEndSuggestions(true)}
                 />
                 {showEndSuggestions && (
-                  <div className="suggestions-list position-absolute w-100">
+                  <div className="suggestions-list position-absolute w-50">
                     {endAddressSuggestions.map((suggestion, index) => (
                       <div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
                         {suggestion.label}

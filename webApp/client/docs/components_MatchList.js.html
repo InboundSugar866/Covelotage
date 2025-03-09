@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/MatchList.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/MatchList.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// React and Related Hooks
+import React, { useState } from 'react';
+
+// Helper Functions
+import { getDayOfWeek } from '../helper/routeHelper';
+
+// Styles
+import 'react-datepicker/dist/react-datepicker.css';
+import 'rc-time-picker/assets/index.css';
+
+// Assets
+import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
+import { ReactComponent as Horloge } from '../assets/horloge.svg';
+import { ReactComponent as Calendrier } from '../assets/calendrier.svg';
+
+/**
+ * MatchList component.
+ *
+ * This component displays a list of routes and allows the user to select a specific route. When a route
+ * is selected, it calls the `onSelectMatchingRoute` function passed as a prop with the index of the selected route.
+ *
+ * @component
+ * @param {Array} routes - Array of route objects to be displayed.
+ * @param {Function} onSelectMatchingRoute - Callback function triggered when a route is selected, with the route's index as an argument.
+ * @param {Array} similarities - Array representing similarities or metadata associated with the routes.
+ * @returns {JSX.Element} A JSX element displaying the list of routes and allowing interaction.
+ */
+export const MatchList = ({ routes, onSelectMatchingRoute, similarities }) => {
+  // State to store the selected route
+  const [selectedRoute, setSelectedRoute] = useState(null);
+
+  /**
+   * Handles the user clicking on a route.
+   *
+   * Sets the selected route and triggers the callback to inform the parent component.
+   *
+   * @function
+   * @param {Object} route - The route object that was clicked.
+   * @param {number} index - The index of the clicked route in the routes array.
+   * @returns {void}
+   */
+  const handleRouteClick = (route, index) => {
+    setSelectedRoute(route); // Update state with the selected route
+    onSelectMatchingRoute(index); // Call parent callback with the selected index
+  };
+
+  /**
+   * Helper function to check if a given date is valid.
+   *
+   * @function
+   * @param {Date} d - The date to validate.
+   * @returns {boolean} Returns `true` if the date is valid, otherwise `false`.
+   */
+  function isValidDate(d) {
+    return d instanceof Date &amp;&amp; !isNaN(d); // Check if the input is a valid Date object
+  }
+
+  return (
+    &lt;div>
+      &lt;h2 className='me-5' style={{ color: '#4F772D' }}>Trajets correspondant&lt;/h2>
+  
+      &lt;div style={{ height: '100%', overflowY: 'auto', border: '1px solid #ccc' }}>
+        &lt;ul style={{ maxHeight: '100vh', overflowY: 'auto' }}>
+          {routes.map((route, index) => {
+            // Find the corresponding similarity for this route
+            const similarity = similarities.find(similarity => similarity.route._id === route._id);
+            
+            return (
+              &lt;li key={route.name} onClick={() => handleRouteClick(route, index)} style={{ cursor: 'pointer', border: selectedRoute === route ? '4px solid #4F772D' : '1px solid #414833', borderRadius: '10px', marginTop: '1rem' }}>
+                &lt;div className="rounded-3 p-4 mx-auto" style={{ position: "relative" }}>
+                  &lt;div className="d-flex align-items-center">
+                    &lt;span className="fw-bold fs-4 text-dark">{route.username}&lt;/span>
+                    {similarity &amp;&amp; (
+                      &lt;span className="mx-2 fs-5 fw-bold" style={{ color: '#4F772D' }}>
+                        {/* Display the similarity score */}
+                        - {similarity.similarity.toFixed(2)*100}% de similarité
+                      &lt;/span>
+                    )}
+                  &lt;/div>
+  
+                  &lt;div className="d-flex align-items-center mt-3">
+                    &lt;Emplacement style={{ width: '20px', height: '20px' }} className="icon me-3" /> 
+                    &lt;div>
+                      &lt;p className="mb-0">{route.startAdress}&lt;/p>
+                      &lt;p className="mb-0">{route.endAdress}&lt;/p>
+                    &lt;/div>
+                  &lt;/div>
+  
+                  &lt;div className="d-flex align-items-center mt-3">
+                    {route.planning.dates.map((date, index) => {
+                      // Create a new date object from the date string
+                      const d = new Date(date);
+                      // Format the date
+                      const formattedDate = `${d.toLocaleDateString('fr-FR')}`;
+                      return (
+                        &lt;li key={index}>
+                          &lt;Calendrier style={{ width: '20px', height: '20px' }} className="icon" />
+                          {formattedDate}
+                        &lt;/li>
+                      );
+                    })}
+                  &lt;/div>
+  
+                  &lt;div className="d-flex align-items-center mt-3">
+                    {route.planning.dates.map((date, index) => {
+                      // Create a new date object from the date string
+                      const d = new Date(date);
+                      // Format the date
+                      const formattedTime = `${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                      return (
+                        &lt;li key={index}>
+                          &lt;Horloge style={{ width: '20px', height: '20px' }} className="icon" />
+                          {formattedTime}
+                        &lt;/li>
+                      );
+                    })}
+                  &lt;/div>
+  
+                  &lt;ul>Horaires hebdomadaires:
+                    {route.planning.periodic.map((periodic, index) => (
+                      &lt;li key={index}>
+                        {getDayOfWeek(periodic.dayOfWeek) + " "}
+                        {isValidDate(periodic.time) ? periodic.time.toLocaleTimeString([], {
+                          hour: '2-digit', 
+                          minute: '2-digit', 
+                          hour12: false
+                        }) : 'Invalid Time' }
+                      &lt;/li>
+                    ))}
+                  &lt;/ul>
+  
+                  &lt;div className="d-flex flex-column">
+                    &lt;span className="fs-5 fw-bold" style={{ color: '#4F772D' }}>Commentaire de {route.username}&lt;/span>
+                    &lt;div>
+                      {route.comment}
+                    &lt;/div>
+                  &lt;/div>
+                &lt;/div>
+              &lt;/li>
+            );
+          })}
+        &lt;/ul>
+      &lt;/div>
+    &lt;/div>
+  );
+  
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Mar 09 2025 18:00:40 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

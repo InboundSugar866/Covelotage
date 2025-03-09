@@ -26,7 +26,7 @@ export default function PageNotFound() {
 
         <div class="d-flex flex-column align-items-center text-center">
           <h1>
-            La page que vous cherchez a ete deplacee ou n'existe plus.
+            La page que vous cherchez a ete deplacée ou n'existe plus.
           </h1>
           <Link to="/">
             <h3 class="mx-auto d-block" alt="commencer">Revenir</h3>

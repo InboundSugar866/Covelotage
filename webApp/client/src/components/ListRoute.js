@@ -17,53 +17,80 @@ import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
 import { ReactComponent as Horloge } from '../assets/horloge.svg';
 import { ReactComponent as Calendrier } from '../assets/calendrier.svg';
 
-// Html
-const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
-
-  // state to store the list of routes
+/**
+ * ListRoute Component
+ * 
+ * @param {Object} props - Component props
+ * @param {boolean} props.refresh - A flag to trigger the refresh of the route list
+ * @param {function} props.onSelectRoute - Callback function triggered when a route is selected
+ * @param {function} props.deleteRoute - Callback function to delete a route
+ * 
+ * @returns {JSX.Element} Rendered component
+ * 
+ * This component displays a list of routes and allows the user to interact with them.
+ */
+const ListRoute = ({ refresh, onSelectRoute, deleteRoute }) => {
+  /**
+   * State to store the list of routes
+   * @type {Array<Object>}
+   */
   const [routes, setRoutes] = useState([]);
-  // state to store the selected route
+
+  /**
+   * State to store the selected route
+   * @type {Object|null}
+   */
   const [selectedRoute, setSelectedRoute] = useState(null);
 
-  // refresh the list of routes 
+  /**
+   * Effect hook to refresh the list of routes when `refresh` changes
+   */
   useEffect(() => {
-    const fetchRoutes = async () => {
-      try {
-        const userRoutes = await getAllRoutes();
-        // format the periodic times into date objects
-        const routes = userRoutes.map((route) => {
-          return {
-            ...route,
-            planning: {
-              ...route.planning,
-              periodic: route.planning.periodic.map((periodic) => {
-                return {
-                  ...periodic,
-                  time: new Date(periodic.time)
-                }
-              }),
-              dates: route.planning.dates.map((date) => new Date(date))
-            }
-          };
-        });
-        setRoutes(routes);
-      } catch (error) {
-        console.error('Erreur lors du chargement des routes :', error);
-      }
-    };
+      /**
+       * Fetches the list of routes from the server
+       */
+      const fetchRoutes = async () => {
+          try {
+              const userRoutes = await getAllRoutes();
+              // Format periodic times into Date objects
+              const routes = userRoutes.map((route) => ({
+                  ...route,
+                  planning: {
+                      ...route.planning,
+                      periodic: route.planning.periodic.map((periodic) => ({
+                          ...periodic,
+                          time: new Date(periodic.time)
+                      })),
+                      dates: route.planning.dates.map((date) => new Date(date))
+                  }
+              }));
+              setRoutes(routes);
+          } catch (error) {
+              console.error('Erreur lors du chargement des routes :', error);
+          }
+      };
 
-    fetchRoutes();
+      fetchRoutes();
   }, [refresh]);
 
-  // function to handle the click on a route
+  /**
+   * Handles the click on a route
+   * 
+   * @param {Object} route - The selected route object
+   */
   const handleRouteClick = (route) => {
-    setSelectedRoute(route);
-    onSelectRoute(route);
+      setSelectedRoute(route);
+      onSelectRoute(route);
   };
 
-  // Helper function to check if the date is valid 
-  function isValidDate(d) { 
-    return d instanceof Date && !isNaN(d); 
+  /**
+   * Checks if the provided date is valid
+   * 
+   * @param {any} d - The date to check
+   * @returns {boolean} Whether the date is valid
+   */
+  function isValidDate(d) {
+      return d instanceof Date && !isNaN(d);
   }
 
   return (

@@ -20,55 +20,57 @@ import { ReactComponent as Profil } from '../assets/Profil.svg';
 import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
 import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
 
-
-// Html
+/**
+ * Profile Component
+ * Displays the user's profile, including the ability to update profile information and upload a profile picture.
+ *
+ * @returns {JSX.Element} The rendered Profile component.
+ */
 export default function Profile() {
-
   const [file, setFile] = useState();
-  const [{ isLoading, apiData, serverError }] = useFetch()
+  const [{ isLoading, apiData, serverError }] = useFetch();
 
-
+  /**
+   * Formik configuration for handling form input and validation.
+   */
   const formik = useFormik({
-    initialValues : {
-      name : apiData?.name || '',
+    initialValues: {
+      name: apiData?.name || '',
       surname: apiData?.surname || '',
       email: apiData?.email || '',
       phone: apiData?.phone || '',
-      street : apiData?.street || '',
-      postCode : apiData?.postCode || '',
-      city : apiData?.city || ''
+      street: apiData?.street || '',
+      postCode: apiData?.postCode || '',
+      city: apiData?.city || '',
     },
-    enableReinitialize : true,
-    validate : profileValidate,
+    enableReinitialize: true,
+    validate: profileValidate,
     validateOnBlur: false,
     validateOnChange: false,
-    onSubmit : async values => {
-      // < || '' > <=> If the file is empty return nothing
-      values = await Object.assign(values, { profile : file || apiData?.profile || ''})
+    onSubmit: async (values) => {
+      values = await Object.assign(values, { profile: file || apiData?.profile || '' });
 
-      let updatePromise = updateUser(values);
+      const updatePromise = updateUser(values);
       toast.promise(updatePromise, {
-        loading : 'Mise à jour ...',
-        success : <b>Mise à jour effectuée</b>,
-        error : <b>Problème lors de la mise à jour</b>
+        loading: 'Mise à jour ...',
+        success: <b>Mise à jour effectuée</b>,
+        error: <b>Problème lors de la mise à jour</b>,
       });
-      
-    }
-  })
+    },
+  });
 
-  /** formik doensn't support file upload so we need to create this handler */
-  const onUpload = async e => {
-    // < e.target.files[0] > collect image just upload
+  /**
+   * Handles file upload and converts it to base64.
+   *
+   * @param {Object} e - The event object containing the uploaded file.
+   */
+  const onUpload = async (e) => {
     const base64 = await convertToBase64(e.target.files[0]);
     setFile(base64);
-  }
-
-  if (isLoading) {
-    return <h1>isLoading</h1>
   };
-  if (serverError) {
-    return <h1>{serverError}</h1>
-  }
+
+  if (isLoading) return <h1>isLoading</h1>;
+  if (serverError) return <h1>{serverError}</h1>;
 
   return (
     <div>

@@ -16,6 +16,7 @@ import { MapContainer, TileLayer, useMapEvents, Marker, Polyline } from 'react-l
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
+import { Tooltip } from 'react-leaflet';
 
 // Assets
 import marker_1 from '../assets/map-marker-icon-1.png';
@@ -29,49 +30,113 @@ import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
 // Utility Library
 import _ from 'lodash';
 
-// Html
+/**
+ * Represents a Map component that manages map interactions and routing.
+ */
 export default function Map() {
 
-  // ergonomics variable for the first selection
+  /**
+   * Flag indicating whether this is the first selection of a point.
+   * @type {React.MutableRefObject<boolean>}
+   */
   const firstSelection = useRef(true);
-  // Manage the behavior of the starting and arrival points
+
+  /**
+   * Whether the start point is currently selected.
+   * @type {boolean}
+   */
   const [isStartPointSelected, setIsStartPointSelected] = useState(true);
-  // allow to avoid multiple calls of the function handlePathSubmit
+
+  /**
+   * Whether the path should be updated.
+   * @type {boolean}
+   */
   const [shouldUpdatePath, setShouldUpdatePath] = useState(false);
-  // prevent the mutilple calls of the function handleMapClick
+
+  /**
+   * Whether a drag-end event is currently occurring.
+   * @type {boolean}
+   */
   const [isDragEndEvent, setIsDragEndEvent] = useState(false);
+
   
-  // starting point and arrival point
+  /**
+   * The starting point coordinates.
+   * @type {Object|null}
+   */
   const [startPoint, setStartPoint] = useState(null);
+
+  /**
+   * The ending point coordinates.
+   * @type {Object|null}
+   */
   const [endPoint, setEndPoint] = useState(null);
-  // points manually modified by the user
+
+  /**
+   * A list of intermediate points for the path.
+   * @type {Array<Object>}
+   */
   const [intermediatePoints, setIntermediatePoints] = useState([]);
 
-  // received points from the server
+  /**
+   * A list of received path points from the server.
+   * @type {Array<Object>}
+   */
   const [receivedPoints, setReceivedPoints] = useState([]);
 
-  // is a route is selected in the list of my routes
-  const isRouteSelected = useRef(false);
-  // route selected in the list of my routes
+
+  /**
+   * Reference to check if a route is selected.
+   * @type {React.MutableRefObject<boolean>}
+   */
+    const isRouteSelected = useRef(false);
+
+  /**
+   * Represents the selected route.
+   * @type {Object|null}
+   */
   const [selectedRoute] = useState(null);
-  // enables updating the displayed information when the same route is re-selected.
+
+  /**
+   * Tracks selection updates.
+   * @type {boolean}
+   */
   const [selectionUpdate] = useState(false);
-  // refresh the list of routes
+
+  /**
+   * Flag to refresh routes or components.
+   * @type {boolean}
+   */
   const [refresh, setRefresh] = useState(false);
   
-  //  id of the selected matching route
+  /**
+   * ID of the selected matching route.
+   * @type {number}
+   */
   const [macthingRouteSelectedId] = useState(0);
-  // matching routes 
+
+  /**
+   * List of matching routes found.
+   * @type {Array<Object>}
+   */
   const [matchingRoutes, setMatchingRoutes] = useState([]);
 
-  // Path color
+  /**
+   * Map styling options for blue areas.
+   * @type {Object}
+   */
   const blueOptions = { fillColor: 'blue' }
   
-  /* Updates the path */
+/**
+ * Updates the path after verifying start and end points, formatting intermediate points,
+ * and fetching the shortest path using external APIs.
+ *
+ * @param {Object} values - The input values (not utilized directly in this function).
+ */
   const handlePathSubmit = async (values) => {
 
-    // verify that the starting point and the arrival point are defined
-    if (!startPoint || !endPoint) return;
+  // verify that the starting point and the arrival point are defined
+  if (!startPoint || !endPoint) return;
 
     // formate the points
     const formatedPoints = [startPoint, ...intermediatePoints.map(point => point.latlng) ,endPoint];
@@ -98,9 +163,10 @@ export default function Map() {
     }).catch((error) => {"Problème lors de la récupération du trajet"});
   }
 
-   /* Updates the path when modifying points of the path */
+  /**
+   * Updates the path dynamically when modifying points.
+   */
   useEffect(() => {
-    console.log("useeffect",firstSelection);
     // not calculate the path if a route is selected
     if (isRouteSelected.current === true) return;
     // allow to avoid the first call of the function
@@ -116,7 +182,10 @@ export default function Map() {
   // call the function when a point is modified
   [startPoint, endPoint, intermediatePoints]);
 
-  /* Use the useMapEvents function to handle map events */
+  /**
+   * Map click handler to manage user clicks and drag events.
+   * @returns {null} Does not render any component.
+   */
   function MapClickHandler() {
     useMapEvents({
       click: (event) => {
@@ -136,7 +205,11 @@ export default function Map() {
     return null;
   }
 
-  /* Handle map click (set startPoint and EndPoint) */
+  /**
+   * Handle map clicks to set start or end points.
+   * @param {Object} event Event object containing latitude and longitude.
+   * @param {boolean} isStart Determines if the click sets the starting point.
+   */
   const handleMapClick = (event, isStart) => {
 
     // ergonomics operations for the first selection
@@ -160,6 +233,11 @@ export default function Map() {
     setShouldUpdatePath(true);
   };
 
+  /**
+   * Handle drag-end events and reformat them for processing.
+   * @param {Object} event Drag event object.
+   * @param {boolean} isStart Indicates if the point dragged is the starting point.
+   */
   function handleDragEnd(event, isStart) {
     // set the drag end event flag
     setIsDragEndEvent(true);
@@ -171,7 +249,12 @@ export default function Map() {
 
   // -------------- CreateRoute.js && ListRoute.js --------------
 
-  /* Format the route for the server */
+  /**
+   * Format the route into a structure suitable for the server.
+   * @param {Object} formData Data from the form submission.
+   * @param {Array<Object>} points Array of points along the route.
+   * @returns {Object|null} Formatted route data or null.
+   */
   function formatRoute(formData, points) {
     // verify the existence of the route
     if (!points || points.length === 0) {
@@ -188,86 +271,95 @@ export default function Map() {
     return formData;
   };
 
-  /* Handle the creation of a route */
-  const handleCreateRoute = (formData) => {
+/**
+ * Handles the creation of a route by formatting the data and sending it to the server.
+ * Displays toast notifications for loading, success, and error states.
+ * @param {Object} formData - The data collected from the form submission.
+ */
+const handleCreateRoute = (formData) => {
+  // format the data for the server
+  const data = formatRoute(formData, receivedPoints);
+  if (!data) return;
+  // add the route to the server
+  const addRoutePromise = addRouteToServer(data);
 
-    // format the data for the server
-    const data = formatRoute(formData, receivedPoints);
-    if (!data) return;
-    // add the route to the server
-    const addRoutePromise = addRouteToServer(data);
+  toast.promise(addRoutePromise, {
+    loading: 'Ajout du trajet...',
+    success: <b>Trajet ajouté</b>,
+    error: (err) => <b>{err.response.data.error}</b>,
+  });
 
-    toast.promise(addRoutePromise, {
-      loading: 'Ajout du trajet...',
-      success: <b>Trajet ajouté</b>,
-      error: (err) => <b>{err.response.data.error}</b>,
-    });
+  addRoutePromise.then(() => {
+    // update the list of routes
+    setRefresh(!refresh);
+  }).catch((error) => {
+    "Problème lors de la création du trajet";
+  });
+};
 
-    addRoutePromise.then(() => {
-      // update the list of routes
-      setRefresh(!refresh);
-    }).catch((error) => {"Problème lors de la création du trajet"});
-  };
+/**
+ * Handles the update of a route by formatting the data and sending it to the server.
+ * Displays toast notifications for loading, success, and error states.
+ * @param {Object} formData - The data collected from the form submission.
+ */
+const handleUpdateRoute = (formData) => {
+  // format the data for the server
+  const data = formatRoute(formData, receivedPoints);
+  // add the route to the server
+  const updateRoutePromise = updateRoute(data);
 
-  /* Handle the update of a route */
-  const handleUpdateRoute = (formData) => {
+  toast.promise(updateRoutePromise, {
+    loading: 'Mise à jour du trajet...',
+    success: <b>Trajet mise à jour</b>,
+    error: (err) => <b>{err.response.data.error}</b>,
+  });
 
-    // format the data for the server
-    const data = formatRoute(formData, receivedPoints);
-    // add the route to the server
-    const updateRoutePromise = updateRoute(data);
+  updateRoutePromise.then(() => {
+    // update the list of routes
+    setRefresh(!refresh);
+  }).catch((error) => {
+    "Problème lors de la mise à jour du trajet";
+  });
+};
 
-    toast.promise(updateRoutePromise, {
-      loading: 'Mise à jour du trajet...',
-      success: <b>Trajet mise à jour</b>,
-      error: (err) => <b>{err.response.data.error}</b>,
-    });
+/**
+ * Finds matching routes by formatting the data and querying the server.
+ * Transforms the returned data and updates the state with the matching routes.
+ * Displays toast notifications for loading, success, and error states.
+ * @param {Object} formData - The data collected from the form submission.
+ */
+const handleFindMatches = (formData) => {
+  // format the data for the server
+  const data = formatRoute(formData, receivedPoints);
+  if (!data) return;
+  // add the route to the server
+  const findMatchesPromise = findMatches(data);
 
-    updateRoutePromise.then(() => {
-      // update the list of routes
-      setRefresh(!refresh);
-    }).catch((error) => {"Problème lors de la mise à jour du trajet"});
-  };
+  toast.promise(findMatchesPromise, {
+    loading: 'Recherche de trajets corresspondants...',
+    success: <b>Trajets récupérés</b>,
+    error: (err) => <b>{err.response.data.error}</b>,
+  });
 
-  // ----------------------- MatchList.js -----------------------
-
-  /* Handle the update of a route */
-  const handleFindMatches = (formData) => {
-    
-    // format the data for the server
-    const data = formatRoute(formData, receivedPoints);
-    console.log('formData : ', formData);
-
-    if (!data) return;
-    // add the route to the server
-    const findMatchesPromise = findMatches(data);
-
-    toast.promise(findMatchesPromise, {
-      loading: 'Recherche de trajets corresspondants...',
-      success: <b>Trajets récupérés</b>,
-      error: (err) => <b>{err.response.data.error}</b>,
-    });
-
-    findMatchesPromise.then((formData) => {
-
-      // transform the points to a list of points [lat, lng]
-      const formatedData = formData.map((route, id) => {
-        let points = route.route;
-        const transformedPoints = points.map(point => {
-          const [lng, lat] = JSON.parse(point);
-          return [lat, lng];
-        });
-        let formattedRoute = route;
-        formattedRoute.route = transformedPoints;
-        return formattedRoute;
+  findMatchesPromise.then((formData) => {
+    // transform the points to a list of points [lat, lng]
+    const formatedData = formData.map((route, id) => {
+      let points = route.route;
+      const transformedPoints = points.map(point => {
+        const [lng, lat] = JSON.parse(point);
+        return [lat, lng];
       });
+      let formattedRoute = route;
+      formattedRoute.route = transformedPoints;
+      return formattedRoute;
+    });
 
+    setMatchingRoutes(formatedData);
+  }).catch((error) => {
+    "Problème lors de la récupération des trajets corresspondants";
+  });
+};
 
-      setMatchingRoutes(formatedData);
-      // update the list of routes
-      // setRefresh(!refresh);
-    }).catch((error) => {"Problème lors de la récupération des trajets corresspondants"});
-  };
 
   /* for the adress search */
   const [startAddress, setStartAddress] = useState('');
@@ -287,7 +379,11 @@ export default function Map() {
   // Cache for search results
   const searchCache = {};
 
-  /* Function to place a marker based on address */
+  /**
+   * Handles address searches using debounce to optimize performance.
+   * @param {string} address Address to search for.
+   * @param {boolean} isStartPoint Indicates if the search is for the starting point.
+   */
   const handleSearch = _.debounce(async (address, isStartPoint) => {
     if (searchCache[address]) {
       if (isStartPoint) {
@@ -327,7 +423,11 @@ export default function Map() {
     }
   }, 500);
 
-  /* Function to handle the suggestion list */
+  /**
+   * Handles user click on address suggestions to set markers.
+   * @param {Object} suggestion Address suggestion data.
+   * @param {boolean} isStartPoint Determines if the suggestion sets the starting point.
+   */
   const handleSuggestionClick = (suggestion, isStartPoint) => {
     try {
       const { x: lng, y: lat } = suggestion;
@@ -408,7 +508,6 @@ export default function Map() {
 
           <div class="d-flex flex-column align-items-center">
             <h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
-            Vous pourrez modifier le chemin une fois le trajet créé.
             <MapContainer
               center={[48.65, 6.15]}
               zoom={17}
@@ -434,7 +533,10 @@ export default function Map() {
                     eventHandlers={{
                       dragend: (event) => { handleDragEnd(event, true) }
                     }}
-                  >          
+                  >
+                    <Tooltip className="custom-tooltip">
+                      Vous pouvez déplacer le point en le faisant glisser.
+                    </Tooltip>
                   </Marker>
               )}
 
@@ -448,6 +550,9 @@ export default function Map() {
                       dragend: (event) => { handleDragEnd(event, false) }
                     }}
                   >
+                    <Tooltip className="custom-tooltip">
+                      Vous pouvez déplacer le point en le faisant glisser.
+                    </Tooltip>
                   </Marker>
               )}
 
@@ -465,12 +570,17 @@ export default function Map() {
 
               {/** Path */
               matchingRoutes.length > 0 && (
-                <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
+                <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]}/>
               )}
 
               {/** Path */
               receivedPoints && (
-                <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
+                <Polyline pathOptions={blueOptions} positions={[receivedPoints]}>
+                  <Tooltip sticky className="custom-tooltip">
+                    Vous pourrez modifier le chemin une fois le trajet créé.
+                  </Tooltip>
+                </Polyline>
+
               )}
 
               <MapClickHandler />

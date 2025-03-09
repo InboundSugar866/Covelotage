@@ -16,6 +16,10 @@ import User from './model/User.model.js';
 import Message from './model/Message.model.js';
 import ENV from './config.js';
 
+// Mailer function to send the email 
+import { sendMail } from './utils/mailer.js';
+import UserModel from "./model/User.model.js"
+
 dotenv.config();
 
 const app = express();
@@ -152,6 +156,28 @@ wss.on('connection', (connection, req) => {
           file: file ? filename : null,
           _id: messageDoc._id,
         })));
+
+      // Email notification logic
+      UserModel.findOne({ _id: recipient })
+      .then(async user => {
+          if (user) {
+              const { email } = user;
+              const message = {
+                  body: {
+                      name: user.username,
+                      intro: `You have received a new message from ${connection.username}: "${text || 'You have received a file.'}"`,
+                      outro: 'Need help, or have questions? Placeholder'
+                  }
+              };
+              const subject = "New Message Notification";
+              console.log('Sending email notification to:', email); // Debugging log
+              await sendMail(email, subject, message);
+              console.log('Email notification sent successfully'); // Debugging log
+          }
+      })
+      .catch(err => {
+          console.error('Error finding user for email notification:', err);
+      });
     }
   });
 

@@ -12,7 +12,15 @@ import '../styles/Home.css';
 // Components
 import Footer from '../components/Footer';
 
-// Html
+/**
+ * Represents the Home page component.
+ * 
+ * This component displays the main structure and content of the home page,
+ * including a navigation bar, background image, and detailed sections with
+ * community-related information.
+ *
+ * @returns {JSX.Element} The JSX for the Home page.
+ */
 export default function Home() {
   return (
     <body>

@@ -1,4 +1,3 @@
-// React and Related Hooks
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -26,68 +25,91 @@ import { ReactComponent as Search } from '../assets/Search.svg';
 // Styles
 import '../styles/Chat.css';
 
-// Html
+/**
+ * Chat component.
+ *
+ * This component handles a real-time chat functionality, allowing users to connect with others,
+ * send and receive messages, and view online and offline users. It also includes a search bar to
+ * filter and select users to chat with.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered chat interface.
+ */
 export default function Chat() {
-  const [ws,setWs] = useState(null);
-  const [onlinePeople,setOnlinePeople] = useState({});
-  const [offlinePeople,setOfflinePeople] = useState({});
-  const [selectedUserId,setSelectedUserId] = useState(null);
-  const [newMessageText,setNewMessageText] = useState('');
-  const [messages,setMessages] = useState([]);
-  const {username,id} = useContext(UserContext);
+  const [ws, setWs] = useState(null);
+  const [onlinePeople, setOnlinePeople] = useState({});
+  const [offlinePeople, setOfflinePeople] = useState({});
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [newMessageText, setNewMessageText] = useState('');
+  const [messages, setMessages] = useState([]);
+  const { username, id } = useContext(UserContext);
   const divUnderMessages = useRef();
 
-  const [created,setCreated] = useState(null);
+  const [created, setCreated] = useState(null);
   const [address, setAddress] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
 
-  /* Open the server connection */
+  /**
+   * Establishes a connection with the WebSocket server.
+   *
+   * Automatically reconnects if the connection is closed.
+   */
   useEffect(() => {
     connectToWs();
   }, [selectedUserId]);
 
-  /* Connect the client and the server for the chat*/
   function connectToWs() {
     const ws = new WebSocket('ws://localhost:8080');
     setWs(ws);
     ws.addEventListener('message', handleMessage);
     ws.addEventListener('close', () => {
       setTimeout(() => {
-        console.log('Disconnected. Trying to reconnect.');
         connectToWs();
       }, 1000);
     });
   }
 
-  /* Function to show the people currently connected */
+  /**
+   * Updates the list of online users.
+   *
+   * @param {Array<Object>} peopleArray - Array of online users, where each user has `userId` and `username`.
+   */
   function showOnlinePeople(peopleArray) {
     const people = {};
-    peopleArray.forEach(({userId,username}) => {
+    peopleArray.forEach(({ userId, username }) => {
       people[userId] = username;
     });
     setOnlinePeople(people);
 
     if (selectedUserId) {
-      setSelectedUsername(selectedUserId)
+      setSelectedUsername(selectedUserId);
     }
   }
 
-  /* Function to create messages */
+  /**
+   * Handles incoming WebSocket messages.
+   *
+   * @param {MessageEvent} ev - The WebSocket message event.
+   */
   function handleMessage(ev) {
     const messageData = JSON.parse(ev.data);
-    //console.log({ev,messageData});
     if ('online' in messageData) {
       showOnlinePeople(messageData.online);
     } else if ('text' in messageData) {
       if (messageData.sender === selectedUserId) {
-        setMessages(prev => ([...prev, {...messageData}]));
+        setMessages((prev) => [...prev, { ...messageData }]);
       }
     }
   }
 
-  /* Function to send the message */
+  /**
+   * Sends a message to the WebSocket server.
+   *
+   * @param {Event} ev - The form submission event.
+   * @param {File|null} file - An optional file to send with the message.
+   */
   function sendMessage(ev, file = null) {
     if (ev) ev.preventDefault();
     const message = {
@@ -98,7 +120,7 @@ export default function Chat() {
       createdAt: new Date(), // Set the current date and time
     };
     ws.send(JSON.stringify(message));
-  
+
     if (file) {
       axios.get(`/messages/${selectedUserId}`).then((res) => {
         setMessages(res.data);
@@ -111,78 +133,94 @@ export default function Chat() {
       ]);
     }
   }
-  
-  /* hide the chat  */
+
+  /**
+   * Scrolls to the bottom of the message list when messages are updated.
+   */
   useEffect(() => {
     const div = divUnderMessages.current;
     if (div) {
-      div.scrollIntoView({behavior:'smooth', block:'end'});
+      div.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   }, [messages]);
 
-  /* check all the people in the server */
+  /**
+   * Fetches the list of offline users.
+   */
   useEffect(() => {
-    axios.get('/people').then(res => {
+    axios.get('/people').then((res) => {
       const offlinePeopleArr = res.data
-        .filter(p => p._id !== id)
-        .filter(p => !Object.keys(onlinePeople).includes(p._id));
+        .filter((p) => p._id !== id)
+        .filter((p) => !Object.keys(onlinePeople).includes(p._id));
       const offlinePeople = {};
-      offlinePeopleArr.forEach(p => {
+      offlinePeopleArr.forEach((p) => {
         offlinePeople[p._id] = p;
       });
       setOfflinePeople(offlinePeople);
     });
   }, [onlinePeople]);
-  
-  /* select a user in the list and show the chat */
+
+  /**
+   * Fetches chat messages for the selected user.
+   */
   useEffect(() => {
     if (selectedUserId) {
-      axios.get('/messages/'+selectedUserId).then(res => {
+      axios.get('/messages/' + selectedUserId).then((res) => {
         setMessages(res.data);
       });
     }
   }, [selectedUserId]);
 
-  const onlinePeopleExclOurUser = {...onlinePeople};
+  const onlinePeopleExclOurUser = { ...onlinePeople };
   delete onlinePeopleExclOurUser[id];
 
   const messagesWithoutDupes = uniqBy(messages, '_id');
 
-  /* Function to open the chat when a user is selected */
+  /**
+   * Updates the username and user details for the selected chat user.
+   *
+   * @async
+   * @param {string} selectedUserId - The ID of the selected user.
+   */
   async function setSelectedUsername(selectedUserId) {
-    const selectedUsername = onlinePeople[selectedUserId] || offlinePeople[selectedUserId]?.username;
-    console.log(selectedUsername);
+    const selectedUsername =
+      onlinePeople[selectedUserId] || offlinePeople[selectedUserId]?.username;
 
-      axios.get(`/api/user/${selectedUsername}`).then(res => {
-        //console.log(res.data.created);
-        setCreated(res.data.created);
-        setAddress(res.data.city);
-      });
+    axios.get(`/api/user/${selectedUsername}`).then((res) => {
+      setCreated(res.data.created);
+      setAddress(res.data.city);
+    });
   }
 
-  /* Update the suggestions based on the search query */
+  /**
+   * Updates the suggestions list based on the search query.
+   */
   useEffect(() => {
     if (searchQuery.trim() === '') {
       setSuggestions([]);
       return;
     }
-    
+
     const allPeople = { ...onlinePeople, ...offlinePeople };
     const filteredSuggestions = Object.keys(allPeople)
-      .filter(userId => {
+      .filter((userId) => {
         const username = allPeople[userId]?.username; // Safely access username
         return username && username.toLowerCase().includes(searchQuery.toLowerCase());
       })
-      .map(userId => ({ userId, username: allPeople[userId].username }));
+      .map((userId) => ({ userId, username: allPeople[userId].username }));
     setSuggestions(filteredSuggestions);
   }, [searchQuery, onlinePeople, offlinePeople]);
 
-  /* Handle when a suggestion is clicked */
+  /**
+   * Handles clicks on a suggestion to select a user.
+   *
+   * @param {string} userId - The ID of the selected user.
+   */
   const handleSuggestionClick = (userId) => {
     setSelectedUserId(userId);
     setSearchQuery(''); // Clear the search input
   };
-  
+
   return (
     <div>
       <div class='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
@@ -249,8 +287,7 @@ export default function Chat() {
                       id={userId}
                       online={true}
                       username={onlinePeopleExclOurUser[userId]}
-                      onClick={() => {setSelectedUserId(userId); 
-                                      console.log(userId);}}
+                      onClick={() => {setSelectedUserId(userId); }}
                       selected={userId === selectedUserId} />
                   ))}
                   {Object.keys(offlinePeople).map(userId => (

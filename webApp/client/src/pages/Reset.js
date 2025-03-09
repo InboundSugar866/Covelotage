@@ -17,7 +17,12 @@ import backgroundImage from '../assets/Fond_urbain1.jpg';
 // Components
 import Footer from '../components/Footer';
 
-// Html
+/**
+ * @function Reset
+ * @description Component for resetting the user's password using a form.
+ *
+ * @returns {JSX.Element} A form interface to reset passwords with validation, error handling, and navigation.
+ */
 export default function Reset() {
 
   const { username } = useAuthStore(state => state.auth)
@@ -36,9 +41,9 @@ export default function Reset() {
       let resetPromise = resetPassword({ username, password: values.password });
 
       toast.promise(resetPromise, {
-        loading: 'Updating...',
-        success: <b>Reset Successfully...!</b>,
-        error : <b>Could not Reset!</b>
+        loading: 'Mise à jour...',
+        success: <b>Mise à jour réussie.</b>,
+        error : <b>Problème lors de la mise à jour</b>
       });
 
       resetPromise.then(function(){ 

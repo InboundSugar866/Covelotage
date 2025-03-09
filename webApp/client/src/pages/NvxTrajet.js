@@ -33,49 +33,97 @@ import 'leaflet/dist/leaflet.css';
 
 // Html
 export default function NvxTrajet() {
-
-  // Ergonomics variable for the first selection
+  /**
+   * Flag indicating whether this is the first selection of a point.
+   * @type {React.MutableRefObject<boolean>}
+   */
   const firstSelection = useRef(true);
 
-  // Manage the behavior of the starting and arrival points
+  /**
+   * Whether the start point is currently selected.
+   * @type {boolean}
+   */
   const [isStartPointSelected, setIsStartPointSelected] = useState(true);
 
-  // Avoid multiple calls of the function handlePathSubmit
+  /**
+   * Whether the path should be updated.
+   * @type {boolean}
+   */
   const [shouldUpdatePath, setShouldUpdatePath] = useState(false);
 
-  // Prevent multiple calls of the function handleMapClick
+  /**
+   * Whether a drag-end event is currently occurring.
+   * @type {boolean}
+   */
   const [isDragEndEvent, setIsDragEndEvent] = useState(false);
 
-  // Starting point and arrival point
+  
+  /**
+   * The starting point coordinates.
+   * @type {Object|null}
+   */
   const [startPoint, setStartPoint] = useState(null);
+
+  /**
+   * The ending point coordinates.
+   * @type {Object|null}
+   */
   const [endPoint, setEndPoint] = useState(null);
 
-  // Points manually modified by the user
+  /**
+   * A list of intermediate points for the path.
+   * @type {Array<Object>}
+   */
   const [intermediatePoints, setIntermediatePoints] = useState([]);
 
-  // Received points from the server
+  /**
+   * A list of received path points from the server.
+   * @type {Array<Object>}
+   */
   const [receivedPoints, setReceivedPoints] = useState([]);
 
-  // Indicates if a route is selected in the list of my routes
-  const isRouteSelected = useRef(false);
 
-  // Route selected in the list of my routes
+  /**
+   * Reference to check if a route is selected.
+   * @type {React.MutableRefObject<boolean>}
+   */
+    const isRouteSelected = useRef(false);
+
+  /**
+   * Represents the selected route.
+   * @type {Object|null}
+   */
   const [selectedRoute, setSelectedRoute] = useState(null);
 
-  // Enables updating the displayed information when the same route is re-selected
+  /**
+   * Tracks selection updates.
+   * @type {boolean}
+   */
   const [selectionUpdate, setSelectionUpdate] = useState(false);
 
-  // Refresh the list of routes
+  /**
+   * Flag to refresh routes or components.
+   * @type {boolean}
+   */
   const [refresh, setRefresh] = useState(false);
-
-  // ID of the selected matching route
+  
+  /**
+   * ID of the selected matching route.
+   * @type {number}
+   */
   const [macthingRouteSelectedId, setMacthingRouteSelectedId] = useState(0);
 
-  // Matching routes
+  /**
+   * List of matching routes found.
+   * @type {Array<Object>}
+   */
   const [matchingRoutes, setMatchingRoutes] = useState([]);
 
-  // Path color
-  const blueOptions = { fillColor: 'blue' };
+  /**
+   * Map styling options for blue areas.
+   * @type {Object}
+   */
+  const blueOptions = { fillColor: 'blue' }
 
   // Route details
   const [routeName, setRouteName] = useState('');
@@ -86,7 +134,12 @@ export default function NvxTrajet() {
   // route similarities
   const [similarities, setSimilarities] = useState([]);
     
-  /* Updates the path */
+/**
+ * Updates the path after verifying start and end points, formatting intermediate points,
+ * and fetching the shortest path using external APIs.
+ *
+ * @param {Object} values - The input values (not utilized directly in this function).
+ */
   const handlePathSubmit = async (values) => {
 
     // verify that the starting point and the arrival point are defined
@@ -117,7 +170,9 @@ export default function NvxTrajet() {
     }).catch((error) => {"Problème lors de l'acquisition du trajet"});
   }
 
-  /* Updates the path when modifying points of the path */
+  /**
+   * Updates the path dynamically when modifying points.
+   */
   useEffect(() => {
     // not calculate the path if a route is selected
     if (isRouteSelected.current === true) return;
@@ -134,7 +189,10 @@ export default function NvxTrajet() {
   // call the function when a point is modified
   [startPoint, endPoint, intermediatePoints]);
 
-  /* Use the useMapEvents function to handle map events */
+  /**
+   * Map click handler to manage user clicks and drag events.
+   * @returns {null} Does not render any component.
+   */
   function MapClickHandler() {
     useMapEvents({
       click: (event) => {
@@ -154,7 +212,11 @@ export default function NvxTrajet() {
     return null;
   }
 
-  /* Handle map click (set startPoint and EndPoint) */
+  /**
+   * Handle map clicks to set start or end points.
+   * @param {Object} event Event object containing latitude and longitude.
+   * @param {boolean} isStart Determines if the click sets the starting point.
+   */
   const handleMapClick = (event, isStart) => {
 
     // ergonomics operations for the first selection
@@ -178,6 +240,11 @@ export default function NvxTrajet() {
     setShouldUpdatePath(true);
   };
 
+  /**
+   * Handle drag-end events and reformat them for processing.
+   * @param {Object} event Drag event object.
+   * @param {boolean} isStart Indicates if the point dragged is the starting point.
+   */
   function handleDragEnd(event, isStart) {
     // set the drag end event flag
     setIsDragEndEvent(true);
@@ -189,7 +256,12 @@ export default function NvxTrajet() {
 
   // -------------- CreateRoute.js && ListRoute.js --------------
 
-  /* Format the route for the server */
+  /**
+   * Format the route into a structure suitable for the server.
+   * @param {Object} formData Data from the form submission.
+   * @param {Array<Object>} points Array of points along the route.
+   * @returns {Object|null} Formatted route data or null.
+   */
   function formatRoute(formData, points) {
     // verify the existence of the route
     if (!points || points.length === 0) {
@@ -206,7 +278,11 @@ export default function NvxTrajet() {
     return formData;
   };
 
-  /* Handle the deletion of a route */
+/**
+ * Handles the deletion of a route by formatting the data and sending it to the server.
+ * Displays toast notifications for loading, success, and error states.
+ * @param {string} routeName - The name of the route to be deleted.
+ */
   const handleDeleteRoute = (routeName) => {
     // delete the route from the server
     const deleteRoutePromise = deleteRoute(routeName);
@@ -223,7 +299,11 @@ export default function NvxTrajet() {
     }).catch((error) => {"Problème lors de la mise à jour de la liste des trajets"});
   }
 
-  /* Submit the form */
+  /**
+   * Submits the form and updates the route if the information is valid.
+   *
+   * @param {Event} e - The form submission event.
+  */
   const handleUpdateRoute1 = (e) => {
     e.preventDefault();
     // Verify that all the required information is filled
@@ -234,7 +314,11 @@ export default function NvxTrajet() {
     }
   };
 
-  /* Handle the update of a route */
+  /**
+   * Handles the update of a route by formatting the data and sending it to the server.
+   *
+   * @param {Object} formData - The form data containing route details.
+ */
   const handleUpdateRoute2 = (formData) => {
     // format the data for the server
     const data = formatRoute(formData, receivedPoints);
@@ -253,7 +337,11 @@ export default function NvxTrajet() {
     }).catch((error) => {"Problème lors de la mise à jour de la liste des trajets"});
   };
 
-  /* Update infomations displayed when a route is selected */
+  /**
+   * Updates the displayed information when a route is selected.
+   *
+   * @param {Object} route - The selected route object.
+ */
   const handleSelectMyRoute = (route) => {
     setRouteSelected(true);
     // disable the first selection flag
@@ -282,14 +370,23 @@ export default function NvxTrajet() {
     setSelectionUpdate(!selectionUpdate);
   };
 
-  /* Update innfomations displayed when a route is selected */
+  /**
+   * Updates the displayed information when a matching route is selected by ID.
+   *
+   * @param {string} id - The ID of the selected matching route.
+ */
   const handleSelecMatchingRoute = (id) => {
     setMacthingRouteSelectedId(id);
   };
 
   // ----------------------- MatchList.js -----------------------
 
-  /* verify that a route is valid */
+  /**
+   * Verifies that a route has valid information before processing.
+   *
+   * @param {Object} route - The route object to validate.
+   * @returns {Object|undefined} - Valid route information or undefined if invalid.
+ */
   function getValideRouteInfos(route) {
     // Verify that the name is filled
     if (!selectedRoute.name.trim()) {
@@ -312,11 +409,14 @@ export default function NvxTrajet() {
     return routeInfos;
   }
 
-  /* Handle the update of a route */
+  /**
+   * Finds matches for a route and updates the matching route list.
+   *
+   * @param {Object} formData - The form data containing route details.
+ */
   const handleFindMatches = (formData) => {
     // Format the data for the server
     const data = formatRoute(formData, receivedPoints);
-    console.log('formData : ', formData);
 
     if (!data) return;
 
@@ -332,7 +432,6 @@ export default function NvxTrajet() {
     findMatchesPromise.then(({ routes, similarities }) => {
       // Transform the points to a list of points [lat, lng]
       const formattedData = routes.map((route, id) => {
-        console.log(route);
         let points = route.route;
         const transformedPoints = points.map(point => {
           const [lng, lat] = JSON.parse(point);
@@ -351,7 +450,9 @@ export default function NvxTrajet() {
     }).catch((error) => { console.log("Pas de trajets similaires") });
   };
 
-  /* find matches for a route button */
+  /**
+   * Handles button click to find matching routes after validation.
+ */
   const handleFindMatchesBtn = () => {
     // Verify that all the required information is filled
     const routeInfos = getValideRouteInfos();
@@ -361,7 +462,9 @@ export default function NvxTrajet() {
     }
   }
 
-  /* update the form when a route is selected */
+  /**
+   * Updates the form fields when a route is selected or modified.
+ */
   useEffect(() => {
     // if no route is selected, return
     if (!selectedRoute) return;

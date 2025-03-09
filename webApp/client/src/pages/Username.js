@@ -15,12 +15,21 @@ import backgroundImage from '../assets/Fond_urbain1.jpg';
 // Components
 import Footer from '../components/Footer';
 
-// Html
+/**
+ * @function Username
+ * @description Component for capturing the user's username and navigating to the password reset page.
+ *
+ * @returns {JSX.Element} Renders a username input form with validation and navigation capabilities.
+ */
 export default function Username() { 
 
   const navigate = useNavigate();
   const setUsername = useAuthStore(state => state.setUsername);
 
+  /**
+   * @constant {Object} formik
+   * @description Formik hook for managing form state and submission.
+   */
   const formik = useFormik({
     initialValues: { username: '',
       },
@@ -32,7 +41,6 @@ export default function Username() {
       navigate('/password')
     }
   });
-
 
   return (
     <div>

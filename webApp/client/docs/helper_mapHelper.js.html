@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: helper/mapHelper.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: helper/mapHelper.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import axios from 'axios';
+// Library for advanced geospatial analysis
+import * as turf from '@turf/turf';
+
+axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;
+
+/**
+ * Get the shortest path between two points.
+ *
+ * This function sends user-defined points to the server and receives the shortest path,
+ * transforming it into a list of [lat, lng] coordinates.
+ *
+ * @async
+ * @function
+ * @param {Array&lt;Object>} userPoints - Array of points, where each point is an object with `lat` and `lng` properties.
+ * @returns {Promise&lt;Array&lt;Array&lt;number>>>} Promise resolving to the shortest path as an array of [lat, lng] pairs.
+ * @throws {Object} Error object with a message on failure.
+ */
+export async function getShortestPath(userPoints) {
+  try {
+    const formatedPoints = userPoints.map((point) =>
+      JSON.stringify([point.lng, point.lat])
+    );
+
+    const r = await axios.post(`/api/shortestPath`, { points: formatedPoints });
+    const {
+      data: { data },
+    } = r;
+
+    const transformedPoints = data.map((point) => {
+      const [lng, lat] = JSON.parse(point);
+      return [lat, lng];
+    });
+
+    return Promise.resolve(transformedPoints);
+  } catch (error) {
+    return Promise.reject({
+      error: 'Problème lors du calcul du trajet',
+    });
+  }
+}
+
+/**
+ * Find matches for a given route.
+ *
+ * This function sends route data to the server to find route matches based on similarities.
+ *
+ * @async
+ * @function
+ * @param {Object} routeData - The route data to analyze for matches.
+ * @returns {Promise&lt;Object>} Promise resolving to an object containing matched routes and similarities.
+ * @throws {Error} Error object if the request fails.
+ */
+export async function findMatches(routeData) {
+  try {
+    const token = await localStorage.getItem('token');
+    const {
+      data: { similarities },
+    } = await axios.post('/api/findMatches', routeData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const routes = [];
+    similarities.forEach((similaritie) => {
+      routes.push(similaritie.route);
+    });
+
+    return Promise.resolve({ routes, similarities });
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
+
+/**
+ * Update the index of intermediate points.
+ *
+ * This function adjusts intermediate points by finding and associating them with the nearest point in a received points list.
+ *
+ * @async
+ * @function
+ * @param {Array&lt;Array&lt;number>>} receivedPoints - List of points to compare against, where each point is an array [lat, lng].
+ * @param {Array&lt;Object>} intermediatePoints - List of intermediate points to update, where each point has a `latlng` property with `lat` and `lng`.
+ * @returns {Promise&lt;Array&lt;Object>>} Promise resolving to the updated list of intermediate points.
+ * @throws {Object} Error object with a message on failure.
+ */
+export async function updateIndex(receivedPoints, intermediatePoints) {
+  try {
+    const formatedIntermediatePoints = intermediatePoints.map((point) => {
+      return [point.latlng.lat, point.latlng.lng];
+    });
+
+    const newIntermediatePoints = formatedIntermediatePoints.map((point) => {
+      const nearestIndex = findClosestPointIndex(point, receivedPoints);
+      const modifiedPoint = {
+        latlng: {
+          lat: point[0],
+          lng: point[1],
+        },
+        index: nearestIndex,
+      };
+      return modifiedPoint;
+    });
+
+    return Promise.resolve(newIntermediatePoints);
+  } catch (error) {
+    return Promise.reject({
+      error: 'Problème lors de la mise à jour du trajet',
+    });
+  }
+}
+
+/**
+ * Find the index of the nearest point in a list.
+ *
+ * This function uses Turf.js to determine the nearest point on a line created from a list of points.
+ *
+ * @function
+ * @param {Array&lt;number>} point - A point represented as an array [lat, lng].
+ * @param {Array&lt;Array&lt;number>>} pointsList - The list of points to search through, where each point is an array [lat, lng].
+ * @returns {number} The index of the nearest point in the list.
+ */
+function findClosestPointIndex(point, pointsList) {
+  const pointsListLine = turf.lineString(pointsList);
+  const nearestPoint = turf.nearestPointOnLine(pointsListLine, point);
+  return nearestPoint.properties.index;
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Mar 09 2025 18:00:40 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

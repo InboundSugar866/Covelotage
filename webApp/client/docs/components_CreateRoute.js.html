@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/CreateRoute.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/CreateRoute.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// React and Related Hooks
+import React, { useState, useEffect } from 'react';
+
+// Date and Time Pickers
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import TimePicker from 'rc-time-picker';
+import 'rc-time-picker/assets/index.css';
+
+// Notification Library
+import toast from 'react-hot-toast';
+
+// Styles
+import '../styles/CreateRoute.css';
+
+// Assets
+import { ReactComponent as CreerTrajet } from '../assets/CreerTrajer.svg';
+
+// Helper Functions
+import { getDayOfWeek } from '../helper/routeHelper';
+
+/**
+ * CreateRoute component for creating and managing a route.
+ * 
+ * @param {Object} props - Component properties.
+ * @param {Function} props.createRoute - Function to handle route creation.
+ * @param {Object} props.selectedRoute - The currently selected route.
+ * @param {Function} props.selectionUpdate - Function to update selection.
+ * @param {Function} props.updateRoute - Function to update a route.
+ * @param {Function} props.handleFindMatches - Function to find matching routes.
+ * @param {string} props.startAddress - Starting address for the route.
+ * @param {Function} props.setStartAddress - Function to set the starting address.
+ * @param {string} props.endAddress - Ending address for the route.
+ * @param {Function} props.setEndAddress - Function to set the ending address.
+ * @param {Array} props.startAddressSuggestions - Suggestions for the start address.
+ * @param {Array} props.endAddressSuggestions - Suggestions for the end address.
+ * @param {Function} props.handleSearch - Function to handle search actions.
+ * @param {Function} props.handleSuggestionClick - Function to handle suggestion clicks.
+ * @param {Function} props.handlePathSubmit - Function to handle path submissions.
+ */
+export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updateRoute, handleFindMatches, 
+                              startAddress, setStartAddress, endAddress, setEndAddress, 
+                              startAddressSuggestions, endAddressSuggestions, handleSearch, handleSuggestionClick,
+                              handlePathSubmit}) => {
+  
+  const [routeName, setRouteName] = useState('');
+  const [comment, setComment] = useState('');
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const [selectedPeriodicTimes, setSelectedPeriodicTimes] = useState([]);
+  const [selectedDayOfWeek, setSelectedDayOfWeek] = useState(0);
+  const [selectedTime, setSelectedTime] = useState(null);
+  
+  const periodicDateRef = new Date(1970, 0, 1);
+
+  /**
+   * Validates if the given hour is valid.
+   * 
+   * @param {Date} date - The date to validate.
+   * @returns {boolean} - Whether the hour is valid.
+   */
+  const isValidHour = (date) => {
+    const hour = date.getHours();
+    return hour >= 0 &amp;&amp; hour &lt;= 23;
+  };
+
+  /**
+   * Adds a selected date to the list of selected dates.
+   */
+  const handleAddDate = () => {
+    if (selectedDate &amp;&amp; isValidHour(selectedDate)) {
+      setSelectedDates([...selectedDates, selectedDate]);
+      setSelectedDate(null);
+    } else {
+      console.error('Heure invalide');
+    }
+  };
+
+  /**
+   * Removes a date from the list of selected dates.
+   * 
+   * @param {number} index - The index of the date to remove.
+   */
+  const handleRemoveDate = (index) => {
+    const updatedDates = [...selectedDates];
+    updatedDates.splice(index, 1);
+    setSelectedDates(updatedDates);
+  };
+
+  /**
+   * Adds a periodic time to the list of periodic times.
+   */
+  const handleAddPeriodicTime = () => {
+    // Check that the time and day of the week are selected
+    if (selectedTime == null || selectedDayOfWeek == null) {
+      console.error('Heure invalide ou jour non sélectionné');
+      return;
+    }
+    // Create a new date object with a fixed date (1st January 1970) 
+    const selectedDateTime = periodicDateRef;
+    // set the time to the selected time 
+    selectedDateTime.setHours(selectedTime.hours(), selectedTime.minutes(), 0);
+    // assenble the day of the week and the time
+    const newPeriodicTime = {
+      dayOfWeek: selectedDayOfWeek,
+      time: selectedDateTime,
+    };
+    // update the selectedPeriodicTimes array
+    setSelectedPeriodicTimes([...selectedPeriodicTimes, newPeriodicTime]);
+  };
+
+  /**
+   * Removes a periodic time from the list of periodic times.
+   * 
+   * @param {number} index - The index of the periodic time to remove.
+   */
+  const handleRemovePeriodicTime = (index) => {
+    const updatedPeriodicTimes = [...selectedPeriodicTimes];
+    updatedPeriodicTimes.splice(index, 1);
+    setSelectedPeriodicTimes(updatedPeriodicTimes);
+  };
+
+  /**
+   * Validates and gathers all route information.
+   * 
+   * @returns {Object|undefined} - Validated route information, or undefined if invalid.
+   */
+  function getValideRouteInfos() {
+    // Verify that the name is filled
+    if (!routeName.trim()) {
+      toast.error('Veuillez entrer un nom pour le chemin.');
+      return;
+    }
+    // Verify that at least one date OR one periodic time is selected
+    if (selectedDates.length === 0 &amp;&amp; selectedPeriodicTimes.length === 0) {
+      toast.error('Veuillez sélectionner au moins une date ou un horaire périodique.');
+      return;
+    }
+    // structure the route information
+    const routeInfos = { 
+      "name": routeName, 
+      "planning": { 
+        "dates": selectedDates, 
+        "periodic": selectedPeriodicTimes 
+      },
+      "startAdress": startAddress,
+      "endAdress": endAddress,
+      "comment": comment
+    }
+    return routeInfos;
+  }
+
+  /**
+   * Handles form submission to create a new route.
+   * 
+   * @param {Event} e - The form submit event.
+   */
+  const handleCreateRoute = (e) => {
+    e.preventDefault();
+    // Verify that all the required information is filled
+    const routeInfos = getValideRouteInfos();
+    if (routeInfos) {
+      // If the conditions are met, submit the form
+      createRoute(routeInfos);
+    }
+  };
+  
+  /**
+   * Formats the selected date to a specific format.
+   * 
+   * @param {Date} date - The date to format.
+   * @returns {string} - The formatted date.
+   */
+  const formatSelectedDate = (date) => {
+
+    const formattedDate = new Intl.DateTimeFormat('fr-FR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',periodicDateRef
+    }).format(date);
+
+    return formattedDate;
+  };
+
+  /**
+   * Updates the form when a route is selected.
+   */
+  useEffect(() => {
+    // if no route is selected, return
+    if (!selectedRoute) return;
+    // update the name of the route
+    setRouteName(selectedRoute.name);
+    // update the comment
+    setComment(selectedRoute.comment);
+    // update the selected dates
+    setSelectedDates(selectedRoute.planning.dates);
+    // update the selected periodic times
+    setSelectedPeriodicTimes(selectedRoute.planning.periodic);
+  }, [selectedRoute, selectionUpdate]);
+
+  // State for showing suggestions list
+  const [showStartSuggestions, setShowStartSuggestions] = useState(false);
+  const [showEndSuggestions, setShowEndSuggestions] = useState(false);
+
+  /**
+   * Closes the suggestion list when clicked outside the box.
+   */
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.search-container')) {
+        setShowStartSuggestions(false);
+        setShowEndSuggestions(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  /**
+   * Auto-resizes the textarea as content grows.
+   * 
+   * @param {HTMLTextAreaElement} textarea - The textarea element.
+   */
+  function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  return (
+    &lt;div>
+      &lt;form onSubmit={handleCreateRoute} class="d-flex row justify-content-center">
+        &lt;h2 style = {{color: '#4F772D'}}>Entrer un nouveau trajet&lt;/h2>
+        &lt;div class="form-group d-flex align-items-center">
+          &lt;div class="row w-100">
+            &lt;div class="col-4">
+              &lt;h3 class="align-self-start" style={{marginLeft:'2rem'}}>Nom du trajet :&lt;/h3>
+            &lt;/div>
+            &lt;div class="col-8">
+              &lt;input 
+                required={true} 
+                type="text" 
+                class="form-control border border-dark w-50" 
+                value={routeName} 
+                onChange={(e) => setRouteName(e.target.value)} 
+              />
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+
+        {/** start point address */}
+        &lt;div class="form-group d-flex align-items-center position-relative">
+          &lt;div class="row w-100">
+            &lt;div class="col-4">
+              &lt;h3 class="align-self-start" style={{marginLeft: '2rem'}}>Adresse de depart :&lt;/h3>
+            &lt;/div>
+            &lt;div class="col-4 search-container" style={{paddingRight:'0'}}>
+              &lt;div>
+                &lt;input class="form-control border border-dark w-100"
+                      type="search"
+                      name="startPointSearch"
+                      value={startAddress}
+                      onChange={(e) => {
+                        setStartAddress(e.target.value);
+                        handleSearch(e.target.value, true);
+                      }}
+                      onFocus={() => setShowStartSuggestions(true)}
+                />
+                {showStartSuggestions &amp;&amp; (
+                  &lt;div class="suggestions-list position-absolute w-100">
+                    {startAddressSuggestions.map((suggestion, index) => (
+                      &lt;div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
+                        {suggestion.label}
+                      &lt;/div>
+                    ))}
+                  &lt;/div>
+                )}
+              &lt;/div>
+            &lt;/div>
+            &lt;div class="col-4 d-flex justify-content-center align-items-center">
+              &lt;button type="button" class='event-button' style={{marginLeft:'2rem'}} onClick={handlePathSubmit}>
+                Recalculer le trajet
+              &lt;/button>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>                  
+
+        {/** end point address */}
+        &lt;div class="form-group d-flex align-items-center">
+          &lt;div class="row w-100">
+            &lt;div class="col-4">
+              &lt;h3 class="align-self-start" style={{marginLeft:'2rem'}}>Adresse d'arrivee :&lt;/h3>
+            &lt;/div>
+            &lt;div class="col-8 search-container">
+              &lt;div class="w-50">
+                &lt;input class="form-control border border-dark w-100"
+                      type="search"
+                      name="endPointSearch"
+                      value={endAddress}
+                      onChange={(e) => {
+                        setEndAddress(e.target.value);
+                        handleSearch(e.target.value, false);
+                      }}
+                      onFocus={() => setShowEndSuggestions(true)}
+                />
+                {showEndSuggestions &amp;&amp; (
+                  &lt;div className="suggestions-list position-absolute w-50">
+                    {endAddressSuggestions.map((suggestion, index) => (
+                      &lt;div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
+                        {suggestion.label}
+                      &lt;/div>
+                    ))}
+                  &lt;/div>
+                )}
+              &lt;/div>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+
+        &lt;div class="form-group d-flex align-items-center">
+          &lt;div class="row w-100">
+            &lt;div class="col-4 d-flex align-items-center">
+              &lt;h3 style={{marginLeft:'2rem'}}>Date et heure de depart :&lt;/h3>
+            &lt;/div>
+            &lt;div class="col-4 d-flex align-items-center" style={{paddingRight:'0'}}>
+              &lt;DatePicker
+                selected={selectedDate}
+                onChange={(value) => setSelectedDate(value)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={5}
+                timeCaption="Time"
+                dateFormat="dd/MM/yyyy HH:mm"
+                isClearable
+                placeholderText="Sélectionnez une date"
+                popperPlacement="bottom-start"
+                portalId="root-portal"
+              />
+            &lt;/div>
+            &lt;div class="col-4 d-flex justify-content-center align-items-center">
+              &lt;button type="button" class='event-button' style={{marginLeft:'2rem'}} onClick={handleAddDate}>
+                Confirmer la date et l'heure
+              &lt;/button>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+        &lt;div>
+          &lt;ul>
+            {selectedDates.map((date, index) => (
+              &lt;li key={index}>
+                {formatSelectedDate(date)}
+                &lt;button type="button" onClick={() => handleRemoveDate(index)}>
+                  Supprimer
+                &lt;/button>
+              &lt;/li>
+            ))}
+          &lt;/ul>
+        &lt;/div>
+        &lt;div class="form-group d-flex align-items-center">
+          &lt;div class="row w-100">
+            &lt;div class="col-4">
+              &lt;h3 class="align-self-start" style={{marginLeft: '2rem'}}>Ajouter un commentaire :&lt;/h3>
+            &lt;/div>
+            &lt;div class="col-8">
+              &lt;textarea
+                required={false}
+                value={comment}
+                class="form-control border border-dark w-100"
+                id="exampleFormControlTextarea1"
+                rows="3"
+                style={{overflow: 'hidden', resize: 'none'}}
+                onChange={(e) => {
+                  setComment(e.target.value);
+                  autoResizeTextarea(e.target);
+                }}
+              >&lt;/textarea>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+  
+        &lt;div>
+          &lt;h2 style = {{color: '#4F772D'}}>Ajouter une periodicite : &lt;/h2>
+          &lt;/div>
+          &lt;div class="form-group d-flex align-items-center">
+            &lt;div class="row w-100">
+              &lt;div class="col-4">
+                &lt;h3 class="align-self-start" style={{marginLeft:'2rem'}}>Jour de la semaine :&lt;/h3>
+              &lt;/div>
+              &lt;div class="col-8">
+                &lt;select
+                  class="event-button"
+                  value={selectedDayOfWeek}
+                  onChange={(e) => setSelectedDayOfWeek(parseInt(e.target.value, 10))}
+                >
+                  &lt;option value={1}>Lundi&lt;/option>
+                  &lt;option value={2}>Mardi&lt;/option>
+                  &lt;option value={3}>Mercredi&lt;/option>
+                  &lt;option value={4}>Jeudi&lt;/option>
+                  &lt;option value={5}>Vendredi&lt;/option>
+                  &lt;option value={6}>Samedi&lt;/option>
+                  &lt;option value={0}>Dimanche&lt;/option>
+                &lt;/select>
+              &lt;/div>
+            &lt;/div>
+          &lt;/div>
+
+          &lt;div class="form-group d-flex align-items-center">
+            &lt;div class="row w-100">
+              &lt;div class="col-4">
+                &lt;h3 class="align-self-start" style={{marginLeft:'2rem'}}>Heure :&lt;/h3>
+              &lt;/div>
+              &lt;div class="col-8 d-flex align-items-center">
+                &lt;TimePicker
+                  showSecond={false}
+                  defaultValue={selectedTime}
+                  onChange={(value) => {setSelectedTime(value)}}
+                />
+                &lt;button class="event-button" type="button" style={{marginLeft:'2rem'}} onClick={handleAddPeriodicTime}>
+                  Confirmer la date et l'heure
+                &lt;/button>
+              &lt;/div>
+            &lt;/div>
+          &lt;/div>
+  
+          &lt;div>
+            &lt;ul>
+              {selectedPeriodicTimes.map((periodicTime, index) => (
+                &lt;li key={index}>
+                  {`
+                    ${getDayOfWeek(periodicTime.dayOfWeek)} 
+                    ${periodicTime.time.toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: false
+                      })}
+                  `}
+                  &lt;button type="button" onClick={() => handleRemovePeriodicTime(index)}>
+                    Supprimer
+                  &lt;/button>
+                &lt;/li>
+              ))}
+            &lt;/ul>
+          &lt;/div> 
+        &lt;button type="submit" class="btn w-auto">
+          &lt;CreerTrajet/>
+        &lt;/button>
+      &lt;/form>
+    &lt;/div>
+  );
+};
+
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Mar 09 2025 18:00:40 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

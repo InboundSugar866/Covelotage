@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/Chat.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/Chat.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { useContext, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+// Components
+import Footer from '../components/Footer';
+import { LogoutButton } from '../components/LogoutButton';
+import Contact from './Contact';
+
+// Context
+import { UserContext } from './UserContext';
+
+// Utilities
+import { uniqBy } from 'lodash';
+import axios from 'axios';
+
+// Assets
+import backgroundImage from '../assets/Fond_urbain.jpg';
+import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
+import { ReactComponent as Membre } from '../assets/membre.svg';
+import { ReactComponent as Profil } from '../assets/Profil.svg';
+import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
+import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
+import { ReactComponent as Search } from '../assets/Search.svg';
+
+// Styles
+import '../styles/Chat.css';
+
+/**
+ * Chat component.
+ *
+ * This component handles a real-time chat functionality, allowing users to connect with others,
+ * send and receive messages, and view online and offline users. It also includes a search bar to
+ * filter and select users to chat with.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered chat interface.
+ */
+export default function Chat() {
+  const [ws, setWs] = useState(null);
+  const [onlinePeople, setOnlinePeople] = useState({});
+  const [offlinePeople, setOfflinePeople] = useState({});
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [newMessageText, setNewMessageText] = useState('');
+  const [messages, setMessages] = useState([]);
+  const { username, id } = useContext(UserContext);
+  const divUnderMessages = useRef();
+
+  const [created, setCreated] = useState(null);
+  const [address, setAddress] = useState(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+
+  /**
+   * Establishes a connection with the WebSocket server.
+   *
+   * Automatically reconnects if the connection is closed.
+   */
+  useEffect(() => {
+    connectToWs();
+  }, [selectedUserId]);
+
+  function connectToWs() {
+    const ws = new WebSocket('ws://localhost:8080');
+    setWs(ws);
+    ws.addEventListener('message', handleMessage);
+    ws.addEventListener('close', () => {
+      setTimeout(() => {
+        connectToWs();
+      }, 1000);
+    });
+  }
+
+  /**
+   * Updates the list of online users.
+   *
+   * @param {Array&lt;Object>} peopleArray - Array of online users, where each user has `userId` and `username`.
+   */
+  function showOnlinePeople(peopleArray) {
+    const people = {};
+    peopleArray.forEach(({ userId, username }) => {
+      people[userId] = username;
+    });
+    setOnlinePeople(people);
+
+    if (selectedUserId) {
+      setSelectedUsername(selectedUserId);
+    }
+  }
+
+  /**
+   * Handles incoming WebSocket messages.
+   *
+   * @param {MessageEvent} ev - The WebSocket message event.
+   */
+  function handleMessage(ev) {
+    const messageData = JSON.parse(ev.data);
+    if ('online' in messageData) {
+      showOnlinePeople(messageData.online);
+    } else if ('text' in messageData) {
+      if (messageData.sender === selectedUserId) {
+        setMessages((prev) => [...prev, { ...messageData }]);
+      }
+    }
+  }
+
+  /**
+   * Sends a message to the WebSocket server.
+   *
+   * @param {Event} ev - The form submission event.
+   * @param {File|null} file - An optional file to send with the message.
+   */
+  function sendMessage(ev, file = null) {
+    if (ev) ev.preventDefault();
+    const message = {
+      recipient: selectedUserId,
+      text: newMessageText,
+      file,
+      sender: id,
+      createdAt: new Date(), // Set the current date and time
+    };
+    ws.send(JSON.stringify(message));
+
+    if (file) {
+      axios.get(`/messages/${selectedUserId}`).then((res) => {
+        setMessages(res.data);
+      });
+    } else {
+      setNewMessageText('');
+      setMessages((prev) => [
+        ...prev,
+        { ...message, _id: Date.now() }, // Ensure createdAt is set
+      ]);
+    }
+  }
+
+  /**
+   * Scrolls to the bottom of the message list when messages are updated.
+   */
+  useEffect(() => {
+    const div = divUnderMessages.current;
+    if (div) {
+      div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [messages]);
+
+  /**
+   * Fetches the list of offline users.
+   */
+  useEffect(() => {
+    axios.get('/people').then((res) => {
+      const offlinePeopleArr = res.data
+        .filter((p) => p._id !== id)
+        .filter((p) => !Object.keys(onlinePeople).includes(p._id));
+      const offlinePeople = {};
+      offlinePeopleArr.forEach((p) => {
+        offlinePeople[p._id] = p;
+      });
+      setOfflinePeople(offlinePeople);
+    });
+  }, [onlinePeople]);
+
+  /**
+   * Fetches chat messages for the selected user.
+   */
+  useEffect(() => {
+    if (selectedUserId) {
+      axios.get('/messages/' + selectedUserId).then((res) => {
+        setMessages(res.data);
+      });
+    }
+  }, [selectedUserId]);
+
+  const onlinePeopleExclOurUser = { ...onlinePeople };
+  delete onlinePeopleExclOurUser[id];
+
+  const messagesWithoutDupes = uniqBy(messages, '_id');
+
+  /**
+   * Updates the username and user details for the selected chat user.
+   *
+   * @async
+   * @param {string} selectedUserId - The ID of the selected user.
+   */
+  async function setSelectedUsername(selectedUserId) {
+    const selectedUsername =
+      onlinePeople[selectedUserId] || offlinePeople[selectedUserId]?.username;
+
+    axios.get(`/api/user/${selectedUsername}`).then((res) => {
+      setCreated(res.data.created);
+      setAddress(res.data.city);
+    });
+  }
+
+  /**
+   * Updates the suggestions list based on the search query.
+   */
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSuggestions([]);
+      return;
+    }
+
+    const allPeople = { ...onlinePeople, ...offlinePeople };
+    const filteredSuggestions = Object.keys(allPeople)
+      .filter((userId) => {
+        const username = allPeople[userId]?.username; // Safely access username
+        return username &amp;&amp; username.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+      .map((userId) => ({ userId, username: allPeople[userId].username }));
+    setSuggestions(filteredSuggestions);
+  }, [searchQuery, onlinePeople, offlinePeople]);
+
+  /**
+   * Handles clicks on a suggestion to select a user.
+   *
+   * @param {string} userId - The ID of the selected user.
+   */
+  const handleSuggestionClick = (userId) => {
+    setSelectedUserId(userId);
+    setSearchQuery(''); // Clear the search input
+  };
+
+  return (
+    &lt;div>
+      &lt;div class='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
+
+        {/* Navigation Bar */}
+        &lt;nav class="navbar d-flex justify-content-end p-2 float-end">
+          &lt;Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/nvxtrajet">
+              &lt;Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
+          &lt;/Link>
+          &lt;Link class="border border-4 border-success rounded-3 mx-1 mt-2" to="/chat">
+              &lt;Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
+          &lt;/Link>
+          &lt;Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/profile">
+              &lt;Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
+          &lt;/Link>
+        &lt;/nav>
+
+        &lt;div class="p-4 mb-4">
+          &lt;div>
+            &lt;h1 class="fw-bold text-large">Covelotage&lt;/h1>
+            &lt;h2 >Votre Communaute Cycliste&lt;/h2>
+          &lt;/div>
+        &lt;/div>
+
+        &lt;div class="light-gray rounded-3 mx-auto my-3 mx-md-5 my-md-4" >
+          &lt;div class="d-flex">
+            &lt;div class="w-25 d-flex flex-column rounded-3">
+              &lt;div class="flex-grow-1">
+                &lt;h2 class="d-flex flex-column align-items-center m-4" style={{color: '#4F772D'}}>Discussion&lt;/h2>
+                {/*&lt;Logo />*/}
+                &lt;div class="input-group">
+                  &lt;div class="input-group-prepend">
+                    &lt;span class="input-group-text">
+                      &lt;i class="fa fa-search">
+                        &lt;Search style={{ width: '20px', height: '20px' }} alt='commencer' />
+                      &lt;/i>
+                    &lt;/span>
+                  &lt;/div>
+                  &lt;input
+                    type="text"
+                    class="form-control"
+                    placeholder="Rechercher un utilisateur"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  {suggestions.length > 0 &amp;&amp; (
+                    &lt;div class="suggestions-list">
+                      {suggestions.map(suggestion => (
+                        &lt;div
+                          key={suggestion.userId}
+                          onClick={() => handleSuggestionClick(suggestion.userId)}
+                          class="suggestion-item"
+                        >
+                          {suggestion.username}
+                        &lt;/div>
+                      ))}
+                    &lt;/div>
+                  )}
+                &lt;/div>
+                &lt;div style={{maxHeight: '60vh', overflowY: 'auto'}}>
+                  {Object.keys(onlinePeopleExclOurUser).map(userId => (
+                    &lt;Contact
+                      key={userId}
+                      id={userId}
+                      online={true}
+                      username={onlinePeopleExclOurUser[userId]}
+                      onClick={() => {setSelectedUserId(userId); }}
+                      selected={userId === selectedUserId} />
+                  ))}
+                  {Object.keys(offlinePeople).map(userId => (
+                    &lt;Contact
+                      key={userId}
+                      id={userId}
+                      online={false}
+                      username={offlinePeople[userId].username}
+                      onClick={() => {setSelectedUserId(userId)}}
+                      selected={userId === selectedUserId} />
+                  ))}
+                &lt;/div>
+              &lt;/div>
+              &lt;div class="p-2 text-center d-flex align-items-center justify-content-center">
+                &lt;span class="mx-2 small text-secondary d-flex align-items-center">
+                  &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style={{width: '1rem', height: '1rem'}}>
+                    &lt;path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+                  &lt;/svg>
+                  {username}
+                &lt;/span>
+                &lt;LogoutButton />
+              &lt;/div>
+            &lt;/div>
+
+            &lt;div class="border-start border-secondary border-2">&lt;/div>
+            
+            &lt;div class="d-flex flex-column w-75 p-2 rounded-3">
+              &lt;div class="flex-grow-1">
+                {!selectedUserId &amp;&amp; (
+                  &lt;div class="d-flex flex-grow-1 align-items-center justify-content-center" style={{height:"75vh"}}>
+                    &lt;div class="text-secondary">&amp;larr; Séléctionnez un utilisateur dans la barre latérale ou recherez un utilisateur dans la barre de recherche&lt;/div>
+                  &lt;/div>
+                )}
+                {!!selectedUserId &amp;&amp; (
+                  &lt;div class="position-relative" style={{height:"70vh"}}>
+                    &lt;div class="border border-2 border-secondary rounded-3 mx-1 mt-2 ">
+
+                      &lt;div class="p-2 fw-bold fs-5" style={{color: '#4F772D'}}>À propos de cet utilisateur&lt;/div>
+
+                      &lt;div class="d-flex align-items-center">
+                        &lt;Emplacement style={{ width: '20px', height: '20px' }} class="icon ms-3"/> {/* me = margin right ms = margin left*/}
+                        &lt;div>
+                          &lt;p class="mb-0">{address}&lt;/p>
+                        &lt;/div>
+                      &lt;/div>
+
+                      &lt;div class="d-flex align-items-center">
+                        &lt;Membre style={{ width: '20px', height: '20px' }} class="icon ms-3"/> {/* me = margin right*/}
+                        &lt;div>
+                          &lt;p class="mb-0">Membre depuis {created}&lt;/p>
+                        &lt;/div>
+                      &lt;/div>
+
+                    &lt;/div>
+                    &lt;div class="overflow-auto top-0 left-0 right-0 bottom-2 mt-2" style={{height:"60vh"}}>
+                      {messagesWithoutDupes.map(message => (
+                        &lt;div key={message._id} class={(message.sender === id ? 'text-end': 'text-start')}>
+                          &lt;div class="text-sm text-secondary mb-0 fs-6">
+                            {new Date(message.createdAt).toLocaleString()}
+                          &lt;/div>
+                          &lt;div class={"text-start d-inline-block p-2 mb-2 rounded text-sm " + (message.sender === id ? 'bg-green':'bg-white ')} style={{maxWidth:"50vw"}}>
+                            {message.text}
+                            {message.file &amp;&amp; (
+                              &lt;div class="">
+                                &lt;a target="_blank" rel="noreferrer" class="d-flex align-items-center gap-1 border-bottom" href={axios.defaults.baseURL + '/uploads/' + message.file}>
+                                  &lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+                                    &lt;path fillRule="evenodd" d="M18.97 3.659a2.25 2.25 0 00-3.182 0l-10.94 10.94a3.75 3.75 0 105.304 5.303l7.693-7.693a.75.75 0 011.06 1.06l-7.693 7.693a5.25 5.25 0 11-7.424-7.424l10.939-10.94a3.75 3.75 0 115.303 5.304L9.097 18.835l-.008.008-.007.007-.002.002-.003.002A2.25 2.25 0 015.91 15.66l7.81-7.81a.75.75 0 011.061 1.06l-7.81 7.81a.75.75 0 001.054 1.068L18.97 6.84a2.25 2.25 0 000-3.182z" clipRule="evenodd" />
+                                  &lt;/svg>
+                                  {message.file}
+                                &lt;/a>
+                              &lt;/div>
+                            )}
+                          &lt;/div>
+                        &lt;/div>
+
+                      ))}
+                      &lt;div ref={divUnderMessages}>&lt;/div>
+                    &lt;/div>
+                  &lt;/div>
+                )}
+              &lt;/div>
+
+              {/* Search bar */}
+              {!!selectedUserId &amp;&amp; (
+              &lt;form class="d-flex gap-2" onSubmit={sendMessage}>
+                &lt;input type="text"
+                      value={newMessageText}
+                      onChange={ev => setNewMessageText(ev.target.value)}
+                      placeholder="Écrivez votre message ici"
+                      class="bg-white flex-grow-1 border rounded p-2"/>
+                &lt;button type="submit" class="bg-primary p-2 text-white rounded">
+                  &lt;svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{width: '1.5rem', height: '1.5rem'}}>
+                    &lt;path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                  &lt;/svg>
+                &lt;/button>
+              &lt;/form>
+              )}
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+      &lt;/div>
+      &lt;Footer/>
+    &lt;/div>
+  );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sun Mar 09 2025 18:00:40 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

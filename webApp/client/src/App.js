@@ -23,7 +23,11 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 /** auth middleware */
 import { AuthorizeUser, ProtectRoute } from './middleware/auth';
 
-/** root routes */
+/** Routing Configuration */
+/**
+ * @constant {Object} router
+ * @description Router configuration object containing all application routes and their components.
+ */
 const router = createBrowserRouter([
   {
     path : '/',
@@ -75,6 +79,12 @@ const router = createBrowserRouter([
   }
 ])
 
+/**
+ * @function App
+ * @description The main application component that sets up the router and Axios configuration.
+ *
+ * @returns {JSX.Element} The application with configured routing and context providers.
+ */
 function App() {
   axios.defaults.withCredentials = true;
   return (

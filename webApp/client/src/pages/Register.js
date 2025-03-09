@@ -15,13 +15,21 @@ import backgroundImage from '../assets/Fond_urbain1.jpg';
 // Components
 import Footer from '../components/Footer';
 
-// Html
+/**
+ * React component for the Register page.
+ * Allows users to register by providing required details and profile image.
+ * Handles form submission and data validation.
+ * @returns {JSX.Element} JSX representation of the Register page.
+ */
 export default function Register() {
 
   const navigate = useNavigate();
   // Profile image
   const[file, setFile] = useState();
 
+  /**
+   * Formik configuration for handling form state, validation, and submission.
+  */
   const formik = useFormik({
     initialValues : {
       email: '',
@@ -41,7 +49,6 @@ export default function Register() {
       const date = new Date();
       const formattedDate = date.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
       
-      console.log(formattedDate);
       values = await Object.assign(values, { profile: file || '', created: formattedDate });
 
       let registerPromise = registerUser(values)
@@ -57,14 +64,17 @@ export default function Register() {
       }).catch(err => { 
         
         if (err.error === "AlreadyExisting") {
-          console.log("err.msg : ",err.msg)
           toast.error(err.msg);
         }        
       });
     }
   });
 
-  /* formik doesn't support file upload so we need to create this handler */
+  /**
+   * Handles file upload and converts it to base64.
+   *
+   * @param {Object} e - The event object containing the uploaded file.
+   */
   const onUpload = async e => {
     // < e.target.files[0] > collect image just upload
     const base64 = await convertToBase64(e.target.files[0]);
