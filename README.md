@@ -60,6 +60,7 @@ mongod
 
 Create a ``.env`` file in the ``webApp/server`` directory and add the following environment variables (``CLIENT_URL=http://localhost:3000, http://localhost:3001`` in the testing environment):
 
+    PORT= 8080
     JWT_SECRET=YOUR_KEY
     APIKey=YOUR_KEY
     // testing email and password
