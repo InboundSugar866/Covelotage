@@ -58,15 +58,20 @@ mongod
 
 2. **Configure environment variables:**
 
-Create a ``.env`` file in the ``webApp/server`` directory and add the following environment variables:
+Create a ``.env`` file in the ``webApp/server`` directory and add the following environment variables (``CLIENT_URL=http://localhost:3000, http://localhost:3001`` in the testing environment):
 
-    PORT=8080
-    MONGO_URI=mongodb://localhost:27017/covelotage
-    JWT_SECRET=your_jwt_secret
+    JWT_SECRET=YOUR_KEY
+    APIKey=YOUR_KEY
+    // testing email and password
+    EMAIL=Example@email.com
+    PASSWORD=Email_password
+    MONGODB_URI=mongodb://localhost:27017/covelotage
     MAP_API_URI=https://api.openrouteservice.org
-    APIKey=your_openrouteservice_api_key
-    CLIENT_URL=http://localhost:3000
+    CLIENT_URL=https://your-production-domain.com
     
+Create a ``.env`` file in the ``webApp/client`` directory and add the following environment variables (``http://localhost:8080`` in the testing environment):
+
+    REACT_APP_SERVER_DOMAIN='https://your-production-domain.com'
 
 3. **Start the server:**
 
@@ -137,22 +142,6 @@ The ``config.js`` file contains important configuration settings for the applica
 - ``EMAIL``: This should be the email address you want to use to send emails from your application. Using the ethereal service during testing.
 - ``PASSWORD``: This should be the password for the email account specified in the ``EMAIL`` field.
 - ``CLIENT_URL``: This is the accepted addresses for the CORS policy. Change this to the address of the website once it is deployed. Currently, it accepts only two parallel sessions.
-
-For security reasons, you should not use the example values provided in the config.js file. Instead, generate your own secure values. For a production environment, you should use a secure email service provider and generate an app-specific password if possible. Do not use your personal email credentials directly.
-
-Below is an example configuration:
-
-    // filepath: Covelotage\webApp\server\config.js
-    export default {
-        JWT_SECRET : "YOUR_KEY",
-        APIKey : "YOUR_KEY",
-        // testing email and password
-        EMAIL : "Example@email.com",
-        PASSWORD : "Email_password",
-        MONGODB_URI : "mongodb://localhost:27017/covelotage",
-        MAP_API_URI : "https://api.openrouteservice.org",
-        CLIENT_URL: ["http://localhost:3000", "http://localhost:3001"]
-    }
 
 2. **Mailer configuration**
 
