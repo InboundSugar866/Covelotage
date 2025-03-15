@@ -6,7 +6,6 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
@@ -19,15 +18,14 @@ import connect from './database/conn.js';
 import router from './router/route.js';
 import User from './model/User.model.js';
 import Message from './model/Message.model.js';
-import ENV from './config.js';
 import { sendMail } from './utils/mailer.js';
 import UserModel from './model/User.model.js';
 
 dotenv.config();
 
 const app = express();
-const port = 8080;
-const jwtSecret = ENV.JWT_SECRET || 'your_jwt_secret';
+const port = process.env.PORT;
+const jwtSecret = process.env.JWT_SECRET;
 const bcryptSalt = bcrypt.genSaltSync(10);
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,7 +38,8 @@ app.use(
     credentials: true,
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      if (ENV.CLIENT_URL.indexOf(origin) === -1) {
+      const allowedOrigins = process.env.CLIENT_URL.split(',');
+      if (allowedOrigins.indexOf(origin) === -1) {
         const msg =
           'The CORS policy for this site does not allow access from the specified Origin.';
         return callback(new Error(msg), false);
