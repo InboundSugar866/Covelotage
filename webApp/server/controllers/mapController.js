@@ -2,7 +2,8 @@
  * @fileOverview Handles API routes for shortest path and route matching services.
  */
 
-import ENV from '../config.js';
+import dotenv from 'dotenv';
+dotenv.config();
 import axios from 'axios';
 import { getRevelentsRoutes } from '../database/req.js';
 import { 
@@ -11,7 +12,9 @@ import {
     compareUserRouteWithRelevantRoutes 
 } from '../utils/algorithm.js';
 
-axios.defaults.baseURL = ENV.MAP_API_URI;
+const apikey = process.env.APIKey;
+
+axios.defaults.baseURL = process.env.MAP_API_URI;
 
 /**
  * Computes the shortest path based on provided coordinates using the OpenRouteService API.
@@ -30,7 +33,7 @@ export async function shortestPath(req, res) {
         const response = await axios.post(
             `/v2/directions/cycling-regular/geojson`, 
             { coordinates: points },
-            { headers: { 'Authorization': `Bearer ${ENV.APIKey}` } }
+            { headers: { 'Authorization': `Bearer ${apikey}` } }
         ); 
         const routeCoordinates = formatCoordinates(response.data.features[0].geometry.coordinates);
         return res.status(201).send({ data: routeCoordinates });

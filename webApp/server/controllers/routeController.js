@@ -3,10 +3,11 @@
  */
 
 import RouteModel from "../model/Route.model.js";
-import ENV from '../config.js'
+import dotenv from 'dotenv';
+dotenv.config();
 import axios from 'axios';
 
-axios.defaults.baseURL = ENV.MAP_API_URI;
+axios.defaults.baseURL = process.env.MAP_API_URI;
 
 /**
  * Adds a new route for a user.

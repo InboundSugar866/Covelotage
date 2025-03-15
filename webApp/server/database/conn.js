@@ -5,7 +5,7 @@
 import mongoose from "mongoose";
 
 import { MongoMemoryServer } from "mongodb-memory-server";
-import ENV from '../config.js'
+//import env from '../config.js'
 
 /**
  * Connects to the MongoDB database using the provided URI from the environment configuration.
@@ -21,7 +21,7 @@ async function connect() {
 
     mongoose.set('strictQuery', true);
     //const db = await mongoose.connect(getUri); // décommenter pour simuler la bdd
-    const db = await mongoose.connect(ENV.MONGODB_URI); // commenter pour simuler la bdd
+    const db = await mongoose.connect(process.env.MONGODB_URI); // commenter pour simuler la bdd
 
     console.log("Database Connected");
     return db;

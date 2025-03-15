@@ -2,12 +2,13 @@
  * @fileOverview Handles API routes for CRUD operations for users and also password recovery.
  */
 
+// Secret variable
+import dotenv from 'dotenv';
+dotenv.config();
 import UserModel from "../model/User.model.js"
 // https://en.wikipedia.org/wiki/Bcrypt
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
-// Secret variable
-import ENV from '../config.js'
 // One time password
 import otpGenerator from 'otp-generator';
 // Mailer function to send the email 
@@ -19,7 +20,8 @@ import cookieParser from 'cookie-parser';
 const app = express();
 app.use(cookieParser());
 
-const jwtSecret = ENV.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET;
+
 
 /**
  * Middleware to verify the existence of a user.
@@ -211,7 +213,7 @@ export async function login(req, res) {
                         const token = jwt.sign({
                             userId : user._id,
                             username : user.username
-                        }, ENV.JWT_SECRET, {expiresIn : "24h"});
+                        }, jwtSecret, {expiresIn : "24h"});
 
                         // set token in a cookie
                         res.cookie('token', token, { sameSite: 'none', secure: true, path: '/' }); // secure:true pour https only
