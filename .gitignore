@@ -9,4 +9,5 @@ webApp/server/node_modules
 /build
 
 # local env
-.env
+webApp/client/.env
+webApp/server/.env
