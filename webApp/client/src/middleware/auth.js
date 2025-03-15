@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains components for protecting routes in a React application by ensuring proper
+ * user authorization. The `AuthorizeUser` component verifies the presence of a valid authentication token 
+ * in local storage, redirecting unauthorized users to the login page. The `ProtectRoute` component checks 
+ * for a valid username in the application's state and redirects users to the login page if missing. These 
+ * components enhance application security and ensure restricted access to protected routes.
+ */
+
 import { Navigate } from "react-router-dom";
 import { useAuthStore } from "../store/store";
 

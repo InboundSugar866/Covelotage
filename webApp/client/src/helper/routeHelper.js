@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file provides utility functions for route management in a React application. These functions 
+ * handle server communication using Axios to retrieve, add, update, and delete routes associated with a user. The 
+ * file also includes a helper function to translate day indices into French day names, enhancing user interface 
+ * localization. The utilities ensure secure handling through token-based authorization and incorporate robust 
+ * error handling for seamless operation within the application.
+ */
+
 import axios from 'axios';
 
 axios.defaults.baseURL = process.env.REACT_APP_SERVER_DOMAIN;

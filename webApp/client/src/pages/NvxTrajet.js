@@ -1,3 +1,12 @@
+/**
+ * @fileOverview This file contains the NvxTrajet component for the Covelotage application.
+ * It manages the creation, updating, and finding of routes using Leaflet for map interactions.
+ * The component allows users to select start and end points, add intermediate points,
+ * and dynamically update the path. It also includes functionalities for finding matching routes,
+ * with visual feedback using toast notifications. The component uses various helper functions
+ * and components to manage map interactions, route handling, and address searches.
+ */
+
 // React and Related Hooks
 import React, { useState, useRef, useEffect } from 'react';
 

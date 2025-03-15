@@ -1,3 +1,12 @@
+/**
+ * @fileOverview This file contains the implementation of the ListRoute React component. The component is designed to
+ * display and manage a list of routes, offering users the ability to select and delete routes. It uses React hooks 
+ * (useState and useEffect) for state management and lifecycle behavior. The file incorporates helper functions for
+ * fetching and formatting route data, and it leverages routing capabilities provided by react-router-dom. Styling
+ * is applied using imported CSS files, and SVG assets are used for icons and visual elements. The ListRoute component
+ * ensures an interactive and user-friendly interface for managing routes, including dynamic refresh and data validation.
+ */
+
 // React and Related Hooks
 import React, { useState, useEffect } from 'react';
 

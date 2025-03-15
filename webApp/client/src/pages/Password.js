@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the Password component for the Covelotage application.
+ * It displays a login form where users can enter their password to authenticate.
+ * The component uses Formik for form management and validation, and provides feedback
+ * using toast notifications. It also includes functionality to navigate to the recovery
+ * page if the user has forgotten their password.
+ */
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';

@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the Recovery component for the Covelotage application.
+ * It handles the OTP (One-Time Password) recovery and verification process.
+ * The component generates and verifies OTPs, provides feedback using toast notifications,
+ * and allows users to resend OTPs if needed. It uses various helper functions and components
+ * to manage the OTP process and navigate the user through the recovery flow.
+ */
+
 import React, { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';

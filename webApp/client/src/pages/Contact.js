@@ -1,3 +1,9 @@
+/**
+ * @fileOverview This file contains the implementation of the Contact component in a React application. The Contact 
+ * component provides an interactive and visually appealing contact card that displays the user's avatar, username, 
+ * and online/offline status. It highlights the card when selected and allows for user interaction through a click event. 
+ */
+
 import Avatar from "./Avatar.js";
 
 /**

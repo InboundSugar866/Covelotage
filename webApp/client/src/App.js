@@ -1,3 +1,9 @@
+/**
+ * @fileOverview This file contains the main application component for the Covelotage application.
+ * It sets up the router and Axios configuration, and provides context providers for user authentication.
+ * The component imports and configures all the necessary routes and their corresponding components.
+ */
+
 //import './index.css';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 

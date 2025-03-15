@@ -1,3 +1,9 @@
+/**
+ * @fileOverview This file contains the Zustand store for managing authentication state in the Covelotage application.
+ * It provides a global state for authentication details, including the username and session status.
+ * The store includes functions to update the username in the authentication state.
+ */
+
 // https://www.npmjs.com/package/zustand
 
 import { create } from 'zustand';

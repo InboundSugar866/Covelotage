@@ -1,3 +1,9 @@
+/**
+ * @fileOverview This file contains the UserContext and UserContextProvider for the Covelotage application.
+ * It manages user-related state, including username and ID, and provides this state to its children components.
+ * The context fetches user profile data if a valid token exists, using an API call to retrieve the user ID and username.
+ */
+
 import {createContext, useEffect, useState} from "react";
 import axios from "axios";
 import Cookies from "js-cookie";

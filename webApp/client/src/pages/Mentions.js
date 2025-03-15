@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the Mentions component for the Covelotage application.
+ * It displays the legal mentions and information about the Covelotage initiative.
+ * The component includes details about the publication director, site design and animation,
+ * terms of use, intellectual property, and personal data management.
+ * It uses various HTML elements to structure and present the information.
+ */
+
 import React from 'react'
 
 // Components

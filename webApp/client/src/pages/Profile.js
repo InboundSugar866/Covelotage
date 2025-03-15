@@ -1,3 +1,10 @@
+/**
+ * @fileOverview This file contains the Profile component for the Covelotage application.
+ * It displays the user's profile, including the ability to update profile information and upload a profile picture.
+ * The component uses Formik for form management and validation, and provides feedback using toast notifications.
+ * It also includes a navigation bar and a footer component.
+ */
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';

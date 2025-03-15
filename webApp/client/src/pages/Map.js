@@ -1,3 +1,13 @@
+/**
+ * @fileOverview This file contains the Map component for the Covelotage application.
+ * It integrates Leaflet for map interactions and routing functionalities.
+ * The component allows users to select start and end points, add intermediate points,
+ * and dynamically update the path. It also includes functionalities for creating,
+ * updating, and finding matching routes, with visual feedback using toast notifications.
+ * The component uses various helper functions and components to manage map interactions,
+ * route handling, and address searches.
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';

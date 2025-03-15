@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the implementation of the LogoutButton React component. The component provides
+ * a user-friendly logout functionality by clearing authentication data (like tokens from local storage and cookies) 
+ * and redirecting users to the home page. It leverages the useNavigate hook from react-router-dom for navigation and 
+ * ensures a seamless logout process. The LogoutButton is designed to be simple, accessible, and easy to integrate into 
+ * any application requiring secure session management.
+ */
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 

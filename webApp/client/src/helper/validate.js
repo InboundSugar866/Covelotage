@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains utility functions for form validation in a React application, using the 
+ * react-hot-toast library for error notifications. These functions validate various aspects of user input, 
+ * including username, password, email, and reset password confirmation, across different forms like login, 
+ * registration, profile updates, and password reset. Each function provides comprehensive error handling and 
+ * ensures that user inputs meet specific criteria, enhancing the application's reliability and user experience.
+ */
+
 import toast from "react-hot-toast";
 import { authenticate } from "./userHelper";
 

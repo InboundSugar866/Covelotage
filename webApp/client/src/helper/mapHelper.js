@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains several utility functions for geospatial data processing and server communication. 
+ * These functions use libraries like Axios for HTTP requests and Turf.js for advanced geospatial analysis. The utilities 
+ * include functionality for finding the shortest path between points, matching routes based on similarities, and updating 
+ * intermediate points by associating them with the nearest points in a given list. Additionally, the file integrates 
+ * robust error handling and asynchronous operations to ensure reliability and scalability in handling geospatial data.
+ */
+
 import axios from 'axios';
 // Library for advanced geospatial analysis
 import * as turf from '@turf/turf';

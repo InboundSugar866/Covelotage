@@ -1,3 +1,10 @@
+/**
+ * @fileOverview This file contains the implementation of a custom React hook `useFetch`. This hook simplifies data
+ * fetching from a server by managing the API call, loading state, and error handling. It uses Axios for HTTP requests 
+ * and React's useState and useEffect hooks for state management and lifecycle behavior. The hook supports both user-based 
+ * token retrieval and query-based requests, making it versatile for various use cases.
+ */
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { getUsername } from '../helper/userHelper'

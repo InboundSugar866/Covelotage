@@ -1,3 +1,9 @@
+/**
+ * @fileOverview This component displays the main structure and content of the home page,
+ * including a navigation bar, background image, and detailed sections with
+ * community-related information.
+ */
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 

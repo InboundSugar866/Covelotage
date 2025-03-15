@@ -1,3 +1,10 @@
+/**
+ * @fileOverview This file contains the Reset component for the Covelotage application.
+ * It provides a form interface for users to reset their password.
+ * The component handles form submission and validation using Formik,
+ * and provides feedback using toast notifications. It also includes a navigation bar and a footer component.
+ */
+
 import React from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useFormik } from 'formik';

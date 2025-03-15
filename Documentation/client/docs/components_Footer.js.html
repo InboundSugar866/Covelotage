@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/Footer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/Footer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileOverview This file contains the implementation of the Footer component. The Footer
+ * is a visually engaging and responsive element that includes essential branding, navigation links, and credits. 
+ * It utilizes React, react-router-dom for linking, SVG assets for graphical representation, and CSS for styling.
+ * The Footer showcases branding like Covélotage, references to PDIE Technopôle Nancy-Brabois, and provides external
+ * links for further user engagement. Additionally, it dynamically renders the current year and a link to legal mentions.
+ */
+
+// React Import
+import React from 'react';
+
+// Router
+import { Link } from 'react-router-dom';
+
+// Assets
+import { ReactComponent as YourSvg } from '../assets/TrouverCoveloteur.svg';
+import logoPdie from '../assets/PDIE.png';
+import { ReactComponent as Route } from '../assets/Route.svg';
+
+// Html
+const Footer = () => {
+  return (
+    &lt;footer class="footer text-black text-center d-flex flex-column align-items-center" style={{height: "25vh", fontweight: "bold", fontsize: "1.3rem", backgroundColor: '#588157'}}>
+      &lt;div class="w-100">
+        &lt;Route class="w-100" />
+      &lt;/div>
+
+      &lt;div class="d-flex flex-column justify-content-center align-items-center w-100 py-2" style={{flex: "1"}}>
+        &lt;div class="d-flex justify-content-between w-100 mb-2">
+          &lt;div class="d-flex flex-column align-items-center justify-content-center me-5" style={{flex: "1"}}>
+            &lt;h3>COVELOTAGE&lt;/h3>
+            &lt;Link to="/login">
+              &lt;YourSvg class="w-100" style={{width: "300px", height: "100px"}}/>
+            &lt;/Link>
+          &lt;/div>
+
+          &lt;div class="d-flex flex-column align-items-center justify-content-center" style={{flex: "1"}}>
+            &lt;h3>UNE INITIATIVE DU PDIE &lt;br/> TECHNOPOLE NANCY BRABOIS&lt;/h3>
+            &lt;a href="https://pdiebrabois.wordpress.com/">
+              &lt;img src={logoPdie} target='_blank' alt='logo_pdie' class="w-100" style={{width: "400px", height: "100px"}}/>
+            &lt;/a>
+          &lt;/div>
+        &lt;/div>
+
+        &lt;span>© {new Date().getFullYear()} Covélotage - PDIE Technopôle Nancy-Brabois - &lt;Link to="/Mentions" class="text-black">Mentions légales&lt;/Link>&lt;/span>
+      &lt;/div>
+    &lt;/footer>
+    );
+  };
+  
+  export default Footer;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sat Mar 15 2025 14:28:05 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

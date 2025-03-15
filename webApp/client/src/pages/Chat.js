@@ -1,3 +1,12 @@
+/**
+ * @fileOverview This file contains the implementation of the Chat component in a React application. The Chat component
+ * provides real-time messaging functionality, allowing users to interact with online and offline users, send and receive
+ * messages, and utilize a search bar for filtering and selecting users. It integrates WebSocket for real-time updates,
+ * Axios for API communication, and uses React state management and lifecycle hooks (useState, useEffect) to enhance the
+ * user experience. Additional features include seamless reconnection, user-specific data rendering, and message deduplication
+ * for reliability and performance.
+ */
+
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 

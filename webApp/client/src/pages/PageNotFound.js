@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the PageNotFound component for the Covelotage application.
+ * It displays a message indicating that the requested page was not found.
+ * The component provides a link for users to navigate back to the homepage.
+ * It uses various HTML elements to structure and present the information,
+ * and includes a background image and a footer component.
+ */
+
 import React from 'react'
 import { Link } from 'react-router-dom';
 

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/Mentions.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/Mentions.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileOverview This file contains the Mentions component for the Covelotage application.
+ * It displays the legal mentions and information about the Covelotage initiative.
+ * The component includes details about the publication director, site design and animation,
+ * terms of use, intellectual property, and personal data management.
+ * It uses various HTML elements to structure and present the information.
+ */
+
+import React from 'react'
+
+// Components
+import Footer from '../components/Footer';
+
+// Html
+const Mentions = () => {
+    return (
+      &lt;div >
+        &lt;div style={{backgroundColor: `#63A3A0`}}>
+          &lt;div class="p-5 rounded text-justify fw-bold">
+
+            &lt;div class='mb-5'>
+              &lt;h1 class="fw-bold text-large">Covelotage&lt;/h1>
+              &lt;h2>Votre Communaute Cycliste&lt;/h2>
+              &lt;p>Le covelotage est une initiative visant à rendre l’utilisation du vélo plus accessible au quotidien, en encourageant les cyclistes grâce à la mise en relation avec d’autres utilisateurs partageant des itinéraires similaires.&lt;/p>
+            &lt;/div>
+
+            &lt;h1>Mentions legales&lt;/h1>
+            &lt;div class='text-justify px-5'>
+              &lt;h3 class="fw-bold">Directeur de publication&lt;/h3>
+              &lt;div class='text px-5'>
+                Denis HEFTRE - Président&lt;br/>
+                Association PDIE Technopôle Nancy Brabois&lt;br/>
+                chez ADH - 5 rue de l’aviation - 54600 VILLERS-LES-NANCY
+              &lt;/div>
+
+              &lt;h3 class='fw-bold  mt-5'>Conception et animation du site&lt;/h3>
+              &lt;div class='text px-5'>
+                &lt;div>ENSEM Conseil - 2 avenue de la forêt de Haye 54500 VANDOEUVRE-LES-NANCY&lt;br/>
+                      &lt;br/>&lt;/div>
+                &lt;div>Hébergement - XXXX&lt;/div>
+              &lt;/div>
+
+              &lt;h3 class='fw-bold  mt-5'>Conditions generales d'utilisation du site et des services proposes&lt;/h3>
+              &lt;div class='text px-5'>
+                &lt;div>L’utilisation du site www.covelotage.fr implique l’acceptation pleine et entière des conditions générales d’utilisation ci-après décrites. Ces conditions d’utilisation sont susceptibles d’être modifiées ou complétées à tout moment, les utilisateurs du site www.covelotage.fr sont donc invités à les consulter de manière régulière.&lt;br/>
+                  &lt;br/>
+                  Aucun élément composant le site ne peut être copié, reproduit, modifié, réédité, chargé, dénaturé, transmis ou distribué de quelque manière que ce soit, sous quelque support que ce soit, de façon partielle ou intégrale, sans l’autorisation écrite et préalable du PDIE Technopôle Nancy Brabois.&lt;br/>
+                  &lt;br/>
+                  Toute utilisation non expressément autorisée du site ou de ses éléments constituerait une atteinte aux droits du PDIE Technopôle Nancy Brabois passible notamment de contrefaçon sanctionnée par les articles L 355-2 et suivants du Code de la Propriété.
+                &lt;/div>
+              &lt;/div>
+
+              &lt;h3 class='fw-bold  mt-5'>Propriete intelectuelle et contrefacon&lt;/h3>
+                &lt;div class='text px-5'>
+                &lt;div>La présentation et chacun des éléments, y compris le nom de domaine, les marques, logos, enseignes, dessins, illustrations, photographies, textes, graphiques et autres fichiers apparaissant sur le présent site, sont protégés par les lois en vigueur sur la propriété intellectuelle, et appartiennent au PDIE Technopôle Nancy Brabois  ou font l’objet d’une autorisation d’utilisation.&lt;br/>
+                  &lt;br/>
+                  Ce site est normalement accessible à tout moment aux utilisateurs. Une interruption pour raison de maintenance technique peut être toutefois décidée par le PDIE Technopôle Nancy Brabois qui s’efforcera alors de communiquer préalablement et dans la mesure du possible, les dates et heures de l’intervention aux utilisateurs.&lt;br/>
+                  &lt;br/>
+                  Le site www.covelotage.fr est mis à jour régulièrement par les membres de l’association PDIE Technopôle Nancy Brabois. De la même façon, les mentions légales peuvent être modifiées à tout moment : elles s’imposent néanmoins à l’utilisateur qui est invité à s’y référer le plus souvent possible afin d’en prendre connaissance.
+                &lt;/div>
+              &lt;/div>
+
+              &lt;h3 class='fw-bold  mt-5'>Gestion des donnees personnelles&lt;/h3>
+              &lt;div class='text px-5'>
+                &lt;div>En France, les données personnelles sont notamment protégées par la loi n° 78/87 du 6 janvier 1978, la loi n° 2004/801 du 6 août 2004, l’article L. 226-13 du Code pénal, la Directive Européenne du 24 octobre 1995 et le règlement n° 2016/679 dit, Règlement sur la Protection des Données (RGPD), de l’Union Européenne.&lt;br/>
+                  &lt;br/>
+                  En tout état de cause le PDIE Technopôle Nancy Brabois ne collecte des informations personnelles relatives à l’utilisateur que pour le besoin des services proposés par le site www.covelotage.fr :&lt;br/>
+                  &lt;br/>
+                  - Nom&lt;br/>
+                  - Prénom&lt;br/>
+                  - Adresse&lt;br/>
+                  - Numéro de téléphone&lt;br/>
+                  - Email&lt;br/>
+                  &lt;br/>
+                  L’utilisateur consent à fournir ces informations lorsqu’il procède par lui-même à leur saisie dans un formulaire. Il est alors précisé à l’utilisateur du site www.covelotage.fr l’obligation ou non de fournir ces informations.&lt;br/>
+                  &lt;br/>
+                  [Texte de description des durées de conservation des données.]&lt;br/>
+                  &lt;br/>
+                  Conformément aux dispositions du RGPD, tout utilisateur dispose d’un droit d’information, d’accès, de rectification, d’effacement, d’opposition et de portabilité des données personnelles le concernant. Pour exercer l’un de ces droits, il suffit à l’utilisateur d’effectuer sa demande par voie postale ou par mail à l’attention de [personne à solliciter] (mail).&lt;br/>
+                  &lt;br/>
+                  Aucune information personnelle de l’utilisateur du site www.covelotage.fr n’est publiée à l’insu de l’utilisateur, échangée, transférée, cédée ou vendue sur un support quelconque à des tiers. Seule l’hypothèse du changement de statut du PDIE Technopôle Nancy Brabois et de ses droits permettrait la transmission desdites informations à l’éventuelle entité qui serait à son tour tenu de la même obligation de conservation et de modification des données vis à vis de l’utilisateur du site www.covelotage.fr.
+                &lt;/div>
+              &lt;/div>
+            &lt;/div>
+          &lt;/div>
+        &lt;/div>
+        &lt;Footer/>
+      &lt;/div>
+    );
+  };
+  
+  export default Mentions;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sat Mar 15 2025 14:28:05 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,3 +1,12 @@
+/**
+ * @fileOverview This file contains the CreateRoute React component and its related logic for managing the creation and 
+ * customization of user-defined routes. It leverages various dependencies including React, hooks such as useState and useEffect, 
+ * third-party libraries for date and time picking (react-datepicker and rc-time-picker), and a notification library (react-hot-toast). 
+ * Additionally, this file includes CSS styles, SVG assets, and helper functions for enhanced functionality. The component enables
+ * the user to define routes with specific names, comments, and plans based on selected dates or periodic schedules. It ensures
+ * robust validations, manages state effectively, and provides an intuitive UI/UX for route creation and management.
+ */
+
 // React and Related Hooks
 import React, { useState, useEffect } from 'react';
 

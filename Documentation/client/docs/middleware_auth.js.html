@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: middleware/auth.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: middleware/auth.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileOverview This file contains components for protecting routes in a React application by ensuring proper
+ * user authorization. The `AuthorizeUser` component verifies the presence of a valid authentication token 
+ * in local storage, redirecting unauthorized users to the login page. The `ProtectRoute` component checks 
+ * for a valid username in the application's state and redirects users to the login page if missing. These 
+ * components enhance application security and ensure restricted access to protected routes.
+ */
+
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../store/store";
+
+/**
+ * Protect the Profile route by ensuring the user is authorized.
+ *
+ * This component checks if a valid authentication token exists in the local storage.
+ * If the token is missing, it redirects the user to the login page.
+ *
+ * @function
+ * @param {Object} props - The component props.
+ * @param {React.ReactNode} props.children - The child components to render if the user is authorized.
+ * @returns {JSX.Element} The child components if authorized, otherwise redirects to the login page.
+ */
+export const AuthorizeUser = ({ children }) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    return &lt;Navigate to={'/login'} replace={true}>&lt;/Navigate>;
+  }
+
+  return children;
+};
+
+/**
+ * Protect the Password route by ensuring the user has a valid username.
+ *
+ * This component checks if the username exists in the application's state.
+ * If the username is missing, it redirects the user to the login page.
+ *
+ * @function
+ * @param {Object} props - The component props.
+ * @param {React.ReactNode} props.children - The child components to render if the user has a valid username.
+ * @returns {JSX.Element} The child components if the username is valid, otherwise redirects to the login page.
+ */
+export const ProtectRoute = ({ children }) => {
+  const username = useAuthStore.getState().auth.username;
+
+  if (!username) {
+    return &lt;Navigate to={'/login'} replace={true}>&lt;/Navigate>;
+  }
+
+  return children;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sat Mar 15 2025 14:28:05 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

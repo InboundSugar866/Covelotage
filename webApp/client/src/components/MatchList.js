@@ -1,3 +1,12 @@
+/**
+ * @fileOverview This file contains the implementation of the MatchList React component. The MatchList component 
+ * is designed to display a list of routes and enable user interaction by selecting specific routes. It leverages 
+ * React hooks such as useState for state management and integrates helper functions for additional functionality. 
+ * The component supports visual enhancements through imported styles and SVG assets, ensuring an intuitive user 
+ * interface. Callback functions are used to handle user interactions, making the component flexible and easily 
+ * integrable within a larger application.
+ */
+
 // React and Related Hooks
 import React, { useState } from 'react';
 

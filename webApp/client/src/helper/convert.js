@@ -1,4 +1,12 @@
 /**
+ * @fileOverview This file contains the implementation of a utility function `convertToBase64` that converts an image file
+ * into a Base64-encoded string. The function reads the provided image file, crops it to a square based on its smaller
+ * dimension, and uses a canvas element to produce the Base64-encoded representation. It employs a Promise-based structure 
+ * for asynchronous processing, ensuring proper error handling during file reading and image manipulation. This utility is 
+ * particularly useful for scenarios where image data needs to be transferred or stored in Base64 format.
+ */
+
+/**
  * Converts an image file into a Base64-encoded string.
  *
  * This function reads an image file, crops it to a square based on the smaller dimension, 

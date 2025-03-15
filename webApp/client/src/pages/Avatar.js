@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the implementation of the Avatar component in a React application. The Avatar component 
+ * dynamically generates a circular avatar with a unique background color based on the user's `userId`. It also displays 
+ * the first letter of the username and includes a status indicator (online/offline). The component validates input properties 
+ * to ensure correctness and logs errors if validation fails. Additionally, the avatar's style and color enhance user 
+ * identification and provide an intuitive visual representation.
+ */
+
 import '../styles/Avatar.css';
 
 /**

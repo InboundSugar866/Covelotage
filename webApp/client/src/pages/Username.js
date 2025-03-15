@@ -1,3 +1,10 @@
+/**
+ * @fileOverview This file contains the Username component for the Covelotage application.
+ * It captures the user's username and navigates to the password reset page.
+ * The component uses Formik for form management and validation, and provides feedback using toast notifications.
+ * It also includes a background image and a footer component.
+ */
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';

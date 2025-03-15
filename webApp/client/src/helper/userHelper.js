@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file provides a set of utility functions to manage user authentication and account operations
+ * within a React application. Using Axios for HTTP communication and jwt-decode for token decoding, these functions 
+ * handle tasks such as retrieving user details, authenticating users, registering new accounts, verifying passwords, 
+ * updating profiles, generating and verifying OTPs, and resetting passwords. The utilities incorporate robust error 
+ * handling and token-based authorization, ensuring secure and reliable interaction with the server.
+ */
+
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 

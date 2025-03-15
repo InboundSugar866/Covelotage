@@ -1,3 +1,10 @@
+/**
+ * @fileOverview This file contains the Register component for the Covelotage application.
+ * It allows users to register by providing required details and a profile image.
+ * The component handles form submission and data validation using Formik,
+ * and provides feedback using toast notifications. It also includes a navigation bar and a footer component.
+ */
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';

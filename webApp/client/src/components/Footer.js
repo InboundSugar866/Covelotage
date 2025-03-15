@@ -1,3 +1,11 @@
+/**
+ * @fileOverview This file contains the implementation of the Footer component. The Footer
+ * is a visually engaging and responsive element that includes essential branding, navigation links, and credits. 
+ * It utilizes React, react-router-dom for linking, SVG assets for graphical representation, and CSS for styling.
+ * The Footer showcases branding like Covélotage, references to PDIE Technopôle Nancy-Brabois, and provides external
+ * links for further user engagement. Additionally, it dynamically renders the current year and a link to legal mentions.
+ */
+
 // React Import
 import React from 'react';
 
