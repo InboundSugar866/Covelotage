@@ -1,7 +1,7 @@
 /**
  * @fileOverview This file contains the CreateRoute React component and its related logic for managing the creation and 
  * customization of user-defined routes. It leverages various dependencies including React, hooks such as useState and useEffect, 
- * third-party libraries for date and time picking (react-datepicker and rc-time-picker), and a notification library (react-hot-toast). 
+ * third-party libraries for date and time picking (react-datepicker and react-time-picker), and a notification library (react-hot-toast). 
  * Additionally, this file includes CSS styles, SVG assets, and helper functions for enhanced functionality. The component enables
  * the user to define routes with specific names, comments, and plans based on selected dates or periodic schedules. It ensures
  * robust validations, manages state effectively, and provides an intuitive UI/UX for route creation and management.
@@ -13,8 +13,8 @@ import React, { useState, useEffect } from 'react';
 // Date and Time Pickers
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import TimePicker from 'rc-time-picker';
-import 'rc-time-picker/assets/index.css';
+import TimePicker from 'react-time-picker';
+import 'react-time-picker/dist/TimePicker.css';
 
 // Notification Library
 import toast from 'react-hot-toast';
@@ -106,18 +106,28 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
       console.error('Heure invalide ou jour non sélectionné');
       return;
     }
-    // Create a new date object with a fixed date (1st January 1970) 
-    const selectedDateTime = periodicDateRef;
-    // set the time to the selected time 
-    selectedDateTime.setHours(selectedTime.hours(), selectedTime.minutes(), 0);
-    // assenble the day of the week and the time
+  
+    // Parse the time string (e.g., "14:30") returned by react-time-picker
+    const [hours, minutes] = selectedTime.split(':').map(Number);
+  
+    // Create a new date object with a fixed date (1st January 1970)
+    const selectedDateTime = new Date();
+    selectedDateTime.setFullYear(1970, 0, 1);
+  
+    // Set the time to the parsed hours and minutes
+    selectedDateTime.setHours(hours, minutes, 0);
+  
+    // Assemble the day of the week and the time
     const newPeriodicTime = {
       dayOfWeek: selectedDayOfWeek,
       time: selectedDateTime,
     };
-    // update the selectedPeriodicTimes array
+  
+    // Update the selectedPeriodicTimes array
     setSelectedPeriodicTimes([...selectedPeriodicTimes, newPeriodicTime]);
   };
+  
+  
 
   /**
    * Removes a periodic time from the list of periodic times.
@@ -425,9 +435,11 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
               </div>
               <div class="col-8 d-flex align-items-center">
                 <TimePicker
-                  showSecond={false}
-                  defaultValue={selectedTime}
-                  onChange={(value) => {setSelectedTime(value)}}
+                  value={selectedTime}
+                  onChange={(value) => setSelectedTime(value)}
+                  disableClock={true}
+                  clearIcon={null}
+                  format="HH:mm"
                 />
                 <button class="event-button" type="button" style={{marginLeft:'2rem'}} onClick={handleAddPeriodicTime}>
                   Confirmer la date et l'heure

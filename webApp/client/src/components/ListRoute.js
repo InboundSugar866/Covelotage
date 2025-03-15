@@ -15,7 +15,6 @@ import { getAllRoutes, getDayOfWeek } from '../helper/routeHelper';
 
 // Styles
 import 'react-datepicker/dist/react-datepicker.css';
-import 'rc-time-picker/assets/index.css';
 import '../styles/ListRoute.css';
 
 // Router

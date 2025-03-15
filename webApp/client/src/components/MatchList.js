@@ -15,7 +15,6 @@ import { getDayOfWeek } from '../helper/routeHelper';
 
 // Styles
 import 'react-datepicker/dist/react-datepicker.css';
-import 'rc-time-picker/assets/index.css';
 
 // Assets
 import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
@@ -152,5 +151,4 @@ export const MatchList = ({ routes, onSelectMatchingRoute, similarities }) => {
       </div>
     </div>
   );
-  
 };
