@@ -1,5 +1,13 @@
+/**
+ * @fileOverview Users database model.
+ */
+
 import mongoose from "mongoose";
 
+/**
+ * Schema definition for the User model.
+ * Represents user data including personal details, credentials, and profile information.
+ */
 export const UserSchema = new mongoose.Schema({
     name : {
         type : String,
@@ -21,7 +29,17 @@ export const UserSchema = new mongoose.Schema({
         required : [true, "Please provide your phone number"],
         unique : false
     },
-    address : {
+    street : {
+        type : String,
+        required : [true, "Please provide your adress"],
+        unique : false
+    },
+    postCode : {
+        type : String,
+        required : [true, "Please provide your adress"],
+        unique : false
+    },
+    city : {
         type : String,
         required : [true, "Please provide your adress"],
         unique : false
@@ -44,7 +62,9 @@ export const UserSchema = new mongoose.Schema({
     name : { type: String},
     surname : { type: String},
     phone : { type : String},
-    address : { type: String},
+    street : { type: String},
+    postCode : { type: String},
+    city : { type: String},
     profile : { type: String},
     created : { type: String}
 });

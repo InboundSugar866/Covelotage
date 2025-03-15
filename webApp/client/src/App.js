@@ -1,8 +1,13 @@
+/**
+ * @fileOverview This file contains the main application component for the Covelotage application.
+ * It sets up the router and Axios configuration, and provides context providers for user authentication.
+ * The component imports and configures all the necessary routes and their corresponding components.
+ */
+
 //import './index.css';
 import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 
 import axios from "axios";
-
 
 /** import all components */
 import Username from './pages/Username';
@@ -24,55 +29,11 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 /** auth middleware */
 import { AuthorizeUser, ProtectRoute } from './middleware/auth';
 
-/** roor routes */
-/*
-const router = createBrowserRouter([
-  {
-    path : '/',
-    element : <Home/>
-  },
-  {
-    path : '/login',
-    element : <Username/>
-  },
-  {
-    path : '/register',
-    element : <Register/>
-  },
-  {
-    path : '/password',
-    element : <ProtectRoute> <Password /> </ProtectRoute> 
-  },
-  {
-    path : '/Profile',
-    element : <AuthorizeUser> <Profile /> </AuthorizeUser> 
-  },
-  {
-    path : '/Recovery',
-    element : <ProtectRoute> <Recovery/></ProtectRoute>
-  },
-  {
-    path : '/Reset',
-    element : <Reset/>
-  },
-  {
-    path : '/map',
-    element : <AuthorizeUser> <Map/> </AuthorizeUser>
-  },
-  {
-    path : '/PageNotFound',
-    element : <PageNotFound/>
-  },
-  {
-    path : '/Chat',
-    element : <AuthorizeUser> <Chat/> </AuthorizeUser>
-  },
-  {
-    path : '/UserContext',
-    element : <AuthorizeUser> <UserContextProvider/> </AuthorizeUser>
-  }
-])
-*/
+/** Routing Configuration */
+/**
+ * @constant {Object} router
+ * @description Router configuration object containing all application routes and their components.
+ */
 const router = createBrowserRouter([
   {
     path : '/',
@@ -124,7 +85,12 @@ const router = createBrowserRouter([
   }
 ])
 
-
+/**
+ * @function App
+ * @description The main application component that sets up the router and Axios configuration.
+ *
+ * @returns {JSX.Element} The application with configured routing and context providers.
+ */
 function App() {
   axios.defaults.withCredentials = true;
   return (

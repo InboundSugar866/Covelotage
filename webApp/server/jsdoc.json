@@ -1,0 +1,14 @@
+{
+  "source": {
+    "include": ["controllers", "database", "middleware", "model", "router", "utils"],
+    "includePattern": ".js$",
+    "excludePattern": "(node_modules/|docs)"
+  },
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "opts": {
+    "destination": "./docs",
+    "recurse": true
+  }
+}

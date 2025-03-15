@@ -2,21 +2,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Bayon&display=swap');
 
 .react-datepicker-popper {
-    z-index: 9999 !important;
+  z-index: 9999 !important;
 }
 
 .react-datepicker-wrapper {
-    display: grid;
-    width: 100%;
+  display: grid;
+  width: 100%;
 }
 
 .react-datepicker__input-container {
-    display: grid;
-    margin-top: 5px;
-    border: 1px solid #343a40;
-    background-color: #D9D9D9;
-    height: 40px;
-    border-radius: .25rem;
+  display: grid;
+  margin-top: 5px;
+  border: 1px solid #343a40;
+  background-color: #D9D9D9;
+  height: 40px;
+  border-radius: .25rem;
 }
 
 .rc-time-picker-input {
@@ -28,40 +28,37 @@
 }
 
 .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
-    padding: 0px
+  padding: 0px
 }
 
 .search-container {
-    position: relative;
-    width: 100%;
-  }
+  position: relative;
+  width: 100%;
+}
   
-  .suggestions-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    background: white;
-    border: 1px solid #ccc;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    display: flex !important;
-    flex-direction: column !important; /* Ensure the suggestions are stacked vertically */
-  }
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #ccc;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex !important;
+  flex-direction: column !important; /* Ensure the suggestions are stacked vertically */
+}
   
-  .suggestions-list div {
-    padding: 10px;
-    cursor: pointer;
-    display: block; /* Ensure each suggestion is a block element */
-  }
-  
-  .suggestions-list div:hover {
-    background-color: #f0f0f0;
-  }
-  
-  
-  
+.suggestions-list div {
+  padding: 10px;
+  cursor: pointer;
+  display: block; /* Ensure each suggestion is a block element */
+}
+
+.suggestions-list div:hover {
+  background-color: #f0f0f0;
+}

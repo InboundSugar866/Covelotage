@@ -1,89 +1,108 @@
+/**
+ * @fileOverview This file contains the implementation of the ListRoute React component. The component is designed to
+ * display and manage a list of routes, offering users the ability to select and delete routes. It uses React hooks 
+ * (useState and useEffect) for state management and lifecycle behavior. The file incorporates helper functions for
+ * fetching and formatting route data, and it leverages routing capabilities provided by react-router-dom. Styling
+ * is applied using imported CSS files, and SVG assets are used for icons and visual elements. The ListRoute component
+ * ensures an interactive and user-friendly interface for managing routes, including dynamic refresh and data validation.
+ */
+
+// React and Related Hooks
 import React, { useState, useEffect } from 'react';
+
+// Helper Functions
 import { getAllRoutes, getDayOfWeek } from '../helper/routeHelper';
+
+// Styles
 import 'react-datepicker/dist/react-datepicker.css';
 import 'rc-time-picker/assets/index.css';
-import { Link, Route } from 'react-router-dom'
-
-import { ReactComponent as Emplacement} from '../assets/emplacement.svg';
-import { ReactComponent as Horloge} from '../assets/horloge.svg';
-import { ReactComponent as Calendrier} from '../assets/calendrier.svg';
-import { ReactComponent as Setting} from '../assets/setting.svg';
-
 import '../styles/ListRoute.css';
 
-//import {handleFindMatchesBtn} from '../pages/NvxTrajet';
+// Router
+import { Link } from 'react-router-dom';
 
-const ListRoute = ({ refresh, onSelectRoute, deleteRoute}) => {
+// Assets
+import { ReactComponent as Emplacement } from '../assets/emplacement.svg';
+import { ReactComponent as Horloge } from '../assets/horloge.svg';
+import { ReactComponent as Calendrier } from '../assets/calendrier.svg';
 
-  // state to store the list of routes
+/**
+ * ListRoute Component
+ * 
+ * @param {Object} props - Component props
+ * @param {boolean} props.refresh - A flag to trigger the refresh of the route list
+ * @param {function} props.onSelectRoute - Callback function triggered when a route is selected
+ * @param {function} props.deleteRoute - Callback function to delete a route
+ * 
+ * @returns {JSX.Element} Rendered component
+ * 
+ * This component displays a list of routes and allows the user to interact with them.
+ */
+const ListRoute = ({ refresh, onSelectRoute, deleteRoute }) => {
+  /**
+   * State to store the list of routes
+   * @type {Array<Object>}
+   */
   const [routes, setRoutes] = useState([]);
-  // state to store the selected route
+
+  /**
+   * State to store the selected route
+   * @type {Object|null}
+   */
   const [selectedRoute, setSelectedRoute] = useState(null);
 
-  // refresh the list of routes 
+  /**
+   * Effect hook to refresh the list of routes when `refresh` changes
+   */
   useEffect(() => {
-    const fetchRoutes = async () => {
-      try {
-        const userRoutes = await getAllRoutes();
-        // format the periodic times into date objects
-        const routes = userRoutes.map((route) => {
-          return {
-            ...route,
-            planning: {
-              ...route.planning,
-              periodic: route.planning.periodic.map((periodic) => {
-                return {
-                  ...periodic,
-                  time: new Date(periodic.time)
-                }
-              }),
-              dates: route.planning.dates.map((date) => new Date(date))
-            }
-          };
-        });
-        setRoutes(routes);
-      } catch (error) {
-        console.error('Erreur lors du chargement des routes :', error);
-      }
-    };
+      /**
+       * Fetches the list of routes from the server
+       */
+      const fetchRoutes = async () => {
+          try {
+              const userRoutes = await getAllRoutes();
+              // Format periodic times into Date objects
+              const routes = userRoutes.map((route) => ({
+                  ...route,
+                  planning: {
+                      ...route.planning,
+                      periodic: route.planning.periodic.map((periodic) => ({
+                          ...periodic,
+                          time: new Date(periodic.time)
+                      })),
+                      dates: route.planning.dates.map((date) => new Date(date))
+                  }
+              }));
+              setRoutes(routes);
+          } catch (error) {
+              console.error('Erreur lors du chargement des routes :', error);
+          }
+      };
 
-    fetchRoutes();
+      fetchRoutes();
   }, [refresh]);
 
-  // function to handle the click on a route
+  /**
+   * Handles the click on a route
+   * 
+   * @param {Object} route - The selected route object
+   */
   const handleRouteClick = (route) => {
-    setSelectedRoute(route);
-    onSelectRoute(route);
+      setSelectedRoute(route);
+      onSelectRoute(route);
   };
 
-
- function BetterAdress(route)  {
-  let addressStart = route.startAdress;
-  let addressEnd = route.endAdress;
-
-  let parts1 = addressStart.split(", ");
-  let parts2 = addressEnd.split(", ");
-
-  // Check if the 7th part is a number
-let postalCodeIndex1 = isNaN(parts1[7]) ? 8 : 7;
-let postalCodeIndex2 = isNaN(parts2[7]) ? 8 : 7;
-
-// Extract the required parts
-let newAddressSart = `${parts1[1]}, ${parts1[2]}, ${parts1[postalCodeIndex1]}, ${parts1[4]}`;
-let newAddressEnd = `${parts2[1]}, ${parts2[2]}, ${parts2[postalCodeIndex2]}, ${parts2[4]}`;
-
-return {newAddressSart, newAddressEnd};
- }
-
-  // Helper function to check if the date is valid 
-  function isValidDate(d) { 
-    return d instanceof Date && !isNaN(d); 
+  /**
+   * Checks if the provided date is valid
+   * 
+   * @param {any} d - The date to check
+   * @returns {boolean} Whether the date is valid
+   */
+  function isValidDate(d) {
+      return d instanceof Date && !isNaN(d);
   }
 
-
   return (
-
-    
     <div>
       <div class="d-flex align-items-center">
         <h2 class='me-5' style = {{color: '#4F772D'}}>Mes Trajets</h2>
@@ -95,12 +114,11 @@ return {newAddressSart, newAddressEnd};
       </div>
       <div style={{ height: '100%', overflowY: 'auto', border: '1px solid #ccc' }}>
 
-
-        <ul>
+        <ul style={{ maxheight: '100vh', overflowY: 'auto'}}>
           {routes.map((route, index) => (
             <li key={route.name} onClick={() => handleRouteClick(route)} style={{ cursor: 'pointer', border: selectedRoute === route ? '4px solid #414833' : '1px solid #414833' }}>
               
-              <div class="rounded-3 p-4 mx-auto" style={{maxwidth: "600px", position: "relative"}}>
+              <div class="rounded-3 p-4 mx-auto" style={{position: "relative"}}>
                 <div class="d-flex justify-content-between align-items-center">
                   <span class="fw-bold fs-4 text-dark">{route.name}</span>
                   
@@ -142,13 +160,7 @@ return {newAddressSart, newAddressEnd};
                     </li>
                   })}
                 </div>
-
-                {/*<button class="event-button">TROUVER UN COVELOTEUR!</button>*/}
               </div>
-              
-              
-            
-
               <ul> Horaires hebdomadaires :
                 {route.planning.periodic.map((periodic, index) => (
                   <li key={index}> {getDayOfWeek(periodic.dayOfWeek)+" "}
@@ -160,14 +172,6 @@ return {newAddressSart, newAddressEnd};
                 </li>
                 ))}
               </ul>
-               {/* Bouton de suppression 
-               <button type="button" onClick={() => deleteRoute(route.name)}>
-                Supprimer
-              </button>
-              
-              <button id="findMatchesBtn" onClick={() => showDiv(route)} style={{display: 'block'}}>
-                Trouver les correspondances
-              </button>*/}
             </li>
           ))}
         </ul>

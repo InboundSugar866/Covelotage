@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: pages/Recovery.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: pages/Recovery.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileOverview This file contains the Recovery component for the Covelotage application.
+ * It handles the OTP (One-Time Password) recovery and verification process.
+ * The component generates and verifies OTPs, provides feedback using toast notifications,
+ * and allows users to resend OTPs if needed. It uses various helper functions and components
+ * to manage the OTP process and navigate the user through the recovery flow.
+ */
+
+import React, { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+
+// Store
+import { useAuthStore } from '../store/store';
+
+// Helper Functions
+import { generateOTP, verifyOTP } from '../helper/userHelper';
+
+// Assets
+import backgroundImage from '../assets/Fond_urbain1.jpg';
+
+// Components
+import Footer from '../components/Footer';
+
+
+/**
+ * React functional component for handling OTP recovery and verification.
+ * 
+ * @component
+ * @returns {JSX.Element} Recovery component.
+ */
+export default function Recovery() {
+
+  const { username } = useAuthStore(state => state.auth);
+
+  const [OTP, setOTP] = useState();
+  const navigate = useNavigate();
+
+  /* 
+   * Skip the initial render and then every time the value of username changes, 
+   * the code inside useEffect will be re-executed. 
+   */
+  useEffect(() => {
+    // Skip the initial render
+    generateOTP(username).then((status) => {
+      if (status === 200) return toast.success('Le code vous a été envoyé par email.');
+      return toast.error('Erreur lors de la création du code temporaire.');
+    }).catch(error => { console.log(error)});
+    
+  }, [username]);
+
+  async function onSubmit(e){
+    e.preventDefault();
+    try {
+      let { status } = await verifyOTP({ username, code : OTP })
+      if(status === 201){
+        toast.success('Vérification approuvée')
+        return navigate('/reset')
+      }  
+    } catch (error) {
+      return toast.error('Le code temporaire ne correspond pas.')
+    }
+  }
+
+  // handler of resend OTP
+  function resendOTP(){
+    let sentPromise = generateOTP(username);
+
+    toast.promise(sentPromise ,
+      {
+        loading: 'Envoie en cours',
+        success: &lt;b>Le code vous a été envoyé par email.&lt;/b>,
+        error: &lt;b>Problème lors de l'envoie du code.&lt;/b>,
+      }
+    );      
+  }
+
+// Html
+  return (
+
+    &lt;div>
+      &lt;Toaster position="top-center" reverseOrder={false}>&lt;/Toaster>
+      &lt;div
+      class="container-fluid d-flex align-items-center justify-content-center position-relative"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        color: 'black',
+        position: 'relative',
+        backgroundRepeat: 'no-repeat',
+        flex: 1,
+        minHeight: '75vh',
+      }}
+      >
+
+        &lt;div
+          class="position-absolute top-0 end-0 bottom-0 start-0"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+            backdropFilter: 'blur(5px)', 
+          }}
+        >
+        &lt;/div>
+
+        &lt;div
+          class="rounded p-4"
+          style={{
+            width: '40%',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            boxShadow: '0px 0px 15px 0px rgba(0,0,0,0.1)',
+            position: 'relative',
+            zIndex: 1, // Ensure the card is above the blurred background
+          }}
+        >
+          &lt;div class="text-center">
+            &lt;h4 class="mb-0">Récupération&lt;/h4>
+          &lt;/div>
+
+          &lt;form onSubmit={onSubmit} class="mt-4">
+            &lt;div class="mb-3">
+              &lt;span>Entrez le code envoyé par mail :&lt;/span>
+              &lt;input
+                onChange={(e) => setOTP(e.target.value)}
+                type="password"
+                class="form-control"
+                placeholder="OTP"
+              />
+            &lt;/div>
+
+            &lt;button type="submit" class="btn btn-primary w-100">
+              Réinitialiser
+            &lt;/button>
+          &lt;/form>
+
+          &lt;div class="text-center mt-3">
+            &lt;span>
+              Vous n'avez rien reçu ? &lt;button onClick={resendOTP} class="btn btn-link">Renvoyer&lt;/button>
+            &lt;/span>
+          &lt;/div>
+        &lt;/div>
+      &lt;/div>
+    &lt;Footer/>
+    &lt;/div>
+  )
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#App">App</a></li><li><a href="global.html#AuthorizeUser">AuthorizeUser</a></li><li><a href="global.html#CreateRoute">CreateRoute</a></li><li><a href="global.html#ListRoute">ListRoute</a></li><li><a href="global.html#LogoutButton">LogoutButton</a></li><li><a href="global.html#MatchList">MatchList</a></li><li><a href="global.html#ProtectRoute">ProtectRoute</a></li><li><a href="global.html#Reset">Reset</a></li><li><a href="global.html#UserContext">UserContext</a></li><li><a href="global.html#UserContextProvider">UserContextProvider</a></li><li><a href="global.html#Username">Username</a></li><li><a href="global.html#addRouteToServer">addRouteToServer</a></li><li><a href="global.html#authenticate">authenticate</a></li><li><a href="global.html#deleteRoute">deleteRoute</a></li><li><a href="global.html#emailVerify">emailVerify</a></li><li><a href="global.html#findClosestPointIndex">findClosestPointIndex</a></li><li><a href="global.html#findMatches">findMatches</a></li><li><a href="global.html#formik">formik</a></li><li><a href="global.html#generateOTP">generateOTP</a></li><li><a href="global.html#getAllRoutes">getAllRoutes</a></li><li><a href="global.html#getDayOfWeek">getDayOfWeek</a></li><li><a href="global.html#getShortestPath">getShortestPath</a></li><li><a href="global.html#getUser">getUser</a></li><li><a href="global.html#getUsername">getUsername</a></li><li><a href="global.html#passwordValidate">passwordValidate</a></li><li><a href="global.html#passwordVerify">passwordVerify</a></li><li><a href="global.html#profileValidate">profileValidate</a></li><li><a href="global.html#registerUser">registerUser</a></li><li><a href="global.html#registerValidate">registerValidate</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetPasswordValidate">resetPasswordValidate</a></li><li><a href="global.html#resetPasswordVerify">resetPasswordVerify</a></li><li><a href="global.html#router">router</a></li><li><a href="global.html#updateIndex">updateIndex</a></li><li><a href="global.html#updateRoute">updateRoute</a></li><li><a href="global.html#updateUser">updateUser</a></li><li><a href="global.html#useAuthStore">useAuthStore</a></li><li><a href="global.html#useEffect">useEffect</a></li><li><a href="global.html#usernameValidate">usernameValidate</a></li><li><a href="global.html#usernameVerify">usernameVerify</a></li><li><a href="global.html#verifyOTP">verifyOTP</a></li><li><a href="global.html#verifyPassword">verifyPassword</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Sat Mar 15 2025 14:28:05 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

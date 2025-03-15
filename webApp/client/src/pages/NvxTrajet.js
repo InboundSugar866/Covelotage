@@ -1,85 +1,154 @@
-import React, { useState, useRef, useEffect} from 'react';
-import toast, {Toaster} from 'react-hot-toast';
-import { Link, Route } from 'react-router-dom'
+/**
+ * @fileOverview This file contains the NvxTrajet component for the Covelotage application.
+ * It manages the creation, updating, and finding of routes using Leaflet for map interactions.
+ * The component allows users to select start and end points, add intermediate points,
+ * and dynamically update the path. It also includes functionalities for finding matching routes,
+ * with visual feedback using toast notifications. The component uses various helper functions
+ * and components to manage map interactions, route handling, and address searches.
+ */
 
+// React and Related Hooks
+import React, { useState, useRef, useEffect } from 'react';
+
+// Notification Library
+import toast, { Toaster } from 'react-hot-toast';
+
+// Router
+import { Link } from 'react-router-dom';
+
+// Assets
 import backgroundImage from '../assets/Fond_urbain.jpg';
-import Footer from '../components/Footer';
 import { ReactComponent as Profil } from '../assets/Profil.svg';
 import { ReactComponent as Messagerie } from '../assets/icon_messagerie.svg';
 import { ReactComponent as Trajet } from '../assets/icon_trajet.svg';
-
-import { getShortestPath, updateIndex, findMatches } from '../helper/mapHelper';
-import { addRouteToServer, updateRoute, deleteRoute } from '../helper/routeHelper';
-
-import ListRoute from '../components/ListRoute';
-import { MatchList } from '../components/MatchList';
-
-import '../styles/NvxTrajet.css';
-
-/** Display OpenSteetMap with leaflet module */
-import { MapContainer, TileLayer, useMapEvents, Marker, Popup, Polyline} from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import marker_1 from '../assets/map-marker-icon-1.png';
 import marker_2 from '../assets/map-marker-icon-2.png';
 import marker_dynamic from '../assets/map-marker-icon-dynamic.png';
 import marker_dynamic_2 from '../assets/map-marker-icon-dynamic-2.png';
 
+// Components
+import Footer from '../components/Footer';
+import ListRoute from '../components/ListRoute';
+import { MatchList } from '../components/MatchList';
 
-import { CreateRoute } from '../components/CreateRoute';
+// Helper Functions
+import { getShortestPath, updateIndex, findMatches } from '../helper/mapHelper';
+import { updateRoute, deleteRoute } from '../helper/routeHelper';
 
+// Leaflet (OpenStreetMap) Integration
+import { MapContainer, TileLayer, useMapEvents, Marker, Popup, Polyline } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Html
 export default function NvxTrajet() {
-
-  // ergonomics variable for the first selection
+  /**
+   * Flag indicating whether this is the first selection of a point.
+   * @type {React.MutableRefObject<boolean>}
+   */
   const firstSelection = useRef(true);
-  // Manage the behavior of the starting and arrival points
+
+  /**
+   * Whether the start point is currently selected.
+   * @type {boolean}
+   */
   const [isStartPointSelected, setIsStartPointSelected] = useState(true);
-  // allow to avoid multiple calls of the function handlePathSubmit
+
+  /**
+   * Whether the path should be updated.
+   * @type {boolean}
+   */
   const [shouldUpdatePath, setShouldUpdatePath] = useState(false);
-  // prevent the mutilple calls of the function handleMapClick
+
+  /**
+   * Whether a drag-end event is currently occurring.
+   * @type {boolean}
+   */
   const [isDragEndEvent, setIsDragEndEvent] = useState(false);
+
   
-  // starting point and arrival point
+  /**
+   * The starting point coordinates.
+   * @type {Object|null}
+   */
   const [startPoint, setStartPoint] = useState(null);
+
+  /**
+   * The ending point coordinates.
+   * @type {Object|null}
+   */
   const [endPoint, setEndPoint] = useState(null);
-  // points manually modified by the user
+
+  /**
+   * A list of intermediate points for the path.
+   * @type {Array<Object>}
+   */
   const [intermediatePoints, setIntermediatePoints] = useState([]);
 
-  // received points from the server
+  /**
+   * A list of received path points from the server.
+   * @type {Array<Object>}
+   */
   const [receivedPoints, setReceivedPoints] = useState([]);
 
-  // is a route is selected in the list of my routes
-  const isRouteSelected = useRef(false);
-  // route selected in the list of my routes
+
+  /**
+   * Reference to check if a route is selected.
+   * @type {React.MutableRefObject<boolean>}
+   */
+    const isRouteSelected = useRef(false);
+
+  /**
+   * Represents the selected route.
+   * @type {Object|null}
+   */
   const [selectedRoute, setSelectedRoute] = useState(null);
-  // enables updating the displayed information when the same route is re-selected.
+
+  /**
+   * Tracks selection updates.
+   * @type {boolean}
+   */
   const [selectionUpdate, setSelectionUpdate] = useState(false);
-  // refresh the list of routes
+
+  /**
+   * Flag to refresh routes or components.
+   * @type {boolean}
+   */
   const [refresh, setRefresh] = useState(false);
   
-  //  id of the selected matching route
+  /**
+   * ID of the selected matching route.
+   * @type {number}
+   */
   const [macthingRouteSelectedId, setMacthingRouteSelectedId] = useState(0);
-  // matching routes 
+
+  /**
+   * List of matching routes found.
+   * @type {Array<Object>}
+   */
   const [matchingRoutes, setMatchingRoutes] = useState([]);
 
-  // Path color
+  /**
+   * Map styling options for blue areas.
+   * @type {Object}
+   */
   const blueOptions = { fillColor: 'blue' }
 
+  // Route details
   const [routeName, setRouteName] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
-
   const [selectedPeriodicTimes, setSelectedPeriodicTimes] = useState([]);
-  const [selectedDayOfWeek, setSelectedDayOfWeek] = useState(0);
-  const [selectedTime, setSelectedTime] = useState(null);
-
-  // state to store the list of routes
-  const [routes, setRoutes] = useState([]);
-
   const [routeSelected, setRouteSelected] = useState(false);
 
-  
-  /** Updates the path */
+  // route similarities
+  const [similarities, setSimilarities] = useState([]);
+    
+/**
+ * Updates the path after verifying start and end points, formatting intermediate points,
+ * and fetching the shortest path using external APIs.
+ *
+ * @param {Object} values - The input values (not utilized directly in this function).
+ */
   const handlePathSubmit = async (values) => {
 
     // verify that the starting point and the arrival point are defined
@@ -91,9 +160,9 @@ export default function NvxTrajet() {
     const getPathPromise = getShortestPath(formatedPoints);
 
     toast.promise(getPathPromise, {
-        loading: 'Calculating path...',
-        success: <b>Path calculated</b>,
-        error: <b>Path calculation failed</b>,
+        loading: 'Calcul du trajet...',
+        success: <b>Trajet calculé</b>,
+        error: <b>Problème lors du calcul du trajet</b>,
     });
 
     getPathPromise.then((points) => {
@@ -105,12 +174,14 @@ export default function NvxTrajet() {
         const updatedIntermediatePoints = updateIndex(points, [...intermediatePoints]);
         updatedIntermediatePoints.then((res) => {  
           setIntermediatePoints(res);
-        }).catch((error) => {"fail to update the index of the intermediate points"});
+        }).catch((error) => {"Problème lors de la mise à jour du trajet"});
       }
-    }).catch((error) => {"fail to get the path from the server"});
+    }).catch((error) => {"Problème lors de l'acquisition du trajet"});
   }
 
-   /** Updates the path when modifying points of the path */
+  /**
+   * Updates the path dynamically when modifying points.
+   */
   useEffect(() => {
     // not calculate the path if a route is selected
     if (isRouteSelected.current === true) return;
@@ -127,7 +198,10 @@ export default function NvxTrajet() {
   // call the function when a point is modified
   [startPoint, endPoint, intermediatePoints]);
 
-  /** Use the useMapEvents function to handle map events */
+  /**
+   * Map click handler to manage user clicks and drag events.
+   * @returns {null} Does not render any component.
+   */
   function MapClickHandler() {
     useMapEvents({
       click: (event) => {
@@ -147,7 +221,11 @@ export default function NvxTrajet() {
     return null;
   }
 
-  /** Handle map click (set startPoint and EndPoint) */
+  /**
+   * Handle map clicks to set start or end points.
+   * @param {Object} event Event object containing latitude and longitude.
+   * @param {boolean} isStart Determines if the click sets the starting point.
+   */
   const handleMapClick = (event, isStart) => {
 
     // ergonomics operations for the first selection
@@ -171,6 +249,11 @@ export default function NvxTrajet() {
     setShouldUpdatePath(true);
   };
 
+  /**
+   * Handle drag-end events and reformat them for processing.
+   * @param {Object} event Drag event object.
+   * @param {boolean} isStart Indicates if the point dragged is the starting point.
+   */
   function handleDragEnd(event, isStart) {
     // set the drag end event flag
     setIsDragEndEvent(true);
@@ -182,7 +265,12 @@ export default function NvxTrajet() {
 
   // -------------- CreateRoute.js && ListRoute.js --------------
 
-  // Format the route for the server
+  /**
+   * Format the route into a structure suitable for the server.
+   * @param {Object} formData Data from the form submission.
+   * @param {Array<Object>} points Array of points along the route.
+   * @returns {Object|null} Formatted route data or null.
+   */
   function formatRoute(formData, points) {
     // verify the existence of the route
     if (!points || points.length === 0) {
@@ -199,45 +287,32 @@ export default function NvxTrajet() {
     return formData;
   };
 
-  // Handle the deletion of a route
+/**
+ * Handles the deletion of a route by formatting the data and sending it to the server.
+ * Displays toast notifications for loading, success, and error states.
+ * @param {string} routeName - The name of the route to be deleted.
+ */
   const handleDeleteRoute = (routeName) => {
     // delete the route from the server
     const deleteRoutePromise = deleteRoute(routeName);
 
     toast.promise(deleteRoutePromise, {
-      loading: 'Deleting route...',
-      success: <b>Route deleted</b>,
-      error: <b>Fail to delete the route</b>,
+      loading: 'Suppression du trajet...',
+      success: <b>Trajet supprimé</b>,
+      error: <b>Problème lors de la suppression du trajet</b>,
     });
 
     deleteRoutePromise.then(() => {
       // update the list of routes
       setRefresh(!refresh);
-    }).catch((error) => {"fail to update the list of routes"});
+    }).catch((error) => {"Problème lors de la mise à jour de la liste des trajets"});
   }
 
-  // Handle the creation of a route
-  const handleCreateRoute = (formData) => {
-
-    // format the data for the server
-    const data = formatRoute(formData, receivedPoints);
-    if (!data) return;
-    // add the route to the server
-    const addRoutePromise = addRouteToServer(data);
-
-    toast.promise(addRoutePromise, {
-      loading: 'Adding route...',
-      success: <b>Route added</b>,
-      error: (err) => <b>{err.response.data.error}</b>,
-    });
-
-    addRoutePromise.then(() => {
-      // update the list of routes
-      setRefresh(!refresh);
-    }).catch((error) => {"fail to update the list of routes"});
-  };
-
-    // Submit the form
+  /**
+   * Submits the form and updates the route if the information is valid.
+   *
+   * @param {Event} e - The form submission event.
+  */
   const handleUpdateRoute1 = (e) => {
     e.preventDefault();
     // Verify that all the required information is filled
@@ -248,16 +323,19 @@ export default function NvxTrajet() {
     }
   };
 
-  // Handle the update of a route
+  /**
+   * Handles the update of a route by formatting the data and sending it to the server.
+   *
+   * @param {Object} formData - The form data containing route details.
+ */
   const handleUpdateRoute2 = (formData) => {
-
     // format the data for the server
     const data = formatRoute(formData, receivedPoints);
     // add the route to the server
     const updateRoutePromise = updateRoute(data);
 
     toast.promise(updateRoutePromise, {
-      loading: 'Updating route...',
+      loading: 'Mise à jour du trajet...',
       success: <b>Route mise à jour</b>,
       error: (err) => <b>{err.response.data.error}</b>,
     });
@@ -265,11 +343,14 @@ export default function NvxTrajet() {
     updateRoutePromise.then(() => {
       // update the list of routes
       setRefresh(!refresh);
-    }).catch((error) => {"fail to update the list of routes"});
+    }).catch((error) => {"Problème lors de la mise à jour de la liste des trajets"});
   };
 
-
-  // Update innfomations displayed when a route is selected
+  /**
+   * Updates the displayed information when a route is selected.
+   *
+   * @param {Object} route - The selected route object.
+ */
   const handleSelectMyRoute = (route) => {
     setRouteSelected(true);
     // disable the first selection flag
@@ -296,27 +377,26 @@ export default function NvxTrajet() {
     setSelectedRoute(route);
     isRouteSelected.current = false;
     setSelectionUpdate(!selectionUpdate);
-
-    //document.querySelector('.col-md-5').classList.add('route-selected');
   };
 
-
-   // Update innfomations displayed when a route is selected
-   const handleSelecMatchingRoute = (id) => {
+  /**
+   * Updates the displayed information when a matching route is selected by ID.
+   *
+   * @param {string} id - The ID of the selected matching route.
+ */
+  const handleSelecMatchingRoute = (id) => {
     setMacthingRouteSelectedId(id);
   };
 
-
   // ----------------------- MatchList.js -----------------------
 
+  /**
+   * Verifies that a route has valid information before processing.
+   *
+   * @param {Object} route - The route object to validate.
+   * @returns {Object|undefined} - Valid route information or undefined if invalid.
+ */
   function getValideRouteInfos(route) {
-    /*
-    routes.map((route, index) => (
-      console.log(route.name);
-    ));
-*/
-    console.log(selectedRoute.planning.dates);
-
     // Verify that the name is filled
     if (!selectedRoute.name.trim()) {
       toast.error('Veuillez entrer un nom pour le chemin.');
@@ -335,32 +415,32 @@ export default function NvxTrajet() {
         "periodic": selectedPeriodicTimes 
       }
     }
-    console.log('routeInfos', routeInfos);
     return routeInfos;
   }
 
-  // Handle the update of a route
+  /**
+   * Finds matches for a route and updates the matching route list.
+   *
+   * @param {Object} formData - The form data containing route details.
+ */
   const handleFindMatches = (formData) => {
-    
-    // format the data for the server
+    // Format the data for the server
     const data = formatRoute(formData, receivedPoints);
-    console.log('formData : ', formData);
 
     if (!data) return;
-    // add the route to the server
+
+    // Add the route to the server
     const findMatchesPromise = findMatches(data);
 
     toast.promise(findMatchesPromise, {
-      loading: 'Findings routes...',
+      loading: 'Recherche de trajets...',
       success: <b>Trajets récupérés</b>,
       error: (err) => <b>{err.response.data.error}</b>,
     });
 
-    findMatchesPromise.then((formData) => {
-
-      // transform the points to a list of points [lat, lng]
-      const formatedData = formData.map((route, id) => {
-        console.log(route);
+    findMatchesPromise.then(({ routes, similarities }) => {
+      // Transform the points to a list of points [lat, lng]
+      const formattedData = routes.map((route, id) => {
         let points = route.route;
         const transformedPoints = points.map(point => {
           const [lng, lat] = JSON.parse(point);
@@ -371,14 +451,17 @@ export default function NvxTrajet() {
         return formattedRoute;
       });
 
-
-      setMatchingRoutes(formatedData);
+      setMatchingRoutes(formattedData);
+      console.log('Similarities:', similarities);
+      setSimilarities(similarities);
       // update the list of routes
       // setRefresh(!refresh);
-    }).catch((error) => {"fail to get matching routes"});
+    }).catch((error) => { console.log("Pas de trajets similaires") });
   };
 
-  // find matches for a route button
+  /**
+   * Handles button click to find matching routes after validation.
+ */
   const handleFindMatchesBtn = () => {
     // Verify that all the required information is filled
     const routeInfos = getValideRouteInfos();
@@ -386,286 +469,197 @@ export default function NvxTrajet() {
       // If the conditions are met, submit the form
       handleFindMatches(routeInfos);
     }
-    console.log('handleFindMatchesBtn OK');
   }
 
+  /**
+   * Updates the form fields when a route is selected or modified.
+ */
+  useEffect(() => {
+    // if no route is selected, return
+    if (!selectedRoute) return;
+    // update the name of the route
+    setRouteName(selectedRoute.name);
+    // update the selected dates
+    setSelectedDates(selectedRoute.planning.dates);
+    // update the selected periodic times
+    setSelectedPeriodicTimes(selectedRoute.planning.periodic);
+  }, [selectedRoute, selectionUpdate]);
 
-/*
-  // for the adress search
-  const [startAddress, setStartAddress] = useState('');
-  const [endAddress, setEndAddress] = useState('');
-  const [startAddressSuggestions, setStartAddressSuggestions] = useState([]);
-  const [endAddressSuggestions, setEndAddressSuggestions] = useState([]);
-  //const provider = new OpenStreetMapProvider();
-  const provider = new OpenStreetMapProvider({
-    params: {
-      'accept-language': 'fr', // render results in Dutch
-      countrycodes: 'fr', // limit search results to the Netherlands
-      addressdetails: 1, // include additional address detail parts
-      limit: 10, // limit the number of results
-    },
-  });
+  return (
+    <div>
+      <Toaster position="" reverseOrder={false}></Toaster>
+      <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
 
-  // Cache for search results
-  const searchCache = {};
+          {/* Navigation Bar */}
+          <nav class="navbar d-flex justify-content-end p-2 float-end">
+              <Link class="border border-4 border-success rounded-3 mx-1 mt-2" to="/nvxtrajet">
+                  <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
+              </Link>
+              <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/chat">
+                  <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
+              </Link>
+              <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/profile">
+                  <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
+              </Link>
+          </nav>
 
-  // Function to place a marker based on address
-  const handleSearch = _.debounce(async (address, isStartPoint) => {
-    // Check cache first
-    if (searchCache[address]) {
-      if (isStartPoint) {
-        setStartAddressSuggestions(searchCache[address]);
-      } else {
-        setEndAddressSuggestions(searchCache[address]);
-      }
-    } else {
-      try {
-        const results = await provider.search({ query: address });
-        if (results.length > 0) {
-          // Store results in cache
-          searchCache[address] = results;
-          if (isStartPoint) {
-            setStartAddressSuggestions(results);
-          } else {
-            setEndAddressSuggestions(results);
-          }
-        }
-      } catch (error) {
-        if (error.message === 'Failed to fetch') {
-          toast.error('Network error: Failed to fetch');
-        }
-        else {
-          toast.error(`Unexpected error: ${error.message}`);
-        }
-      }
-    }
-  }, 500); // Debounce time (ms)
-  
-  const handleSuggestionClick = (suggestion, isStartPoint) => {
-    try {
-      const { x: lng, y: lat } = suggestion;
-      if (isStartPoint) {
-        setStartPoint({ lat, lng });
-        setStartAddress(suggestion.label);
-        // Update the start point in the receivedPoints array
-        setReceivedPoints(prevPoints => {
-          const newPoints = [...prevPoints];
-          newPoints[0] = { lat, lng };
-          return newPoints;
-        });
-      } else {
-        setEndPoint({ lat, lng });
-        setEndAddress(suggestion.label);
-        // Update the end point in the receivedPoints array
-        setReceivedPoints(prevPoints => {
-          const newPoints = [...prevPoints];
-          newPoints[newPoints.length - 1] = { lat, lng };
-          return newPoints;
-        });
-        handlePathSubmit();
-      }
-    }
-    catch (error) {
-      toast.error("error");
-    }
-  };*/
-
-    // update the form when a route is selected
-    useEffect(() => {
-      // if no route is selected, return
-      if (!selectedRoute) return;
-      // update the name of the route
-      setRouteName(selectedRoute.name);
-      // update the selected dates
-      setSelectedDates(selectedRoute.planning.dates);
-      // update the selected periodic times
-      setSelectedPeriodicTimes(selectedRoute.planning.periodic);
-    }, [selectedRoute, selectionUpdate]);
-
-
-    return (
-      <div>
-        <Toaster position="" reverseOrder={false}></Toaster>
-        <div className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
-
-
-            {/* Navigation Bar */}
-            <nav class="navbar d-flex justify-content-end p-2 float-end">
-                <Link class="border border-4 border-success rounded-3 mx-1 mt-2" to="/nvxtrajet">
-                    <Trajet style={{ width: '100px', height: '100px' }} alt='commencer'/>
-                </Link>
-                <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/chat">
-                    <Messagerie style={{ width: '100px', height: '100px' }} alt='commencer'/>
-                </Link>
-                <Link class="border border-2 border-dark rounded-3 mx-1 mt-2" to="/profile">
-                    <Profil style={{ width: '100px', height: '100px' }} alt='commencer'/>
-                </Link>
-            </nav>
-
-            <div class="p-4 mb-4">
-              <div>
-                <h1 class="fw-bold text-large">Covelotage</h1>
-                <h2 >Votre Communaute Cycliste</h2>
-              </div>
+          <div class="p-4 mb-4">
+            <div>
+              <h1 class="fw-bold text-large">Covelotage</h1>
+              <h2 >Votre Communaute Cycliste</h2>
             </div>
+          </div>
 
-
-
-            <div class="light-gray rounded-3 p-4 mx-auto my-3 mx-md-5 my-md-4" >
-                <div class="row">
-                  {/*<!-- Left Column: ListRoute -->*/}
-                  <div class="col-md-5">
-                    <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute} />
-                  </div>
-                  {/*<!-- Right Column: MatchList -->*/}
-                  <div class="col-md-7">
-                    {true && (
-                      <MatchList routes={matchingRoutes} handleFindMatches={handleFindMatches} onSelectMatchingRoute={handleSelecMatchingRoute} />
-                    )}
-                  </div>
-                  <div>
-                    <button class='event-button mt-2' id="findMatchesBtn" onClick={handleFindMatchesBtn} style={{display: routeSelected ? 'block' : 'none' }}>
-                      TROUVER UN COVELOTEUR !
+          <div class="light-gray rounded-3 p-4 mx-auto my-3 mx-md-5 my-md-4" >
+              <div class="row">
+                {/*<!-- Left Column: ListRoute -->*/}
+                <div class="col-md-5">
+                  <ListRoute refresh={refresh} onSelectRoute={handleSelectMyRoute} deleteRoute={handleDeleteRoute} />
+                </div>
+                {/*<!-- Right Column: MatchList -->*/}
+                <div class="col-md-7">
+                  {true && (
+                    <MatchList routes={matchingRoutes} onSelectMatchingRoute={handleSelecMatchingRoute} similarities={similarities}/>
+                  )}
+                </div>
+                <div>
+                  <button class='event-button mt-2' id="findMatchesBtn" onClick={handleFindMatchesBtn} style={{display: routeSelected ? 'block' : 'none' }}>
+                    TROUVER UN COVELOTEUR !
+                  </button>
+                </div>
+                <div>
+                  {selectedRoute && (
+                    <button class='event-button mt-2' id="findMatchesBtn" onClick={handleUpdateRoute1} style={{display: routeSelected ? 'block' : 'none' }}>
+                      Modifier le trajet
                     </button>
-                  </div>
-                  <div>
-                    {selectedRoute && (
-                      <button class='event-button mt-2' id="findMatchesBtn" onClick={handleUpdateRoute1} style={{display: routeSelected ? 'block' : 'none' }}>
-                        Modifier le trajet
-                      </button>
+                  )}
+                </div>
+              </div>
+
+              <div class="d-flex flex-column align-items-center">
+                <h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
+                <MapContainer
+                    center={[48.65, 6.15]}
+                    zoom={17}
+                    style={{
+                        border: '4px solid #414833',
+                        height: '50vw',
+                        width: '50vw',
+                        position: 'relative',
+                    }}
+                    >
+                      
+                    <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+
+                    { /** Starting point */
+                        startPoint && (
+                        <Marker
+                            position={[startPoint.lat, startPoint.lng]}
+                            //altitude={[startPoint.altitude, startPoint.altitude]}
+                            icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
+                            draggable={true}
+                            eventHandlers={{
+                            dragend: (event) => { handleDragEnd(event, true) }
+                            }}
+                        >          
+                        </Marker>
                     )}
-                  </div>
-                </div>
 
+                    { /** End point */
+                        endPoint && (
+                        <Marker
+                            position={[endPoint.lat, endPoint.lng]}
+                            icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
+                            draggable={true}
+                            eventHandlers={{
+                            dragend: (event) => { handleDragEnd(event, false) }
+                            }}
+                        >
+                        </Marker>
+                    )}
 
-                <div class="d-flex flex-column align-items-center">
-                  <h2 class='me-5 my-3' style = {{color: '#4F772D'}}>Carte</h2>
-                  <MapContainer
-                      center={[48.65, 6.15]}
-                      zoom={17}
-                      style={{
-                          border: '1px solid #ccc',
-                          height: '700px',
-                          width: '700px',
-                          margin: '10px',
-                          position: 'relative',
-                      }}
-                      >
-                        
-                        
-                      <TileLayer
-                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                          // attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      />
+                    {/** Matching routes */
+                    matchingRoutes.length > 0 &&
+                        matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
+                            (<Marker 
+                            key={index}
+                            position={point}
+                            icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
+                            >
+                            </Marker>)
+                        ))       
+                    }
+
+                    {/** Path */
+                    matchingRoutes.length > 0 && (
+                        <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
+                    )}
+
+                    {/** Path */
+                    receivedPoints && (
+                        <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
+                    )}
+                    
+                    {/** Dynamics points */
+                      receivedPoints.map((point, index) => (
+                      <Marker 
+                      key={index}
+                      position={point}
+                      icon={L.icon({ iconUrl: marker_dynamic, iconSize: [10, 10] })}
+                      // draggable only if not start or end point
+                      draggable={(index !== 0) && (index !== receivedPoints.length - 1)}
                       
+                      eventHandlers={{
+                          dragend: (event) => {
+                          // set the drag end event flag
+                          setIsDragEndEvent(true);
 
-                      { /** Starting point */
-                          startPoint && (
-                          <Marker
-                              position={[startPoint.lat, startPoint.lng]}
-                              //altitude={[startPoint.altitude, startPoint.altitude]}
-                              icon={L.icon({ iconUrl: marker_1, iconSize: [40, 40] })}
-                              draggable={true}
-                              eventHandlers={{
-                              dragend: (event) => { handleDragEnd(event, true) }
-                              }}
-                          >          
-                          </Marker>
-                      )}
+                          // reformat the event
+                          const modifiedPoint = {
+                              latlng: event.target._latlng,
+                              index: index,
+                          };
 
-                      { /** End point */
-                          endPoint && (
-                          <Marker
-                              position={[endPoint.lat, endPoint.lng]}
-                              icon={L.icon({ iconUrl: marker_2, iconSize: [40, 40] })}
-                              draggable={true}
-                              eventHandlers={{
-                              dragend: (event) => { handleDragEnd(event, false) }
-                              }}
-                          >
-                          </Marker>
-                      )}
+                          // retrieve the list of points previously moved manually
+                          const points = [...intermediatePoints];
+                                          
+                          // Check if the index already exists.
+                          const existingIndex = points.findIndex(
+                              (point) => point.index === index
+                          );
 
-                      {/** Matching routes */
-                      matchingRoutes.length > 0 &&
-                          matchingRoutes[macthingRouteSelectedId].route.map((point, index) => (
-                              (<Marker 
-                              key={index}
-                              position={point}
-                              icon={L.icon({ iconUrl: marker_dynamic_2, iconSize: [20, 20] })}
-                              >
-                              </Marker>)
-                          ))       
-                      }
+                          // update the temporary list
+                          if (existingIndex !== -1) {
+                              // update the existing point
+                              points[existingIndex] = modifiedPoint;
+                          } else {
+                              // add the new point
+                              points.push(modifiedPoint);
+                              // sort the list of points
+                              points.sort((a, b) => a.index - b.index);
+                          }
 
-                      {/** Path */
-                      matchingRoutes.length > 0 && (
-                          <Polyline color='green' positions={[matchingRoutes[macthingRouteSelectedId].route]} />
-                      )}
-
-                      {/** Path */
-                      receivedPoints && (
-                          <Polyline pathOptions={blueOptions} positions={[receivedPoints]} />
-                      )}
-                      
-                      {/** Dynamics points */
-                          receivedPoints.map((point, index) => (
-                          <Marker 
-                          key={index}
-                          position={point}
-                          icon={L.icon({ iconUrl: marker_dynamic, iconSize: [10, 10] })}
-                          // draggable only if not start or end point
-                          draggable={(index !== 0) && (index !== receivedPoints.length - 1)}
-                          
-                          eventHandlers={{
-                              dragend: (event) => {
-                              // set the drag end event flag
-                              setIsDragEndEvent(true);
-
-                              // reformat the event
-                              const modifiedPoint = {
-                                  latlng: event.target._latlng,
-                                  index: index,
-                              };
-
-                              // retrieve the list of points previously moved manually
-                              const points = [...intermediatePoints];
-                                              
-                              // Check if the index already exists.
-                              const existingIndex = points.findIndex(
-                                  (point) => point.index === index
-                              );
-
-                              // update the temporary list
-                              if (existingIndex !== -1) {
-                                  // update the existing point
-                                  points[existingIndex] = modifiedPoint;
-                              } else {
-                                  // add the new point
-                                  points.push(modifiedPoint);
-                                  // sort the list of points
-                                  points.sort((a, b) => a.index - b.index);
-                              }
-
-                              // update the list of intermediate points
-                              setIntermediatePoints(points);
-                              // enable the update of the path
-                              setShouldUpdatePath(true);                
-                              }
-                          }}
-                          >
-                          { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
-                          </Marker>
-                      ))}
-                      <MapClickHandler />
-                  </MapContainer>
-                </div>
-                
-            </div>
-        </div>
-        <Footer/>
+                          // update the list of intermediate points
+                          setIntermediatePoints(points);
+                          // enable the update of the path
+                          setShouldUpdatePath(true);                
+                          }
+                        }}
+                        >
+                        { false && (<Popup>Point dynamique {index + 1} // lat {point}</Popup>)}
+                        </Marker>
+                    ))}
+                    <MapClickHandler />
+                </MapContainer>
+              </div>
+              
+          </div>
       </div>
-  
-    );
-  }
+      <Footer/>
+    </div>
+  );
+}
   

@@ -1,8 +1,26 @@
+/**
+ * @fileOverview Retrieves relevant routes based on user planning details and conditions.
+ */
 
 import RouteModel from '../model/Route.model.js';
 
 const periodicDateRef = new Date(1970, 0, 1);
 
+/**
+ * Retrieves relevant routes based on user planning details and conditions.
+ *
+ * @async
+ * @function getRevelentsRoutes
+ * @param {Object} req - The request object containing user and planning details.
+ * @param {Object} req.user - The user object from the token.
+ * @param {string} req.user.username - The username of the current user.
+ * @param {Object} req.body - The request body containing planning details.
+ * @param {Object} req.body.planning - The planning details provided by the user.
+ * @param {Array<string>} req.body.planning.dates - Array of specific dates.
+ * @param {Array<Object>} req.body.planning.periodic - Array of periodic times with dayOfWeek and time.
+ * @returns {Promise<Array<Object>>} Resolves with an array of relevant route objects.
+ * @throws {Error} Rejects with an error if any occurs during database query execution.
+ */
 export async function getRevelentsRoutes(req) {
     try {
         // Get the username from the token
@@ -75,7 +93,7 @@ export async function getRevelentsRoutes(req) {
                 };
             });
         } else {
-            console.log("No date conditions");
+            console.error("No date conditions");
         }   
 
         /** Conditions for periodic times */
@@ -157,7 +175,7 @@ export async function getRevelentsRoutes(req) {
                 };
             });           
         } else {
-            console.log("No periodic conditions");
+            console.error("No periodic conditions");
         }
       
         

@@ -1,110 +1,183 @@
+/**
+ * @fileOverview This file contains utility functions for form validation in a React application, using the 
+ * react-hot-toast library for error notifications. These functions validate various aspects of user input, 
+ * including username, password, email, and reset password confirmation, across different forms like login, 
+ * registration, profile updates, and password reset. Each function provides comprehensive error handling and 
+ * ensures that user inputs meet specific criteria, enhancing the application's reliability and user experience.
+ */
+
 import toast from "react-hot-toast";
 import { authenticate } from "./userHelper";
 
-/** validate login page username */
+/**
+ * Validate the login page username.
+ *
+ * This function checks if the username exists and verifies its format.
+ *
+ * @async
+ * @function
+ * @param {Object} values - The form values containing the username.
+ * @returns {Promise<Object>} A Promise resolving to an errors object with validation messages.
+ */
 export async function usernameValidate(values) {
-
-    const errors = usernameVerify({}, values);
-    if (values.username) {
-        // check user existance
-        const { status } = await authenticate(values.username);
-        // 200 <=> the request was successful
-        if (status !== 200) {
-            errors.exist = toast.error('User does not exist');
-        }
+  const errors = usernameVerify({}, values);
+  if (values.username) {
+    const { status } = await authenticate(values.username);
+    if (status !== 200) {
+      errors.exist = toast.error(
+        "L'utilisateur n'a pas été trouvé, vérifiez le nom d'utilisateur"
+      );
     }
-    return errors;
+  }
+  return errors;
 }
 
-/** validate password page */
+/**
+ * Validate the password page.
+ *
+ * This function checks the validity of the password.
+ *
+ * @async
+ * @function
+ * @param {Object} values - The form values containing the password.
+ * @returns {Promise<Object>} A Promise resolving to an errors object with validation messages.
+ */
 export async function passwordValidate(values) {
-
-    const errors = passwordVerify({}, values);
-    return errors;
+  const errors = passwordVerify({}, values);
+  return errors;
 }
 
-/** validate reset form */
+/**
+ * Validate the reset form.
+ *
+ * This function validates the reset password form, including password confirmation.
+ *
+ * @async
+ * @function
+ * @param {Object} values - The form values for resetting the password.
+ * @returns {Promise<Object>} A Promise resolving to an errors object with validation messages.
+ */
 export async function resetPasswordValidate(values) {
-    
-    const errors = resetPasswordVerify({}, values);
-    return errors;
+  const errors = resetPasswordVerify({}, values);
+  return errors;
 }
 
-/** validate register page */
+/**
+ * Validate the register page.
+ *
+ * This function validates username, password, and email for the registration process.
+ *
+ * @async
+ * @function
+ * @param {Object} values - The form values for registration.
+ * @returns {Promise<Object>} A Promise resolving to an errors object with validation messages.
+ */
 export async function registerValidate(values) {
-
-    const errors = usernameVerify({}, values);
-    passwordVerify(errors, values);
-    emailVerify(errors, values);
-    return errors;
+  const errors = usernameVerify({}, values);
+  passwordVerify(errors, values);
+  emailVerify(errors, values);
+  return errors;
 }
 
-/** validate profile page */
+/**
+ * Validate the profile page.
+ *
+ * This function validates the email for the profile page.
+ *
+ * @async
+ * @function
+ * @param {Object} values - The form values for profile updates.
+ * @returns {Promise<Object>} A Promise resolving to an errors object with validation messages.
+ */
 export async function profileValidate(values) {
-
-    const errors = emailVerify({}, values);
-    return errors;
+  const errors = emailVerify({}, values);
+  return errors;
 }
 
-
-/** ************************************************************************************** */
-
-/** Validate reset password */
+/**
+ * Validate the reset password.
+ *
+ * This helper function checks if the password matches the confirmation password.
+ *
+ * @function
+ * @param {Object} errors - The errors object to update.
+ * @param {Object} values - The form values containing the password and confirmation password.
+ * @returns {Object} The updated errors object with validation messages.
+ */
 function resetPasswordVerify(errors = {}, values) {
-
-    if(values.password !== values.confirm_pwd){
-        errors.password = toast.error('Password not match...!');
-    }
-    // if (passwordVerify({}, values).password) {
-    //     errors.password = passwordVerify({}, values).password;
-    // }
-
-    return errors;
+  if (values.password !== values.confirm_pwd) {
+    errors.password = toast.error("Mauvais mot de passe...!");
+  }
+  return errors;
 }
 
-/** Verify password */
+/**
+ * Verify the password.
+ *
+ * This helper function validates the password format and strength.
+ *
+ * @function
+ * @param {Object} errors - The errors object to update.
+ * @param {Object} values - The form values containing the password.
+ * @returns {Object} The updated errors object with validation messages.
+ */
 function passwordVerify(errors = {}, values) {
+  const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
 
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-
-    if(!values.password){
-        errors.password = toast.error('Password required...!');
-    }
-    else if(values.password.includes(" ")) {
-        errors.password = toast.error('Wrong Password...!');
-    } 
-    else if(values.password.length < 4 ) {
-        errors.password = toast.error('Password must be more than 4 characters long');
-    } 
-    else if(!specialChars.test(values.password) ) {
-        errors.password = toast.error('Password must have special character');
-    }
-    return errors;
+  if (!values.password) {
+    errors.password = toast.error("Mot de passe requis...!");
+  } else if (values.password.includes(" ")) {
+    errors.password = toast.error("Mauvais mot de passe...!");
+  } else if (values.password.length < 8) {
+    errors.password = toast.error(
+      "Le mot de passe doit faire au moins 8 caractères"
+    );
+  } else if (!specialChars.test(values.password)) {
+    errors.password = toast.error(
+      "Le mot de passe doit contenir un caractère spécial"
+    );
+  }
+  return errors;
 }
 
-/** Verify username */
+/**
+ * Verify the username.
+ *
+ * This helper function validates the username format.
+ *
+ * @function
+ * @param {Object} errors - The errors object to update.
+ * @param {Object} values - The form values containing the username.
+ * @returns {Object} The updated errors object with validation messages.
+ */
 function usernameVerify(errors = {}, values) {
-
-    if(!values.username){
-        errors.username = toast.error('Usename required...!');
-    } 
-    else if(values.username.includes(" ")) {
-        errors.username = toast.error('Invalide Username...!');
-    }
-    return errors;
+  if (!values.username) {
+    errors.username = toast.error("Nom d'utilisateur requis...!");
+  } else if (values.username.includes(" ")) {
+    errors.username = toast.error("Nom d'utilisateur inconnu...!");
+  }
+  return errors;
 }
 
-/** Verify email */
+/**
+ * Verify the email.
+ *
+ * This helper function validates the email format.
+ *
+ * @function
+ * @param {Object} errors - The errors object to update.
+ * @param {Object} values - The form values containing the email.
+ * @returns {Object} The updated errors object with validation messages.
+ */
 function emailVerify(errors = {}, values) {
-
-    if(!values.email){
-        errors.email = toast.error('Email required...!');
-    } 
-    else if(values.email.includes(" ")) {
-        errors.email = toast.error('Wrong Email...!');
-    }
-    else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
-        errors.email = toast.error('Invalide email adress...!');
-    }
-    return errors;
+  if (!values.email) {
+    errors.email = toast.error("Email requis...!");
+  } else if (values.email.includes(" ")) {
+    errors.email = toast.error("Email non reconnu...!");
+  } else if (
+    !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+  ) {
+    errors.email = toast.error("Email invalide...!");
+  }
+  return errors;
 }
