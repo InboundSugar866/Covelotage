@@ -7,3 +7,6 @@ webApp/server/node_modules
 
 # production
 /build
+
+# local env
+.env
