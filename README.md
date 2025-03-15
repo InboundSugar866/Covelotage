@@ -59,7 +59,6 @@ mongod
 2. **Configure environment variables:**
 
 Create a ``.env`` file in the ``webApp/server`` directory and add the following environment variables:
-    ```bash
 
     PORT=8080
     MONGO_URI=mongodb://localhost:27017/covelotage
@@ -72,7 +71,6 @@ Create a ``.env`` file in the ``webApp/server`` directory and add the following 
 3. **Start the server:**
 
 Open a new terminal window and run the following commands:
-    ```bash
 
     cd webApp/server
     npm start
@@ -80,7 +78,6 @@ Open a new terminal window and run the following commands:
 4. **Start the client:**
 
 Open a new terminal window and run the following commands:
-    ```bash
 
     cd webApp/client
     npm start
@@ -90,7 +87,6 @@ The client application will be available at ``http://localhost:3000``.
 ## Project Structure
 
 The project is structured as follows:
-    ```tree
 
     covelotage/
     ├── webApp/
@@ -134,7 +130,7 @@ The application requires the following environment variables:
 
 ## Configuration
 
-1. **API confifiguration**
+1. **API configuration**
 The ``config.js`` file contains important configuration settings for the application.
 - ``JWT_SECRET``: This is a secret key used to sign and verify JSON Web Tokens (JWT). It should be a long, random string that is kept secret. You can generate a new secret key using a secure random string generator.
 - ``APIKey``: This is an API key for accessing the OpenRouteService API. You should obtain this key by signing up for an account with OpenRouteService and generating an API key.
