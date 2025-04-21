@@ -9,7 +9,7 @@ import Mailgen from 'mailgen';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const email = process.env.EMAIL;
+const senderemail = process.env.EMAIL;
 const password = process.env.PASSWORD;
 
 // NodeMailer configuration
@@ -19,7 +19,7 @@ let nodeConfig = {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: email, // generated ethereal user
+        user: senderemail, // generated ethereal user
         pass: password, // generated ethereal password
     }
 };
@@ -50,7 +50,7 @@ export async function sendMail(userEmail, subject, message) {
 
         // Configure the email details
         const email = {
-            from: email,
+            from: senderemail,
             to: userEmail,
             subject: subject,
             html: emailBody,
