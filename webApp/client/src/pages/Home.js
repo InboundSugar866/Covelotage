@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <body>
       <div class="d-flex flex-column min-vh-100">
-        <container class='flex-grow-1'>
+        <container class='flex-grow-1' style={{height: '70vh'}}>
           <div class="flex-grow-1 d-flex flex-column" className='backgroundImage' style={{backgroundImage: `url(${backgroundImage})`}}>
             <div style={{height: '75vh'}}>
 

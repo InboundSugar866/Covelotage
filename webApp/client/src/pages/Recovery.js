@@ -78,10 +78,10 @@ export default function Recovery() {
 // Html
   return (
 
-    <div>
+    <div className="d-flex flex-column min-vh-100">
       <Toaster position="top-center" reverseOrder={false}></Toaster>
       <div
-      class="container-fluid d-flex align-items-center justify-content-center position-relative"
+      class="container-fluid d-flex align-items-center justify-content-center position-relative flex-grow-1"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
@@ -89,8 +89,6 @@ export default function Recovery() {
         color: 'black',
         position: 'relative',
         backgroundRepeat: 'no-repeat',
-        flex: 1,
-        minHeight: '75vh',
       }}
       >
 

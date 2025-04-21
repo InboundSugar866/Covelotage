@@ -64,11 +64,11 @@ export default function Reset() {
   if (status && status !== 201) return <Navigate to={'/password'} replace={true} ></Navigate>;
 
   return (
-    <div>
+    <div className="d-flex flex-column min-vh-100">
       <Toaster position="top-center" reverseOrder={false}></Toaster>
 
       <div
-        class="container-fluid d-flex align-items-center justify-content-center"
+        class="container-fluid d-flex align-items-center justify-content-center flex-grow-1"
         style={{
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
@@ -76,8 +76,6 @@ export default function Reset() {
           color: 'black',
           position: 'relative',
           backgroundRepeat: 'no-repeat',
-          flex: 1,
-          minHeight: '75vh'
         }}
       >
     
