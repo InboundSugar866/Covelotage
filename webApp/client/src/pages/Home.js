@@ -56,15 +56,15 @@ export default function Home() {
                   <div >
                     <div class="d-flex justify-content-center gap-5">
                       <div class="fs-4 col-3 text-justify bg-white-50 rounded p-2">
-                        <h2>Trouvez un coveloteur</h2>
+                      <h2 class="text-center">Trouvez un coveloteur</h2>
                         <p class="fs-5 fw-light text-justify">Entrez les itinéraires que vous emprûntez quotidiennement sur le secteur du Grand Nancy, et contactez d’autres cyclistes avec un trajet similaire au votre.</p>
                       </div>
                       <div class="fs-4 col-3 text-justify bg-white-50 rounded p-2">
-                        <h2>Decouvrir des parcours</h2>
+                        <h2 class="text-center">Decouvrir des parcours</h2>
                         <p class="fs-5 fw-light">Explorez des itinéraires de vélo sûrs et populaires dans le Grand Nancy. Obtenez des informations sur des lieux de stationnement, les points d’eau, et plus encore.</p>
                       </div>
                       <div class="fs-4 col-3 text-justify bg-white-50 rounded p-2">
-                        <h2>Trouvez votre compagnon</h2>
+                        <h2 class="text-center">Partagez vos trajets a velo</h2>
                         <p class="fs-5 fw-light">Rejoignez une communauté cycliste dynamique. Interragissez avec d’autres utilisateurs, partagez des expériences et contribuez à un environnement urbain plus sûr.</p>
                       </div>
                     </div>
