@@ -31,6 +31,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "react-leaflet": "^5.0.0",
+    "react-refresh": "^0.17.0",
     "react-router": "^7.8.2",
     "react-router-dom": "^7.3.0",
     "react-scripts": "^5.0.1",
@@ -71,4 +72,5 @@
     "vite": "^6.2.2"
   }
 }
+
 
