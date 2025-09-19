@@ -9,7 +9,7 @@
     "@turf/turf": "^7.2.0",
     "@babel/runtime": "^7.26.10",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.11.0",
+    "axios": "^1.12.0",
     "bootstrap": "^5.3.3",
     "cross-spawn": "^7.0.6",
     "events": "^3.3.0",
@@ -67,4 +67,3 @@
     "@types/react-dom": "^18.2.7"
   }
 }
-
