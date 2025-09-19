@@ -379,10 +379,10 @@ const handleFindMatches = (formData) => {
   //const provider = new OpenStreetMapProvider();
   const provider = new OpenStreetMapProvider({
     params: {
-      'accept-language': 'fr', // render results in Dutch
-      countrycodes: 'fr', // limit search results to the Netherlands
+      'accept-language': 'fr', // render results in French
+      countrycodes: 'fr', // limit search results to France
       addressdetails: 1, // include additional address detail parts
-      limit: 10, // limit the number of results
+      limit: 5, // limit the number of results
     },
   });
 
