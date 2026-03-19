@@ -81,10 +81,10 @@ export default function Password() {
   }
 
   return (
-    <div>
+    <div className="d-flex flex-column min-vh-100">
       <Toaster position="" reverseOrder={false} />
       <div
-        className="container-fluid d-flex align-items-center justify-content-center"
+        className="container-fluid d-flex align-items-center justify-content-center flex-grow-1"
         style={{
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: 'cover',
@@ -92,8 +92,6 @@ export default function Password() {
           color: 'white',
           position: 'relative',
           backgroundRepeat: 'no-repeat',
-          flex: 1,
-          minHeight: '75vh',
         }}
       >
         <div

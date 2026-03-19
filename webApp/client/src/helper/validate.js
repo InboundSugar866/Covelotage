@@ -122,7 +122,7 @@ function resetPasswordVerify(errors = {}, values) {
  * @returns {Object} The updated errors object with validation messages.
  */
 function passwordVerify(errors = {}, values) {
-  const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  const specialChars = /[`!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/;
 
   if (!values.password) {
     errors.password = toast.error("Mot de passe requis...!");

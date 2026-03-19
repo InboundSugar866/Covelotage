@@ -17,6 +17,8 @@ import * as mapController from '../controllers/mapController.js'
 import * as routeController from '../controllers/routeController.js';
 import * as messageController from '../controllers/messageController.js'; // Import the message controller
 import Auth, {localVariables} from '../middleware/auth.js';
+import { ensureAdmin } from '../middleware/auth.js';
+import * as adminController from '../controllers/adminController.js';
 
 /** POST Methods for Users*/
 router.route('/register').post(controller.register); // register user
@@ -35,6 +37,12 @@ router.route('/send-message-notification').post(messageController.sendMessageNot
 router.route('/user/:username').get(controller.getUser); // user with username
 router.route('/verifyOTP').get(controller.verifyUser, controller.verifyOTP); // verify generated OTP
 router.route('/createResetSession').get(controller.createResetSession); // reset all the variables
+
+/** Admin routes (requires authenticated admin) */
+router.route('/admin/users').get(Auth, ensureAdmin, adminController.listUsers);
+router.route('/admin/users/:id').get(Auth, ensureAdmin, adminController.getUserById);
+router.route('/admin/users/:id').delete(Auth, ensureAdmin, adminController.deleteUser);
+router.route('/admin/routes').get(Auth, ensureAdmin, adminController.listRoutes);
 
 /** GET Methods for Routes */
 router.route('/getroutes').get(Auth, routeController.getRoutes); // get user routes

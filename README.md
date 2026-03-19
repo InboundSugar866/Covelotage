@@ -29,7 +29,7 @@ Before you begin, ensure you have the following installed on your machine:
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/your-username/covelotage.git
+    git clone https://github.com/InboundSugar866/Covelotage.git
     cd covelotage
     ```
 
@@ -132,7 +132,7 @@ The application requires the following environment variables:
 - ``JWT_SECRET``: The secret key for JWT authentication.
 - ``MAP_API_URI``: The base URL for the OpenRouteService API.
 - ``APIKey``: The API key for the OpenRouteService API.
-- ``CLIENT_URL``: The URL of the client application.
+- ``CLIENT_URL``: The URL of the client application, for example: www.covelotage.fr
 
 ## Configuration
 
@@ -181,10 +181,11 @@ To deploy the Covelotage application in a real environment, follow these steps:
 1. **Set up a production database:**
 
 Ensure you have a production MongoDB instance and update the ``MONGO_URI`` environment variable accordingly.
+Make sure to visit https://www.mongodb.com/cloud/atlas/register to have access to a cloud database or serve one locally on the server.
 
 2. **Configure environment variables:**
 
-Ensure all environment variables are set correctly for the production environment.
+Ensure all environment variables (.env) are set correctly for the production environment.
 
 3. **Build the client application:**
 
@@ -198,14 +199,75 @@ This will create a ``build`` directory with the production build of the client a
 4. **Serve the client application:**
 
 Use a static file server (e.g., Nginx, Apache) to serve the files in the ``build`` directory.
+For example in Nginx:
+```
+server {
+    listen 80;
+    server_name www.covelotage.fr;
+
+    # Redirect all HTTP requests to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name www.covelotage.frc;
+
+    # SSL configuration
+    ssl_certificate /etc/letsencrypt/live/covelotage.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/covelotage.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Serve React frontend
+    root /var/www/covelotage/client/build;
+    index index.html;
+
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # Proxy API requests to Node.js backend running from /server/server.js
+    location /api/ {
+        proxy_pass http://localhost:8080/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # WebSocket support for /socket.io
+    location /socket.io/ {
+        proxy_pass http://localhost:8080/socket.io/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
+}
+
+```
 
 5. **Start the server:**
 
 Ensure the server is running with the correct environment variables.
+Install Certbot and configure SSL on a linux server:
+```
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d www.covelotage.fr
+```
 
 6. **Configure WebSocket server:**
 
 Ensure the WebSocket server is configured correctly and running.
+Ensure WebSocket initialization is handled in server.js and uses wss:// protocol when HTTPS is enabled.
 
 ## API Endpoints
 

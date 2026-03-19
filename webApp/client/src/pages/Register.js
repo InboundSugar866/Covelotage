@@ -118,7 +118,7 @@ export default function Register() {
               <label htmlFor="profile" class="form-label">
                 <img src={file || avatar} class="img-fluid rounded-circle" alt="avatar" style={{ width: '200px' }} />
               </label>
-              <input onChange={onUpload} type="file" id="profile" name="profile" class="form-control" />
+              <input onChange={onUpload} type="file" id="profile" name="profile" class="form-control" required/>
             </div>
             <div class="mb-2">
               <input {...formik.getFieldProps('name')} type="text" class="form-control" placeholder="Prénom" required />

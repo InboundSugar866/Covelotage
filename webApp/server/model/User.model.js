@@ -59,6 +59,13 @@ export const UserSchema = new mongoose.Schema({
         required : [false, "Date created"],
         unique: false
     },
+    // Admin flag to grant access to administrative endpoints/UI
+    isAdmin: {
+        type: Boolean,
+        default: false,
+        required: false
+    },
+    // duplicate/legacy fields kept for backwards compatibility
     name : { type: String},
     surname : { type: String},
     phone : { type : String},

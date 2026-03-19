@@ -130,7 +130,7 @@ export async function register(req, res) {
                         user.save()
                             .then(async result => {
                                 // Sign the JWT token with the user id and username
-                                jwt.sign({userId: result._id, username}, jwtSecret, { expiresIn: '20s' }, (err, token) => {
+                                jwt.sign({userId: result._id, username, isAdmin: result.isAdmin}, jwtSecret, { expiresIn: '20s' }, (err, token) => {
                                   if (err) throw err;
                                   // Set the token in the cookie
                                   res.cookie('token', token, {sameSite:'none', secure:true}); // secure:true pour https only
@@ -145,11 +145,15 @@ export async function register(req, res) {
                                   }
                                   // Create the email subject
                                   const subject = "Confirmation d'inscription";
-                                  // Send the email to the user
-                                  await sendMail(email, subject, message)
-                                  // Send the response to the client with a success message
-                                  res.status(201).send({ msg : "Utilisateur enregistré"});
-                                
+                                    // Send the email to the user (don't fail registration if email fails)
+                                    try {
+                                        await sendMail(email, subject, message);
+                                    } catch (mailErr) {
+                                        console.error('Registration email failed:', mailErr);
+                                    }
+                                    // Send the response to the client with a success message
+                                    res.status(201).send({ msg : "Utilisateur enregistré"});
+
                               })
                               .catch(error => res.status(500).send({error}))
         
@@ -212,7 +216,8 @@ export async function login(req, res) {
                         // create jwt token
                         const token = jwt.sign({
                             userId : user._id,
-                            username : user.username
+                            username : user.username,
+                            isAdmin: user.isAdmin || false
                         }, jwtSecret, {expiresIn : "24h"});
 
                         // set token in a cookie

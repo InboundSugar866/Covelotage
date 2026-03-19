@@ -293,7 +293,15 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
                 {showStartSuggestions && (
                   <div class="suggestions-list position-absolute w-100">
                     {startAddressSuggestions.map((suggestion, index) => (
-                      <div key={index} onClick={() => handleSuggestionClick(suggestion, true)}>
+                      <div
+                        key={index}
+                        style={suggestion.label === 'Pas de résultats trouvés' ? { cursor: 'not-allowed', color: '#888' } : { cursor: 'pointer' }}
+                        onClick={() => {
+                          if (suggestion.label !== 'Pas de résultats trouvés') {
+                            handleSuggestionClick(suggestion, true);
+                          }
+                        }}
+                      >
                         {suggestion.label}
                       </div>
                     ))}
@@ -330,7 +338,15 @@ export const CreateRoute = ({ createRoute, selectedRoute, selectionUpdate, updat
                 {showEndSuggestions && (
                   <div className="suggestions-list position-absolute w-50">
                     {endAddressSuggestions.map((suggestion, index) => (
-                      <div key={index} onClick={() => handleSuggestionClick(suggestion, false)}>
+                      <div
+                        key={index}
+                        style={suggestion.label === 'Pas de résultats trouvés' ? { cursor: 'not-allowed', color: '#888' } : { cursor: 'pointer' }}
+                        onClick={() => {
+                          if (suggestion.label !== 'Pas de résultats trouvés') {
+                            handleSuggestionClick(suggestion, false);
+                          }
+                        }}
+                      >
                         {suggestion.label}
                       </div>
                     ))}

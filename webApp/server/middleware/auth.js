@@ -47,3 +47,22 @@ export function localVariables(req, res, next){
     }
     next()
 }
+
+/**
+ * Middleware to ensure the current user is an admin.
+ */
+export async function ensureAdmin(req, res, next) {
+    try {
+        // req.user should already be set by Auth middleware
+        if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+        // If token payload contains isAdmin flag, accept; otherwise reject
+        if (req.user.isAdmin) return next();
+        // Try to decode token again to read full payload if required
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded && decoded.isAdmin) return next();
+        return res.status(403).json({ error: 'Forbidden: admin only' });
+    } catch (err) {
+        return res.status(403).json({ error: 'Forbidden: admin only' });
+    }
+}

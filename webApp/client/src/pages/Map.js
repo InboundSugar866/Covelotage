@@ -379,10 +379,10 @@ const handleFindMatches = (formData) => {
   //const provider = new OpenStreetMapProvider();
   const provider = new OpenStreetMapProvider({
     params: {
-      'accept-language': 'fr', // render results in Dutch
-      countrycodes: 'fr', // limit search results to the Netherlands
+      'accept-language': 'fr', // render results in French
+      countrycodes: 'fr', // limit search results to France
       addressdetails: 1, // include additional address detail parts
-      limit: 10, // limit the number of results
+      limit: 5, // limit the number of results
     },
   });
 
@@ -395,6 +395,16 @@ const handleFindMatches = (formData) => {
    * @param {boolean} isStartPoint Indicates if the search is for the starting point.
    */
   const handleSearch = _.debounce(async (address, isStartPoint) => {
+    // Don't search for empty or very short addresses
+    if (!address || address.length < 3) {
+      if (isStartPoint) {
+        setStartAddressSuggestions([]);
+      } else {
+        setEndAddressSuggestions([]);
+      }
+      return;
+    }
+
     if (searchCache[address]) {
       if (isStartPoint) {
         setStartAddressSuggestions(searchCache[address]);
@@ -407,7 +417,7 @@ const handleFindMatches = (formData) => {
         if (results.length > 0) {
           const formattedResults = results.map(result => {
             const parts = result.label.split(', ');
-            const formattedLabel = parts.slice(0, 3).join(', '); // Customize this line to show only the first three parts
+            const formattedLabel = parts.slice(0, 3).join(', ');
             return {
               label: formattedLabel,
               x: result.x,
@@ -428,10 +438,11 @@ const handleFindMatches = (formData) => {
           }
         }
       } catch (error) {
-        toast.error(`Erreur : ${error.message}`);
+        toast.dismiss(); // Dismiss previous toasts
+        toast.error(`Recherche de l'adresse en cours...`); // Debounce network error...
       }
     }
-  }, 500);
+  }, 1000);
 
   /**
    * Handles user click on address suggestions to set markers.

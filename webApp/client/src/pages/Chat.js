@@ -381,7 +381,7 @@ export default function Chat() {
 
               {/* Search bar */}
               {!!selectedUserId && (
-              <form class="d-flex gap-2" onSubmit={sendMessage}>
+              <form class="d-flex gap-2" onSubmit={sendMessage} style={{ zIndex: 10 }}>
                 <input type="text"
                       value={newMessageText}
                       onChange={ev => setNewMessageText(ev.target.value)}

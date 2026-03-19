@@ -5,63 +5,68 @@
 
 import nodemailer from 'nodemailer';
 import Mailgen from 'mailgen';
-//import ENV from '../config.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const email = process.env.EMAIL;
+const senderemail = process.env.EMAIL || 'no-reply@covelotage.local';
 const password = process.env.PASSWORD;
-
-// NodeMailer configuration
-// https://ethereal.email/create
-let nodeConfig = {
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: email, // generated ethereal user
-        pass: password, // generated ethereal password
-    }
-};
-
-/** Create a transporter for sending emails */
-let transporter = nodemailer.createTransport(nodeConfig);
 
 /** Create a mail generator for generating email content */
 let MailGenerator = new Mailgen({
-    theme: "default",
+    theme: 'default',
     product: {
-        name: "Mailgen",
+        name: 'Mailgen',
         link: 'https://mailgen.js/',
     },
 });
 
 /**
- * Sends an email to the specified user.
- * @param {string} userEmail - The recipient's email address.
- * @param {string} subject - The subject of the email.
- * @param {Object} message - The message content to be included in the email body.
- * @returns {Promise<void>} A promise indicating the success or failure of the email sending process.
+ * Sends an email to the specified user. If SMTP credentials are not configured, this
+ * function will create a disposable Ethereal account (for development) and use it.
+ * It will return the nodemailer info and, when using Ethereal, log a preview URL.
  */
 export async function sendMail(userEmail, subject, message) {
     try {
-        // Generate the email body using Mailgen
+        // Generate HTML body
         const emailBody = MailGenerator.generate(message);
 
-        // Configure the email details
+        // Build transporter config depending on env
+        let transporter;
+
+            if (senderemail && password) {
+            // Use configured SMTP server
+            transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+                port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 587,
+                secure: process.env.SMTP_SECURE === 'true' || false,
+                auth: { user: senderemail, pass: password },
+            });
+        } else {
+                // No SMTP credentials provided: create a lightweight JSON transport for local development.
+                // This avoids external dependencies but keeps template rendering intact. When real
+                // SMTP credentials are provided in the .env (EMAIL/PASSWORD and optionally SMTP_HOST/PORT),
+                // the same code will use them automatically.
+                transporter = nodemailer.createTransport({ jsonTransport: true });
+                console.log('No SMTP credentials provided — using JSON transport (development). Set EMAIL and PASSWORD in .env for real SMTP.');
+        }
+
         const email = {
-            from: email,
+            from: senderemail || 'no-reply@example.com',
             to: userEmail,
-            subject: subject,
+            subject,
             html: emailBody,
         };
 
-        // Send the email using the transporter
-        await transporter.sendMail(email);
-        console.log("Email sent");
-        return Promise.resolve();
+        const info = await transporter.sendMail(email);
+
+        // If using Ethereal or a test account, nodemailer.getTestMessageUrl(info) returns a preview URL.
+        const previewUrl = nodemailer.getTestMessageUrl ? nodemailer.getTestMessageUrl(info) : null;
+        if (previewUrl) console.log('Preview URL: %s', previewUrl);
+
+        console.log('Email sent: %s', info.messageId || '(no messageId)');
+        return Promise.resolve(info);
     } catch (error) {
-        console.error(error);
+        console.error('sendMail error:', error);
         return Promise.reject(error);
     }
 }

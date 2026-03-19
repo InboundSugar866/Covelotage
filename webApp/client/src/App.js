@@ -22,6 +22,7 @@ import Home from './pages/Home';
 import Chat from './pages/Chat';
 import Mentions from './pages/Mentions';
 import NvxTrajet from './pages/NvxTrajet';
+import Admin from './pages/Admin';
 import {UserContextProvider} from "./pages/UserContext";
 
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
   {
     path : '/map',
     element : <UserContextProvider><AuthorizeUser> <Map/> </AuthorizeUser></UserContextProvider>
+  },
+  {
+    path : '/admin',
+    element : <UserContextProvider><AuthorizeUser> <Admin/> </AuthorizeUser></UserContextProvider>
   },
   {
     path : '/PageNotFound',
