@@ -63,9 +63,12 @@ Create a ``.env`` file in the ``webApp/server`` directory and add the following 
     PORT= 8080
     JWT_SECRET=YOUR_KEY
     APIKey=YOUR_KEY
-    // testing email and password
+    // testing email and password for the SMTP server
     EMAIL=Example@email.com
     PASSWORD=Email_password
+    SMTP_HOST=smtp.yourprovider.com // optional
+    SMTP_PORT=587 // optional
+    SMTP_SECURE=false // optional; true for 465
     MONGODB_URI=mongodb://localhost:27017/covelotage
     MAP_API_URI=https://api.openrouteservice.org
     CLIENT_URL=https://your-production-domain.com
@@ -282,6 +285,13 @@ The server exposes the following API endpoints:
 ## WebSocket Configuration
 
 The application uses WebSocket for real-time communication. The WebSocket server is set up in the ``server.js`` file and handles connections, messages, and notifications.
+
+## Administration
+
+In order to access the API endpoint of the admin page, the user needs to be connected and an admin. In order to make an admin user, create a normal user and open the database in MongoDB Compass, then set the ``isadmin`` to ``true``.
+
+When connected, simply access ``http://localhost:3000/admin`` to view the page. 
+- ``GET /admin``: Opens the admin dashboard in order to view and delete items in the database.
 
 ## License
 
