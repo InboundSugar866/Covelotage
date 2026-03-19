@@ -5,6 +5,9 @@
 webApp/client/node_modules
 webApp/server/node_modules
 
+webApp/client/package-lock.json
+webApp/server/package-lock.json
+
 # production
 /build
 
