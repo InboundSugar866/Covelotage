@@ -13,6 +13,7 @@ The entire documentation for all the functions is available in the ``Documentati
 - [Deployment](#deployment)
 - [API Endpoints](#api-endpoints)
 - [WebSocket Configuration](#websocket-configuration)
+- [Administration](#Administration)
 - [License](#license)
 
 ## Prerequisites
